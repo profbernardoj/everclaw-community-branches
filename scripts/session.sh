@@ -63,7 +63,7 @@ resolve_model() {
 # Open a session
 cmd_open() {
   local model_name="${1:?Usage: session.sh open <model_name> [duration_seconds]}"
-  local duration="${2:-3600}"
+  local duration="${2:-604800}"  # default: 7 days
 
   get_auth
   local model_id
@@ -146,6 +146,7 @@ case "$ACTION" in
     done
     echo ""
     echo "Examples:"
+    echo "  session.sh open kimi-k2.5 604800       # 7 day session (default)"
     echo "  session.sh open kimi-k2.5:web 3600    # 1 hour session"
     echo "  session.sh open kimi-k2.5 86400       # 1 day session"
     echo "  session.sh close 0xABC123...          # Close by session ID"
