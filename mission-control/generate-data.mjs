@@ -345,6 +345,24 @@ function main() {
 
   fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
   fs.writeFileSync(OUTPUT, JSON.stringify(data, null, 2));
+
+  // Also inject data directly into index.html so it works from file:// protocol
+  const htmlPath = path.join(path.dirname(OUTPUT), "index.html");
+  try {
+    let html = fs.readFileSync(htmlPath, "utf-8");
+    const dataScript = `<script id="embedded-data">window.__DASHBOARD_DATA__ = ${JSON.stringify(data)};</script>`;
+    // Replace existing embedded data or insert before closing </head>
+    if (html.includes('<script id="embedded-data">')) {
+      html = html.replace(/<script id="embedded-data">[\s\S]*?<\/script>/, dataScript);
+    } else {
+      html = html.replace('</head>', dataScript + '\n</head>');
+    }
+    fs.writeFileSync(htmlPath, html);
+    console.log(`✅ Dashboard data embedded into index.html`);
+  } catch (e) {
+    console.error(`⚠️  Could not embed data into index.html: ${e.message}`);
+  }
+
   console.log(`✅ Dashboard data written to ${OUTPUT}`);
   console.log(`   Activities: ${data.stats.totalActivities}`);
   console.log(`   Life Goals: ${lifeGoals.length}`);
