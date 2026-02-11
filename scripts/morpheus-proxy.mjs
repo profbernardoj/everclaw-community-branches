@@ -119,88 +119,203 @@ function resolveModelId(modelName) {
 
 // --- Request handler ---
 
+// --- OpenAI-compatible error helper ---
+// Returns errors in the exact format OpenAI uses so OpenClaw's failover
+// engine classifies them correctly (server_error, not billing).
+function oaiError(res, status, message, type = "server_error", code = null) {
+  res.writeHead(status, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({
+    error: {
+      message,
+      type,        // "server_error" | "invalid_request_error" | "rate_limit_error"
+      code: code,  // null or string like "model_not_found"
+      param: null,
+    }
+  }));
+}
+
+// --- Forward a single inference attempt ---
+function forwardToRouter(body, sessionId, modelId, isStreaming, timeoutMs = 180000) {
+  return new Promise((resolve, reject) => {
+    const upstreamUrl = new URL("/v1/chat/completions", ROUTER_URL);
+    const upstreamHeaders = {
+      "Authorization": getBasicAuth(),
+      "Content-Type": "application/json",
+      "session_id": sessionId,
+      "model_id": modelId,
+    };
+
+    const upstreamReq = http.request(upstreamUrl, {
+      method: "POST",
+      headers: upstreamHeaders,
+      timeout: timeoutMs,
+    }, (upstreamRes) => {
+      // Collect full response to inspect for errors before piping
+      if (isStreaming && upstreamRes.headers["content-type"]?.includes("text/event-stream")) {
+        // For streaming, resolve immediately with the response to pipe through
+        resolve({ status: upstreamRes.statusCode, stream: upstreamRes, headers: upstreamRes.headers });
+      } else {
+        const chunks = [];
+        upstreamRes.on("data", (c) => chunks.push(c));
+        upstreamRes.on("end", () => {
+          resolve({ status: upstreamRes.statusCode, body: Buffer.concat(chunks), headers: upstreamRes.headers });
+        });
+        upstreamRes.on("error", (e) => reject(e));
+      }
+    });
+
+    upstreamReq.on("error", (e) => reject(new Error(`upstream_connect: ${e.message}`)));
+    upstreamReq.on("timeout", () => {
+      upstreamReq.destroy();
+      reject(new Error("upstream_timeout"));
+    });
+
+    upstreamReq.write(body);
+    upstreamReq.end();
+  });
+}
+
+// Check if an error response from the router indicates an invalid/expired session
+function isSessionError(status, bodyStr) {
+  if (status >= 400 && status < 500) {
+    const lower = bodyStr.toLowerCase();
+    return lower.includes("session") && (lower.includes("not found") || lower.includes("expired") || lower.includes("invalid") || lower.includes("closed"));
+  }
+  return false;
+}
+
 async function handleChatCompletions(req, res, body) {
   let parsed;
   try {
     parsed = JSON.parse(body);
   } catch (e) {
-    res.writeHead(400, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: { message: "Invalid JSON body" } }));
-    return;
+    return oaiError(res, 400, "Invalid JSON body", "invalid_request_error");
   }
 
   const requestedModel = parsed.model || "kimi-k2.5";
   const modelId = resolveModelId(requestedModel);
   if (!modelId) {
-    res.writeHead(400, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({
-      error: { message: `Unknown model: ${requestedModel}. Available: ${Object.keys(MODEL_MAP).join(", ")}` }
-    }));
-    return;
+    return oaiError(res, 400,
+      `Unknown model: ${requestedModel}. Available: ${Object.keys(MODEL_MAP).join(", ")}`,
+      "invalid_request_error", "model_not_found");
   }
 
+  // --- Attempt 1: use existing/new session ---
   let sessionId;
   try {
     sessionId = await getOrCreateSession(modelId);
   } catch (e) {
-    console.error(`[morpheus-proxy] Session error: ${e.message}`);
-    res.writeHead(502, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: { message: `Failed to open Morpheus session: ${e.message}` } }));
-    return;
+    console.error(`[morpheus-proxy] Session open error: ${e.message}`);
+    // This is a Morpheus infrastructure error, NOT a billing error
+    return oaiError(res, 502, `Morpheus session unavailable: ${e.message}`, "server_error", "morpheus_session_error");
   }
 
-  // Forward to Morpheus router
   const isStreaming = parsed.stream === true;
+  let attempt1Error = null;
 
-  const upstreamUrl = new URL("/v1/chat/completions", ROUTER_URL);
-  const upstreamHeaders = {
-    "Authorization": getBasicAuth(),
-    "Content-Type": "application/json",
-    "session_id": sessionId,
-    "model_id": modelId,
-  };
+  try {
+    const result = await forwardToRouter(body, sessionId, modelId, isStreaming);
 
-  const upstreamReq = http.request(upstreamUrl, {
-    method: "POST",
-    headers: upstreamHeaders,
-    timeout: 120000, // 2 min timeout for P2P inference
-  }, (upstreamRes) => {
-    // Pass through status and headers
-    const outHeaders = { "Content-Type": upstreamRes.headers["content-type"] || "application/json" };
-    if (isStreaming && upstreamRes.headers["content-type"]?.includes("text/event-stream")) {
-      outHeaders["Content-Type"] = "text/event-stream";
-      outHeaders["Cache-Control"] = "no-cache";
-      outHeaders["Connection"] = "keep-alive";
+    // --- Streaming response ---
+    if (result.stream) {
+      const outHeaders = {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      };
+      res.writeHead(result.status, outHeaders);
+      result.stream.on("data", (chunk) => res.write(chunk));
+      result.stream.on("end", () => res.end());
+      result.stream.on("error", (e) => {
+        console.error(`[morpheus-proxy] Stream error: ${e.message}`);
+        res.end();
+      });
+      return;
     }
-    res.writeHead(upstreamRes.statusCode, outHeaders);
 
-    upstreamRes.on("data", (chunk) => res.write(chunk));
-    upstreamRes.on("end", () => res.end());
-    upstreamRes.on("error", (e) => {
-      console.error(`[morpheus-proxy] Upstream response error: ${e.message}`);
-      res.end();
-    });
-  });
+    // --- Non-streaming response ---
+    const bodyStr = result.body.toString();
 
-  upstreamReq.on("error", (e) => {
-    console.error(`[morpheus-proxy] Upstream request error: ${e.message}`);
-    if (!res.headersSent) {
-      res.writeHead(502, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: { message: `Morpheus upstream error: ${e.message}` } }));
+    // If router returned success, pass through
+    if (result.status >= 200 && result.status < 300) {
+      res.writeHead(result.status, { "Content-Type": result.headers["content-type"] || "application/json" });
+      res.end(result.body);
+      return;
     }
-  });
 
-  upstreamReq.on("timeout", () => {
-    console.error(`[morpheus-proxy] Upstream request timed out`);
-    upstreamReq.destroy();
-    if (!res.headersSent) {
-      res.writeHead(504, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: { message: "Morpheus inference timed out" } }));
+    // If it's a session error, we can retry with a fresh session
+    if (isSessionError(result.status, bodyStr)) {
+      console.log(`[morpheus-proxy] Session error detected (${result.status}), will retry with new session`);
+      sessions.delete(modelId); // invalidate cached session
+      attempt1Error = `session_invalid (${result.status})`;
+      // Fall through to retry below
+    } else {
+      // Non-session upstream error — return as server_error (not billing!)
+      console.error(`[morpheus-proxy] Router error (${result.status}): ${bodyStr.substring(0, 200)}`);
+      return oaiError(res, result.status >= 500 ? 502 : result.status,
+        `Morpheus inference error: ${bodyStr.substring(0, 500)}`,
+        "server_error", "morpheus_inference_error");
     }
-  });
+  } catch (e) {
+    if (e.message === "upstream_timeout") {
+      console.error(`[morpheus-proxy] Upstream timed out on attempt 1`);
+      return oaiError(res, 504, "Morpheus inference timed out", "server_error", "timeout");
+    }
+    // Connection error — might be transient, try to invalidate session and retry
+    console.error(`[morpheus-proxy] Attempt 1 failed: ${e.message}`);
+    sessions.delete(modelId);
+    attempt1Error = e.message;
+  }
 
-  upstreamReq.write(body);
-  upstreamReq.end();
+  // --- Attempt 2: open a fresh session and retry once ---
+  if (attempt1Error) {
+    console.log(`[morpheus-proxy] Retrying with fresh session (attempt 1 failed: ${attempt1Error})`);
+    let newSessionId;
+    try {
+      newSessionId = await openSession(modelId);
+    } catch (e) {
+      console.error(`[morpheus-proxy] Session re-open failed: ${e.message}`);
+      return oaiError(res, 502, `Morpheus session unavailable after retry: ${e.message}`, "server_error", "morpheus_session_error");
+    }
+
+    try {
+      const result = await forwardToRouter(body, newSessionId, modelId, isStreaming);
+
+      if (result.stream) {
+        const outHeaders = {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        };
+        res.writeHead(result.status, outHeaders);
+        result.stream.on("data", (chunk) => res.write(chunk));
+        result.stream.on("end", () => res.end());
+        result.stream.on("error", (e) => {
+          console.error(`[morpheus-proxy] Stream error (retry): ${e.message}`);
+          res.end();
+        });
+        return;
+      }
+
+      const bodyStr = result.body.toString();
+      if (result.status >= 200 && result.status < 300) {
+        res.writeHead(result.status, { "Content-Type": result.headers["content-type"] || "application/json" });
+        res.end(result.body);
+        return;
+      }
+
+      console.error(`[morpheus-proxy] Retry also failed (${result.status}): ${bodyStr.substring(0, 200)}`);
+      return oaiError(res, 502,
+        `Morpheus inference failed after retry: ${bodyStr.substring(0, 500)}`,
+        "server_error", "morpheus_inference_error");
+    } catch (e) {
+      if (e.message === "upstream_timeout") {
+        return oaiError(res, 504, "Morpheus inference timed out (retry)", "server_error", "timeout");
+      }
+      console.error(`[morpheus-proxy] Retry failed: ${e.message}`);
+      return oaiError(res, 502, `Morpheus upstream error after retry: ${e.message}`, "server_error", "morpheus_upstream_error");
+    }
+  }
 }
 
 function handleModels(req, res) {

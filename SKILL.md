@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.4.0
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 10+ models, and maintain persistent inference by recycling staked MOR. Includes OpenAI-compatible proxy with auto-session management, Gateway Guardian watchdog, bundled security skills, and zero-dependency wallet management via macOS Keychain.
+version: 0.5.0
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 10+ models, and maintain persistent inference by recycling staked MOR. Includes OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian watchdog, bundled security skills, and zero-dependency wallet management via macOS Keychain.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -569,6 +569,79 @@ curl http://127.0.0.1:8083/v1/chat/completions \
 - Provider connection resets are transient — retries usually succeed
 - The proxy itself runs as a KeepAlive launchd service — auto-restarts if it crashes
 
+### Proxy Resilience (v0.5)
+
+v0.5 adds three critical improvements to the proxy that prevent prolonged outages caused by **cooldown cascades** — where both primary and fallback providers become unavailable simultaneously.
+
+#### Problem: Cooldown Cascades
+
+When a primary provider (e.g., Venice) returns a billing error, OpenClaw's failover engine marks that provider as "in cooldown." If the Morpheus proxy also returns errors that OpenClaw misclassifies as billing errors, **both providers enter cooldown** and the agent goes completely offline — sometimes for 6+ hours.
+
+#### Fix 1: OpenAI-Compatible Error Classification
+
+The proxy now returns errors in the exact format OpenAI uses, with proper `type` and `code` fields:
+
+```json
+{
+  "error": {
+    "message": "Morpheus session unavailable: ...",
+    "type": "server_error",
+    "code": "morpheus_session_error",
+    "param": null
+  }
+}
+```
+
+**Key distinction:** All Morpheus infrastructure errors are typed as `"server_error"` — never `"billing"` or `"rate_limit_error"`. This ensures OpenClaw treats them as transient failures and retries appropriately, instead of putting the provider into extended cooldown.
+
+Error codes returned by the proxy:
+
+| Code | Meaning |
+|------|---------|
+| `morpheus_session_error` | Failed to open or refresh a blockchain session |
+| `morpheus_inference_error` | Provider returned an error during inference |
+| `morpheus_upstream_error` | Connection error to the proxy-router |
+| `timeout` | Inference request exceeded the time limit |
+| `model_not_found` | Requested model not in MODEL_MAP |
+
+#### Fix 2: Automatic Session Retry
+
+When the proxy-router returns a session-related error (expired, invalid, not found, closed), the proxy now:
+
+1. **Invalidates** the cached session
+2. **Opens a fresh** blockchain session
+3. **Retries** the inference request once
+
+This handles the common case where the proxy-router restarts and loses its in-memory session state, or when a long-running session expires mid-request.
+
+#### Fix 3: Multi-Tier Fallback Chain
+
+Configure OpenClaw with multiple fallback models across providers:
+
+```json5
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "venice/claude-opus-4-6",
+        "fallbacks": [
+          "venice/claude-opus-45",    // Try different Venice model first
+          "venice/kimi-k2-5",         // Try yet another Venice model
+          "morpheus/kimi-k2.5"        // Last resort: decentralized inference
+        ]
+      }
+    }
+  }
+}
+```
+
+This way, if the primary model has billing issues, OpenClaw tries other models on the same provider (which may have separate rate limits) before falling back to Morpheus. The cascade is:
+
+1. **venice/claude-opus-4-6** (primary) → billing error
+2. **venice/claude-opus-45** (fallback 1) → tries a different model on Venice
+3. **venice/kimi-k2-5** (fallback 2) → tries open-source model on Venice
+4. **morpheus/kimi-k2.5** (fallback 3) → decentralized inference, always available if MOR is staked
+
 ---
 
 ## 13. OpenClaw Integration (v0.2)
@@ -624,15 +697,23 @@ Add to your `openclaw.json` via config patch or manual edit:
 
 ### Step 2: Set as Fallback
 
+Configure a multi-tier fallback chain (recommended since v0.5):
+
 ```json5
 {
   "agents": {
     "defaults": {
       "model": {
         "primary": "venice/claude-opus-4-6",
-        "fallbacks": ["morpheus/kimi-k2.5"]
+        "fallbacks": [
+          "venice/claude-opus-45",   // Different model, same provider
+          "venice/kimi-k2-5",        // Open-source model, same provider
+          "morpheus/kimi-k2.5"       // Decentralized fallback
+        ]
       },
       "models": {
+        "venice/claude-opus-45": { "alias": "Claude Opus 4.5" },
+        "venice/kimi-k2-5": { "alias": "Kimi K2.5" },
         "morpheus/kimi-k2.5": { "alias": "Kimi K2.5 (Morpheus)" },
         "morpheus/kimi-k2-thinking": { "alias": "Kimi K2 Thinking (Morpheus)" },
         "morpheus/glm-4.7-flash": { "alias": "GLM 4.7 Flash (Morpheus)" }
@@ -641,6 +722,8 @@ Add to your `openclaw.json` via config patch or manual edit:
   }
 }
 ```
+
+⚠️ **Why multi-tier?** A single fallback creates a single point of failure. If both the primary provider and the single fallback enter cooldown simultaneously (e.g., billing error triggers cooldown on both), your agent goes offline. Multiple fallback tiers across different models and providers ensure at least one path remains available.
 
 ### Step 3: Add Auth Profile
 
@@ -674,11 +757,15 @@ And in `openclaw.json` under `auth.profiles`:
 ### Failover Behavior
 
 When your primary provider (e.g., Venice) returns billing/credit errors:
-1. OpenClaw marks the profile as **disabled** (5h backoff)
-2. Falls back to `morpheus/kimi-k2.5`
-3. The proxy auto-opens a 7-day Morpheus session (if none exists)
-4. Inference routes through the Morpheus P2P network
-5. When primary credits refill, OpenClaw switches back automatically
+1. OpenClaw marks the primary model's profile as **in cooldown**
+2. Tries fallback 1 (`venice/claude-opus-45`) — different model, same provider
+3. If that also fails, tries fallback 2 (`venice/kimi-k2-5`) — open-source model
+4. If all Venice models fail, falls back to `morpheus/kimi-k2.5`
+5. The proxy auto-opens a 7-day Morpheus session (if none exists)
+6. Inference routes through the Morpheus P2P network
+7. When primary credits refill, OpenClaw switches back automatically
+
+**v0.5 improvement:** The Morpheus proxy now returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the Morpheus provider into extended cooldown due to transient infrastructure issues. If a Morpheus session expires mid-request, the proxy automatically opens a fresh session and retries once.
 
 ---
 
@@ -733,7 +820,7 @@ Edit variables at the top of `gateway-guardian.sh`:
 
 ---
 
-## Quick Reference (v0.3)
+## Quick Reference (v0.5)
 
 | Action | Command |
 |--------|---------|

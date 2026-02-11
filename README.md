@@ -77,9 +77,11 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **Morpheus Proxy Router** | Connects to the Morpheus P2P network and routes inference requests to providers |
 | **OpenAI-Compatible Proxy** | Translates standard API calls into Morpheus format — any OpenAI client works |
 | **Auto-Session Manager** | Opens 7-day blockchain sessions on demand, renews before expiry, recycles MOR |
+| **Session Auto-Retry** | If a session expires mid-request, opens a fresh one and retries automatically (v0.5) |
+| **Cooldown-Safe Errors** | Returns proper OpenAI error types so failover engines don't misclassify Morpheus errors as billing errors (v0.5) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
-**Benefit:** Your agent gets persistent access to 10+ open-source models (Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously.
+**Benefit:** Your agent gets persistent access to 10+ open-source models (Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously. And since v0.5, if something goes wrong at the infrastructure level, the proxy handles it gracefully instead of triggering cascading cooldowns that take your agent offline for hours.
 
 ### 🛡️ Gateway Guardian — Self-Healing Agent
 | Component | What It Does |
