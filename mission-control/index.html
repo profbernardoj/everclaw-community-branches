@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦞 Mission Control — OpenClaw</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+.header { background: #161b22; border-bottom: 1px solid #30363d; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+.header h1 { font-size: 22px; font-weight: 600; }
+.header h1 span { font-size: 26px; }
+.header .subtitle { color: #8b949e; font-size: 13px; margin-left: auto; }
+.tabs { display: flex; background: #161b22; border-bottom: 1px solid #30363d; padding: 0 24px; gap: 0; }
+.tab { padding: 12px 20px; cursor: pointer; color: #8b949e; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.tab:hover { color: #e6edf3; }
+.tab.active { color: #e6edf3; border-bottom-color: #f78166; }
+.tab .icon { margin-right: 6px; }
+.content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Activity Feed */
+.feed-note { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #8b949e; font-size: 13px; }
+.feed-item { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 12px; transition: border-color 0.2s; }
+.feed-item:hover { border-color: #58a6ff; }
+.feed-item .time { color: #8b949e; font-size: 12px; margin-bottom: 6px; }
+.feed-item .type { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-left: 8px; text-transform: uppercase; }
+.type-config { background: #1f3a5f; color: #58a6ff; }
+.type-message { background: #1a3a2a; color: #3fb950; }
+.type-search { background: #3d2e00; color: #d29922; }
+.type-email { background: #3d1e36; color: #db61a2; }
+.type-cron { background: #2d1f3d; color: #bc8cff; }
+.type-security { background: #3d1e1e; color: #f85149; }
+.type-system { background: #1c2128; color: #8b949e; }
+.feed-item .title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.feed-item .desc { color: #8b949e; font-size: 13px; line-height: 1.5; }
+
+/* Calendar */
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-header h2 { font-size: 18px; }
+.cal-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.cal-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+.cal-legend span { font-size: 12px; color: #8b949e; }
+.cal-grid { display: grid; grid-template-columns: 80px repeat(7, 1fr); border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+.cal-cell { border: 1px solid #21262d; padding: 6px 8px; min-height: 60px; font-size: 12px; }
+.cal-day-header { background: #161b22; font-weight: 600; text-align: center; padding: 10px 8px; font-size: 13px; color: #e6edf3; }
+.cal-time { background: #0d1117; color: #8b949e; font-size: 11px; display: flex; align-items: flex-start; justify-content: center; padding-top: 8px; font-weight: 500; }
+.cal-event { border-radius: 4px; padding: 3px 6px; margin-bottom: 3px; font-size: 11px; font-weight: 500; line-height: 1.3; }
+.cal-blue { background: #1f3a5f; color: #58a6ff; border-left: 3px solid #58a6ff; }
+.cal-green { background: #1a3a2a; color: #3fb950; border-left: 3px solid #3fb950; }
+.cal-red { background: #3d1e1e; color: #f85149; border-left: 3px solid #f85149; }
+.cal-gray { background: #1c2128; color: #8b949e; border-left: 3px solid #8b949e; }
+.cal-today { background: #111922 !important; }
+
+/* Search */
+.search-box { position: relative; margin-bottom: 20px; }
+.search-box input { width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px 16px 14px 44px; color: #e6edf3; font-size: 15px; outline: none; transition: border-color 0.2s; }
+.search-box input:focus { border-color: #58a6ff; }
+.search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #8b949e; }
+.search-result { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+.search-result .source { color: #8b949e; font-size: 12px; margin-bottom: 4px; }
+.search-result .match { font-size: 14px; line-height: 1.6; }
+.search-result mark { background: #3d2e00; color: #d29922; padding: 1px 3px; border-radius: 3px; }
+.no-results { text-align: center; padding: 60px 20px; color: #8b949e; }
+.no-results .big { font-size: 48px; margin-bottom: 12px; }
+.search-stats { color: #8b949e; font-size: 13px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>🦞</span> Mission Control</h1>
+  <div class="subtitle">OpenClaw Dashboard — Bernardo Johnston</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('feed')"><span class="icon">📋</span>Activity Feed</div>
+  <div class="tab" onclick="switchTab('calendar')"><span class="icon">📅</span>Calendar</div>
+  <div class="tab" onclick="switchTab('search')"><span class="icon">🔍</span>Global Search</div>
+</div>
+
+<div class="content">
+  <!-- ACTIVITY FEED -->
+  <div id="feed" class="panel active">
+    <div class="feed-note">📡 Showing recent agent activity. Live data integration coming soon — will auto-populate from memory files.</div>
+    <div id="feed-items"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="calendar" class="panel">
+    <div class="cal-header">
+      <h2>📅 Scheduled Tasks — This Week</h2>
+      <div class="cal-legend">
+        <span><span class="dot" style="background:#58a6ff"></span> Briefings</span>
+        <span><span class="dot" style="background:#3fb950"></span> Reports</span>
+        <span><span class="dot" style="background:#f85149"></span> Birthdays</span>
+        <span><span class="dot" style="background:#8b949e"></span> Security</span>
+      </div>
+    </div>
+    <div id="cal-grid" class="cal-grid"></div>
+  </div>
+
+  <!-- GLOBAL SEARCH -->
+  <div id="search" class="panel">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search memories, tasks, documents, and conversations..." oninput="doSearch(this.value)">
+    </div>
+    <div id="search-stats" class="search-stats"></div>
+    <div id="search-results"></div>
+    <div id="search-empty" class="no-results">
+      <div class="big">🔍</div>
+      <div>Search across all of OpenClaw's memories, tasks, and documents</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.textContent.toLowerCase().includes(tab === 'feed' ? 'activity' : tab)) t.classList.add('active');
+  });
+}
+
+// Activity Feed Data
+const activities = [
+  { time: '2026-02-06 17:15', type: 'email', title: 'Test email sent via ProtonMail', desc: 'Sent test email from REDACTED@example.com to REDACTED@example.com using OpenClaw browser automation. Message received successfully.' },
+  { time: '2026-02-06 16:43', type: 'config', title: 'Model upgraded to Claude Opus 4.6', desc: 'Verified correct model ID (claude-opus-4-6) from Venice API docs. Updated config with primary model and Kimi K2.5 as listed fallback.' },
+  { time: '2026-02-06 16:09', type: 'search', title: 'Morning briefing test delivered', desc: 'Compiled and sent test morning briefing covering: Onchain/Crypto, Space, AI, and Agentic news. Format approved by David.' },
+  { time: '2026-02-06 15:56', type: 'config', title: 'Brave Search API configured', desc: 'Added Brave Search API key (BernardoSearch) to OpenClaw config under tools.web.search. Free tier: 1 req/sec, 2000/month.' },
+  { time: '2026-02-06 15:46', type: 'config', title: 'Model switched to Claude Opus 4.5', desc: 'Temporarily switched to Claude Opus 4.5 while debugging Opus 4.6 model ID format.' },
+  { time: '2026-02-05 23:27', type: 'system', title: 'Moltbook claim posted to X', desc: 'David posted verification tweet from @profbernardoj. Moltbook registration as BernardoJohnston pending claim verification.' },
+  { time: '2026-02-05 22:54', type: 'system', title: 'Registered on Moltbook', desc: 'Registered as BernardoJohnston on Moltbook (social network for AI agents). API key saved. Read-only mode per security policy.' },
+  { time: '2026-02-05 22:30', type: 'system', title: 'ProtonMail account setup', desc: 'David set up REDACTED@example.com as dedicated email. Will use browser automation for access (2FA enabled).' },
+  { time: '2026-02-05 22:10', type: 'config', title: 'Brave Search API key received', desc: 'Received API key for Brave Search (BernardoSearch). Free tier with 2000 requests/month.' },
+  { time: '2026-02-05 21:58', type: 'config', title: 'Fallback model set to Kimi K2.5', desc: 'Set Kimi K2.5 as fallback model per David\'s preference (more recent and powerful than Llama 3.3 70B).' },
+  { time: '2026-02-05 21:51', type: 'config', title: 'Model switch attempted: Claude Opus 4.6', desc: 'Initial attempt used incorrect ID claude-opus-46. Venice API requires claude-opus-4-6 format.' },
+  { time: '2026-02-05 15:55', type: 'config', title: 'OpenClaw upgraded to 2026.2.3-1', desc: 'System upgraded via npm. Gateway restarted successfully.' },
+  { time: '2026-02-03 00:00', type: 'cron', title: 'Birthday reminders configured', desc: 'Set up birthday reminders for all family members: Savannah, Sydney, Sofia, Daniel, Leia, David, and Cayla.' },
+  { time: '2026-02-02 23:00', type: 'security', title: 'Security hardening complete', desc: 'Installed SkillGuard, PromptGuard, and ACIP prompt injection defenses. Disabled mDNS broadcasting. File permissions tightened.' },
+  { time: '2026-02-02 05:00', type: 'system', title: 'Initial setup with David', desc: 'First conversation. Set up Signal integration, configured Venice AI provider, created USER.md profile with family info and life goals.' },
+];
+
+// Render activity feed
+function renderFeed() {
+  const container = document.getElementById('feed-items');
+  container.innerHTML = activities.map(a => `
+    <div class="feed-item" data-search="${a.title} ${a.desc} ${a.time}">
+      <div class="time">${a.time} <span class="type type-${a.type}">${a.type}</span></div>
+      <div class="title">${a.title}</div>
+      <div class="desc">${a.desc}</div>
+    </div>
+  `).join('');
+}
+
+// Calendar
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const timeSlots = ['7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM'];
+
+  // Header row
+  let html = '<div class="cal-cell cal-day-header"></div>';
+  days.forEach((d, i) => {
+    const isToday = d.toDateString() === now.toDateString();
+    const label = dayNames[i] + ' ' + (d.getMonth() + 1) + '/' + d.getDate();
+    html += `<div class="cal-cell cal-day-header ${isToday ? 'cal-today' : ''}">${label}${isToday ? ' ●' : ''}</div>`;
+  });
+
+  // Events mapped by day index and hour
+  const events = {};
+  function addEvent(dayIdx, hour, label, cls) {
+    const key = dayIdx + '-' + hour;
+    if (!events[key]) events[key] = [];
+    events[key].push({ label, cls });
+  }
+
+  // Morning briefings
+  for (let i = 0; i < 5; i++) addEvent(i, 7, '☀️ Morning Briefing', 'cal-blue');
+  for (let i = 5; i < 7; i++) addEvent(i, 8, '☀️ Weekend Briefing', 'cal-blue');
+
+  // Daily capabilities report
+  for (let i = 0; i < 7; i++) addEvent(i, 14, '🛠️ Capabilities Report', 'cal-green');
+
+  // Hourly security (show only a few to not clutter)
+  for (let i = 0; i < 7; i++) addEvent(i, 10, '🔒 Security Check', 'cal-gray');
+
+  // Birthday check - Savannah Feb 20
+  const savDate = new Date(2026, 1, 20);
+  days.forEach((d, i) => {
+    if (d.toDateString() === savDate.toDateString()) addEvent(i, 9, '🎂 Savannah Birthday Reminder', 'cal-red');
+  });
+
+  // Time rows
+  timeSlots.forEach(slot => {
+    const hour = parseInt(slot);
+    const isPM = slot.includes('PM') && hour !== 12;
+    const h24 = isPM ? hour + 12 : (hour === 12 && slot.includes('PM') ? 12 : hour);
+
+    html += `<div class="cal-cell cal-time">${slot}</div>`;
+    days.forEach((d, i) => {
+      const isToday = d.toDateString() === now.toDateString();
+      const key = i + '-' + h24;
+      const evts = events[key] || [];
+      html += `<div class="cal-cell ${isToday ? 'cal-today' : ''}">`;
+      evts.forEach(e => {
+        html += `<div class="cal-event ${e.cls}">${e.label}</div>`;
+      });
+      html += '</div>';
+    });
+  });
+
+  grid.innerHTML = html;
+}
+
+// Global Search
+const searchableContent = [
+  ...activities.map(a => ({ source: `Activity: ${a.time}`, text: `${a.title}. ${a.desc}`, type: a.type })),
+  { source: 'USER.md', text: 'David Johnston. Born April 18, 1985. Wife REDACTED born June 14, 1988. Children: Leia, Savannah, Sydney, Sofia, Daniel, Andrew (expected 2026 IVF). Core vision: AI augments individuals rather than consolidating power. Building Morpheus AI, Based AI. Coined Johnston\'s Law: Everything that can be decentralized will be decentralized.', type: 'system' },
+  { source: 'USER.md — Goals', text: 'Family First. Christ-Centered Family. Great Commission — Bible translation, missionaries Jim Baker and Stephen Hanlon. Space Settlement — SpaceX VIP, Space Fund investor, Firefly Aerospace. Abolition of the State — anarcho-capitalist voluntarist. Wealth Creation for Others — Morpheus AI, Based AI, Omni Protocol, USDT/Tether origins.', type: 'system' },
+  { source: 'ACCOUNTS.md', text: 'Signal: +1XXXXXXXXXX. Venice AI: API key configured. ProtonMail: REDACTED@example.com. Moltbook: BernardoJohnston (verified). Brave Search API: BernardoSearch (free tier). X/Twitter: @profbernardoj (dedicated account).', type: 'config' },
+  { source: 'Config', text: 'Primary model: venice/claude-opus-4-6 (Claude Opus 4.6). Fallback: venice/kimi-k2-5 (Kimi K2.5). Available: Claude Opus 4.5, Llama 3.3 70B. Provider: Venice AI. Gateway: local loopback port 18789. Channel: Signal.', type: 'config' },
+  { source: 'Cron Jobs', text: 'Morning Briefing Weekdays 7:45 AM CST. Morning Briefing Weekends 8:45 AM CST. Daily Capabilities Report 2:00 PM CST. Hourly Security Checks. Birthday reminders for Savannah Mar 20, David Apr 18, Sydney Apr 21, Sofia May 23, Cayla Jun 14, Daniel Oct 7, Leia Jan 4.', type: 'cron' },
+  { source: 'Security', text: 'SkillGuard installed for skill scanning. PromptGuard for injection defense. ACIP hardening. mDNS broadcasting disabled. File permissions restricted. Signal allowFrom +1XXXXXXXXXX only. Moltbook read-only policy — many agents may be malicious.', type: 'security' },
+  { source: 'Moltbook', text: 'Registered as BernardoJohnston on Moltbook social network for AI agents. Claimed via X tweet from @profbernardoj. Read-only policy. Top posts about supply chain attacks on skills, nightly autonomous builds, memory management, email-to-podcast workflows.', type: 'system' },
+];
+
+function doSearch(query) {
+  const results = document.getElementById('search-results');
+  const stats = document.getElementById('search-stats');
+  const empty = document.getElementById('search-empty');
+
+  if (!query.trim()) {
+    results.innerHTML = '';
+    stats.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  const q = query.toLowerCase();
+  const matches = searchableContent.filter(item =>
+    item.text.toLowerCase().includes(q) || item.source.toLowerCase().includes(q)
+  );
+
+  stats.innerHTML = `Found ${matches.length} result${matches.length !== 1 ? 's' : ''} for "${query}"`;
+
+  results.innerHTML = matches.map(m => {
+    const highlighted = m.text.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>');
+    return `
+      <div class="search-result">
+        <div class="source">📄 ${m.source} <span class="type type-${m.type}" style="font-size:10px">${m.type}</span></div>
+        <div class="match">${highlighted}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Init
+renderFeed();
+renderCalendar();
+</script>
+</body>
+</html>
