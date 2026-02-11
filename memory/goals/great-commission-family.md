@@ -13,8 +13,15 @@
 - Family values: Christ-centered, strong marriage, moral examples
 - Communication: kind, friendly, warm, personal
 
+## Education Framework for Children
+- **Balaji Srinivasan's "10 Skills That Still Matter in the Age of AI"** (saved 2026-02-11)
+  - Vision, Verification, Prompting, Polishing, Community, Geography, Scarcity, Cryptography, Physicality, Resiliency
+  - David's intent: direct children's learning toward these durable skills
+  - Focus on: clear communication (prompting), critical thinking (verification), physical capability, community building
+  - Full quote: `memory/insights/balaji-value-in-age-of-ai.md`
+
 ## Actions Taken
-- (tracking starts Feb 2026)
+- 2026-02-11: Saved Balaji education framework for guiding children's skill development
 
 ## Actions Suggested (avoid repeating)
 - (none yet)

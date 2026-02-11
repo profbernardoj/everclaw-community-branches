@@ -1,5 +1,5 @@
 {
-  "generated": "2026-02-11T05:03:21.396Z",
+  "generated": "2026-02-11T09:08:02.600Z",
   "owner": "[REDACTED]",
   "lifeGoals": [
     {
@@ -433,6 +433,27 @@
   ],
   "activities": [
     {
+      "time": "2026-02-11 23:33",
+      "date": "2026-02-11",
+      "type": "system",
+      "title": "Tomorrow's Plan: SmartAgentProtocol",
+      "desc": "David wants to develop a full version of OpenClaw under SmartAgentProtocol that: Wraps all Everclaw improvements into an easy-install package Targets users NOT comfortable with Terminal"
+    },
+    {
+      "time": "2026-02-11 23:30",
+      "date": "2026-02-11",
+      "type": "system",
+      "title": "SmartAgentProtocol GitHub Org",
+      "desc": "Accepted invitation to SmartAgentProtocol org as admin/owner Org: https://github.com/orgs/SmartAgentProtocol Description: \"Open Source Chat Interface For Wallets, Dapps, DAOs, & Smart Contracts\""
+    },
+    {
+      "time": "2026-02-11 22:52",
+      "date": "2026-02-11",
+      "type": "system",
+      "title": "Mission Control Dashboard Rebuilt",
+      "desc": "Rebuilt dashboard to load from `dashboard-data.json` instead of hardcoded data Added `generate-data.mjs` script that reads memory files, goals, USER.md, MEMORY.md New Life Goals tab showing all 6 life"
+    },
+    {
       "time": "2026-02-11 22:08",
       "date": "2026-02-11",
       "type": "config",
@@ -559,12 +580,16 @@
       "content": "### Morpheus Proxy Error Classification (2026-02-11)\nMorpheus infrastructure failures (502s) must return `type: \"server_error\"` not `\"billing\"` — otherwise OpenClaw triggers extended cooldown and cascades across all providers.\n### Sub-agent Task Complexity (2026-02-11)\nKimi K2.5 via sub-agent choked on complex multi-file coding task (2s exit, no output). Heavy coding work should stay on Claude. This validates the HEAVY tier in the router.\n### ERC-8004 Contract Quirks (2026-02-11)\n- `totalSupply("
     },
     {
+      "heading": "SmartAgentProtocol (GitHub Org)",
+      "content": "- Org: https://github.com/orgs/SmartAgentProtocol\n- Role: admin/owner (profbernardoj)\n- Description: \"Open Source Chat Interface For Wallets, Dapps, DAOs, & Smart Contracts\"\n- **Vision:** Full version of OpenClaw with Everclaw improvements, packaged for non-technical users\n- **Workflow:** PRs, code review, CI testing — higher bar than Everclaw's direct-push model\n- **Target users:** People not comfortable with Terminal — needs GUI installer / one-click setup\n- **Starting Feb 12, 2026**\n---"
+    },
+    {
       "heading": "Upcoming",
-      "content": "- Publish Everclaw to ClawHub on Feb 16 (cron job `6ff30a74` scheduled)\n- ~~Version x402 + agent registry as v0.7~~ DONE\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
+      "content": "- **SmartAgentProtocol development** — Feb 12 (PRs, testing practices, easy-install packaging)\n- Publish Everclaw to ClawHub on Feb 16 (cron job `6ff30a74` scheduled)\n- ~~Version x402 + agent registry as v0.7~~ DONE\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
     }
   ],
   "stats": {
-    "totalActivities": 16,
+    "totalActivities": 19,
     "totalGoals": 8,
     "activeGoals": 1,
     "memoryFiles": 7

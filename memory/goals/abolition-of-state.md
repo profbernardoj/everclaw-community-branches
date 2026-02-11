@@ -17,8 +17,15 @@
 - Onchain property rights (celestial land registry) — replaces state-issued titles
 - Smart contracts replacing legal system functions
 
+## Key Thinkers & Frameworks
+- **Balaji Srinivasan** (@balajis) — founder of Network School, author of *The Network State*
+  - Network State = voluntary smart contract between people with free choice of membership
+  - Replaces nation-state model (force-based government monopoly) with opt-in governance
+  - His framework for human value in AI age: vision, verification, prompting, polishing, community, geography, scarcity, cryptography, physicality, resiliency
+  - Full quote saved: `memory/insights/balaji-value-in-age-of-ai.md`
+
 ## Actions Taken
-- (tracking starts Feb 2026)
+- 2026-02-11: Saved Balaji Srinivasan insight on Network State + human value in AI age
 
 ## Actions Suggested (avoid repeating)
 - (none yet)
