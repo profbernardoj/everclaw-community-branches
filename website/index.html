@@ -338,59 +338,7 @@
     </div>
   </header>
 
-  <!-- How It Works -->
-  <div class="container">
-    <div class="how-it-works">
-      <h3>How It Works</h3>
-      <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Stake MOR tokens for inference sessions. When the session ends, your MOR comes back. Stake again. Forever.</p>
-      <div class="flow">
-        <div class="flow-step">Your Agent</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step">Everclaw Proxy</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step">Morpheus P2P</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step">AI Model</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- What's New -->
-  <div class="container" style="margin-top: 32px;">
-    <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
-      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.7</h3>
-      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
-        <div>
-          <strong style="color: var(--green);">💸 x402 Payment Client</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Automatic HTTP 402 payment handling. Your agent detects payment-required responses, signs USDC on Base via EIP-712, and retries — all in one call. Budget controls prevent runaway spending ($1/request, $10/day defaults).</p>
-        </div>
-        <div>
-          <strong style="color: var(--green);">🔍 ERC-8004 Agent Registry</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Discover agents on-chain via the Identity and Reputation registries on Base. Look up any agent by ID, read their registration file, check reputation scores, and find x402-enabled endpoints.</p>
-        </div>
-      </div>
-      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
-        <div>
-          <strong style="color: var(--text-muted);">v0.6 — Model Router</strong>
-          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">3-tier classifier, 13 dimensions, &lt;1ms</p>
-        </div>
-        <div>
-          <strong style="color: var(--text-muted);">v0.5 — Proxy Resilience</strong>
-          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Cooldown-safe errors, session auto-retry</p>
-        </div>
-        <div>
-          <strong style="color: var(--text-muted);">v0.4 — Zero-Dep Wallet</strong>
-          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">macOS Keychain, no external accounts</p>
-        </div>
-        <div>
-          <strong style="color: var(--text-muted);">v0.3 — Security Suite</strong>
-          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">SkillGuard, ClawdStrike, PromptGuard, Bagman</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Path Selector -->
+  <!-- Path Selector (CTA) -->
   <div class="container">
     <h2 style="text-align: center; margin-bottom: 8px;">Get Started</h2>
     <p style="text-align: center; color: var(--text-muted); font-size: 15px; margin-bottom: 24px;">Choose your starting point:</p>
@@ -519,8 +467,10 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</
         <p>When you open an inference session, your MOR tokens are locked as a deposit. When the session ends, they come back. Stake them again for a new session. This is what makes the access yours forever — you're not buying consumable API credits.</p>
       </div>
     </div>
+  </div>
 
-    <!-- Path: Existing OpenClaw Users -->
+  <!-- Path: Existing OpenClaw Users -->
+  <div class="container">
     <div class="section" id="section-existing">
       <h2>Add Everclaw to OpenClaw</h2>
 
@@ -597,6 +547,58 @@ curl http://127.0.0.1:8083/health</code>
       <div class="economics">
         <h4>💡 MOR is staked, not spent</h4>
         <p>When you open an inference session, your MOR tokens are locked as a deposit. When the session ends, they come back. Stake them again for a new session. This is what makes the access yours forever — you're not buying consumable API credits.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="container">
+    <div class="how-it-works">
+      <h3>How It Works</h3>
+      <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Stake MOR tokens for inference sessions. When the session ends, your MOR comes back. Stake again. Forever.</p>
+      <div class="flow">
+        <div class="flow-step">Your Agent</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Everclaw Proxy</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Morpheus P2P</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">AI Model</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What's New -->
+  <div class="container" style="margin-top: 32px;">
+    <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.7</h3>
+      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
+        <div>
+          <strong style="color: var(--green);">💸 x402 Payment Client</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Automatic HTTP 402 payment handling. Your agent detects payment-required responses, signs USDC on Base via EIP-712, and retries — all in one call. Budget controls prevent runaway spending ($1/request, $10/day defaults).</p>
+        </div>
+        <div>
+          <strong style="color: var(--green);">🔍 ERC-8004 Agent Registry</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Discover agents on-chain via the Identity and Reputation registries on Base. Look up any agent by ID, read their registration file, check reputation scores, and find x402-enabled endpoints.</p>
+        </div>
+      </div>
+      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
+        <div>
+          <strong style="color: var(--text-muted);">v0.6 — Model Router</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">3-tier classifier, 13 dimensions, &lt;1ms</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.5 — Proxy Resilience</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Cooldown-safe errors, session auto-retry</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.4 — Zero-Dep Wallet</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">macOS Keychain, no external accounts</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.3 — Security Suite</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">SkillGuard, ClawdStrike, PromptGuard, Bagman</p>
+        </div>
       </div>
     </div>
   </div>
