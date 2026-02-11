@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.6.0
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 10+ models, and maintain persistent inference by recycling staked MOR. Includes OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian watchdog, bundled security skills, and zero-dependency wallet management via macOS Keychain.
+version: 0.7.0
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 10+ models, and maintain persistent inference by recycling staked MOR. Includes OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian watchdog, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -820,7 +820,220 @@ Edit variables at the top of `gateway-guardian.sh`:
 
 ---
 
-## Quick Reference (v0.6)
+## 17. x402 Payment Client (v0.7)
+
+Everclaw v0.7 includes an x402 payment client that lets your agent make USDC payments to any x402-enabled endpoint. The [x402 protocol](https://x402.org) is an HTTP-native payment standard: when a server returns HTTP 402, your agent automatically signs a USDC payment and retries.
+
+### How x402 Works
+
+```
+Agent → request → Server returns 402 + PAYMENT-REQUIRED header
+Agent → parse requirements → sign EIP-712 payment → retry with PAYMENT-SIGNATURE header
+Server → verify signature via facilitator → settle USDC → return resource
+```
+
+### CLI Usage
+
+```bash
+# Make a request to an x402-protected endpoint
+node scripts/x402-client.mjs GET https://api.example.com/data
+
+# Dry-run: see what would be paid without signing
+node scripts/x402-client.mjs --dry-run GET https://api.example.com/data
+
+# Set max payment per request
+node scripts/x402-client.mjs --max-amount 0.50 GET https://api.example.com/data
+
+# POST with body
+node scripts/x402-client.mjs POST https://api.example.com/task '{"prompt":"hello"}'
+
+# Check daily spending
+node scripts/x402-client.mjs --budget
+```
+
+### Programmatic Usage
+
+```javascript
+import { makePayableRequest, createX402Client } from './scripts/x402-client.mjs';
+
+// One-shot request
+const result = await makePayableRequest("https://api.example.com/data");
+// result.paid → true if 402 was handled
+// result.amount → "$0.010000" (USDC)
+// result.body → response content
+
+// Reusable client with budget limits
+const client = createX402Client({
+  maxPerRequest: 0.50,  // $0.50 USDC max per request
+  dailyLimit: 5.00,     // $5.00 USDC per day
+  dryRun: false,
+});
+
+const res = await client.get("https://agent-api.example.com/query?q=weather");
+const data = await client.post("https://agent-api.example.com/task", { prompt: "hello" });
+
+// Check spending
+console.log(client.budget());
+// { date: "2026-02-11", spent: "$0.520000", remaining: "$4.480000", limit: "$5.000000", transactions: 3 }
+```
+
+### Payment Flow Details
+
+1. **Request** — Standard HTTP request to any URL
+2. **402 Detection** — Server returns `HTTP 402` with `PAYMENT-REQUIRED` header containing JSON payment requirements
+3. **Budget Check** — Verifies amount against per-request max ($1.00 default) and daily limit ($10.00 default)
+4. **EIP-712 Signing** — Signs a `TransferWithAuthorization` (EIP-3009) for USDC on Base using the agent's wallet
+5. **Retry** — Resends the request with `PAYMENT-SIGNATURE` header containing the signed payment payload
+6. **Settlement** — The Coinbase facilitator verifies the signature and settles the USDC transfer
+7. **Response** — Server returns the requested resource
+
+### Security
+
+- **Private key from 1Password** at runtime (never on disk) — follows Bagman patterns
+- **Budget controls** prevent runaway spending: $1/request max, $10/day by default
+- **Dry-run mode** for testing without signing or spending
+- **USDC on Base only** — no other chains or tokens (EIP-3009 TransferWithAuthorization)
+- **Daily budget tracking** persisted to `.x402-budget.json` (amounts only, no keys)
+
+### Key Addresses
+
+| Item | Address |
+|------|---------|
+| USDC (Base) | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` |
+| Coinbase Facilitator | `https://api.cdp.coinbase.com/platform/v2/x402` |
+| Base Chain ID | `8453` (CAIP-2: `eip155:8453`) |
+
+---
+
+## 18. ERC-8004 Agent Registry (v0.7)
+
+The [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) protocol provides on-chain registries for agent discovery and trust. Everclaw v0.7 includes a reader that queries the Identity and Reputation registries on Base mainnet.
+
+### What Is ERC-8004?
+
+ERC-8004 defines three registries:
+
+- **Identity Registry** (ERC-721): Each agent is an NFT with a `tokenURI` pointing to a registration file containing name, description, services/endpoints, x402 support, and trust signals
+- **Reputation Registry**: Clients give structured feedback (value + tags) to agents. Summary scores aggregate across all clients
+- **Validation Registry**: Stake-secured re-execution and zkML verification (read-only in Everclaw)
+
+Agents are discoverable, portable (transferable NFTs), and verifiable across organizational boundaries.
+
+### CLI Usage
+
+```bash
+# Look up an agent by ID
+node scripts/agent-registry.mjs lookup 1
+
+# Get reputation data
+node scripts/agent-registry.mjs reputation 1
+
+# Full discovery (identity + registration file + reputation)
+node scripts/agent-registry.mjs discover 1
+
+# List agents in a range
+node scripts/agent-registry.mjs list 1 10
+
+# Get total registered agents
+node scripts/agent-registry.mjs total
+```
+
+### Programmatic Usage
+
+```javascript
+import { lookupAgent, getReputation, discoverAgent, totalAgents, listAgents } from './scripts/agent-registry.mjs';
+
+// Look up identity
+const agent = await lookupAgent(1);
+// {
+//   agentId: 1,
+//   owner: "0x89E9...",
+//   uri: "data:application/json;base64,...",
+//   wallet: "0x89E9...",
+//   registration: {
+//     name: "ClawNews",
+//     description: "Hacker News for AI agents...",
+//     services: [{ name: "web", endpoint: "https://clawnews.io" }, ...],
+//     x402Support: false,
+//     active: true,
+//     supportedTrust: ["reputation"]
+//   }
+// }
+
+// Get reputation
+const rep = await getReputation(1);
+// {
+//   agentId: 1,
+//   clients: ["0x3975...", "0x718B..."],
+//   feedbackCount: 2,
+//   summary: { count: 2, value: "100", decimals: 0 },
+//   feedback: [{ client: "0x3975...", value: "100", tag1: "tip", tag2: "agent" }, ...]
+// }
+
+// Full discovery
+const full = await discoverAgent(1);
+// Combines identity, registration file, services, and reputation into one object
+```
+
+### Registration File Format
+
+Agent registration files (resolved from `tokenURI`) follow the ERC-8004 standard:
+
+```json
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "MyAgent",
+  "description": "What the agent does",
+  "image": "https://example.com/logo.png",
+  "services": [
+    { "name": "web", "endpoint": "https://myagent.com" },
+    { "name": "A2A", "endpoint": "https://agent.example/.well-known/agent-card.json", "version": "0.3.0" },
+    { "name": "MCP", "endpoint": "https://mcp.agent.eth/", "version": "2025-06-18" }
+  ],
+  "x402Support": true,
+  "active": true,
+  "supportedTrust": ["reputation", "crypto-economic"]
+}
+```
+
+The reader handles all URI types: `data:` URIs (base64-encoded JSON stored on-chain), `ipfs://` URIs (via public IPFS gateway), and `https://` URIs.
+
+### Contract Addresses (Base Mainnet)
+
+| Registry | Address |
+|----------|---------|
+| Identity | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
+| Reputation | `0x8004BAa17C55a88189AE136b182e5fdA19dE9b63` |
+
+⚠️ **Same addresses on all EVM chains** — Ethereum, Base, Arbitrum, Polygon, Optimism, Linea, Avalanche, etc. The Identity Registry does NOT implement `totalSupply()`, so `totalAgents()` uses a binary search via `ownerOf()`.
+
+### Combining x402 + Agent Registry
+
+The x402 client and agent registry work together for agent-to-agent payments:
+
+```javascript
+import { discoverAgent } from './scripts/agent-registry.mjs';
+import { makePayableRequest } from './scripts/x402-client.mjs';
+
+// 1. Discover an agent and find its x402-enabled endpoint
+const agent = await discoverAgent(42);
+const apiEndpoint = agent.services.find(s => s.name === "A2A")?.endpoint;
+
+// 2. Make a paid request — x402 handling is automatic
+if (agent.x402Support && apiEndpoint) {
+  const result = await makePayableRequest(apiEndpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ task: "Analyze this data..." }),
+    maxAmount: 500000n, // $0.50 USDC
+  });
+  console.log(result.body); // Agent's response
+}
+```
+
+---
+
+## Quick Reference (v0.7)
 
 | Action | Command |
 |--------|---------|
@@ -838,6 +1051,14 @@ Edit variables at the top of `gateway-guardian.sh`:
 | Proxy health | `curl http://127.0.0.1:8083/health` |
 | Guardian test | `bash scripts/gateway-guardian.sh --verbose` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
+| x402 request | `node scripts/x402-client.mjs GET <url>` |
+| x402 dry-run | `node scripts/x402-client.mjs --dry-run GET <url>` |
+| x402 budget | `node scripts/x402-client.mjs --budget` |
+| Lookup agent | `node scripts/agent-registry.mjs lookup <id>` |
+| Agent reputation | `node scripts/agent-registry.mjs reputation <id>` |
+| Discover agent | `node scripts/agent-registry.mjs discover <id>` |
+| List agents | `node scripts/agent-registry.mjs list <start> [count]` |
+| Total agents | `node scripts/agent-registry.mjs total` |
 | Scan a skill | `node security/skillguard/src/cli.js scan <path>` |
 | Batch scan | `node security/skillguard/src/cli.js batch <dir>` |
 | Security audit | `bash security/clawdstrike/scripts/collect_verified.sh` |
@@ -1093,3 +1314,6 @@ With the router in place, only complex reasoning tasks in the main session use p
 - `security/clawdstrike/SKILL.md` — ClawdStrike full documentation
 - `security/prompt-guard/SKILL.md` — PromptGuard full documentation
 - `security/bagman/SKILL.md` — Bagman full documentation
+- [x402 Protocol](https://x402.org) — HTTP-native payment protocol specification
+- [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) — Trustless Agents EIP specification
+- [8004scan](https://www.8004scan.io) — Agent registry explorer

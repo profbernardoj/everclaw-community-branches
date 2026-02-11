@@ -80,9 +80,22 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **Session Auto-Retry** | If a session expires mid-request, opens a fresh one and retries automatically (v0.5) |
 | **Cooldown-Safe Errors** | Returns proper OpenAI error types so failover engines don't misclassify Morpheus errors as billing errors (v0.5) |
 | **Model Router** | 3-tier local prompt classifier — routes simple tasks to GLM Flash, standard tasks to Kimi K2.5, complex tasks to Claude (v0.6) |
+| **x402 Payment Client** | Automatic HTTP 402 payment handling — signs USDC on Base via EIP-712, with budget controls and dry-run mode (v0.7) |
+| **ERC-8004 Agent Registry** | Discover agents on-chain — reads Identity + Reputation registries on Base, resolves registration files, checks trust signals (v0.7) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
-**Benefit:** Your agent gets persistent access to 10+ open-source models (Kimi K2.5, GLM-4, Qwen3, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on free Morpheus models automatically.
+**Benefit:** Your agent gets persistent access to 10+ open-source models (Kimi K2.5, GLM-4, Qwen3, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on free Morpheus models automatically. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain.
+
+### 💸 Agent Economy — x402 Payments + ERC-8004 Registry
+| Component | What It Does |
+|-----------|-------------|
+| **x402 Payment Client** | Automatic HTTP 402 payment handling — detects payment-required responses, signs USDC on Base via EIP-712, retries with payment |
+| **Budget Controls** | Per-request max ($1 default) and daily spending limit ($10 default) prevent runaway payments |
+| **ERC-8004 Agent Registry** | Discovers agents on Base via on-chain Identity (ERC-721) and Reputation registries |
+| **Agent Discovery** | Full pipeline: identity → fetch registration file → check endpoints → check reputation scores |
+| **Combined Flow** | Discover an agent on-chain → check its x402 support → make a paid API request — all programmatic |
+
+**Benefit:** Your agent can discover other agents on-chain, verify their reputation, and pay them for services — all without custodial intermediaries. USDC payments are signed with EIP-712 and settled via the Coinbase facilitator. Budget controls prevent surprise spending.
 
 ### 🛡️ Gateway Guardian — Self-Healing Agent
 | Component | What It Does |
@@ -180,6 +193,11 @@ When a session ends, your MOR comes back. Open a new session with the same token
 | Proxy health | `curl http://127.0.0.1:8083/health` |
 | Route a prompt | `node scripts/router.mjs "your prompt here"` |
 | Route (JSON) | `node scripts/router.mjs --json "your prompt"` |
+| x402 request | `node scripts/x402-client.mjs GET <url>` |
+| x402 dry-run | `node scripts/x402-client.mjs --dry-run GET <url>` |
+| Lookup agent | `node scripts/agent-registry.mjs lookup <id>` |
+| Discover agent | `node scripts/agent-registry.mjs discover <id>` |
+| Agent reputation | `node scripts/agent-registry.mjs reputation <id>` |
 | Scan a skill | `node security/skillguard/src/cli.js scan <path>` |
 | Security audit | `bash security/clawdstrike/scripts/collect_verified.sh` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
@@ -203,6 +221,9 @@ That's it. No external accounts. No API keys. No subscriptions.
 - **OpenClaw:** [openclaw.ai](https://openclaw.ai)
 - **MOR on Base:** [Uniswap](https://app.uniswap.org/explore/tokens/base/0x7431ada8a591c955a994a21710752ef9b882b8e3)
 - **Morpheus GitHub:** [MorpheusAIs/Morpheus-Lumerin-Node](https://github.com/MorpheusAIs/Morpheus-Lumerin-Node)
+- **x402 Protocol:** [x402.org](https://x402.org)
+- **ERC-8004:** [eips.ethereum.org/EIPS/eip-8004](https://eips.ethereum.org/EIPS/eip-8004)
+- **8004scan:** [8004scan.io](https://www.8004scan.io)
 
 ---
 
