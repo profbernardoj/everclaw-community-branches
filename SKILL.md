@@ -1,6 +1,6 @@
 ---
 name: everclaw
-version: 0.5.0
+version: 0.6.0
 description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 10+ models, and maintain persistent inference by recycling staked MOR. Includes OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian watchdog, bundled security skills, and zero-dependency wallet management via macOS Keychain.
 homepage: https://everclaw.com
 metadata:
@@ -820,7 +820,7 @@ Edit variables at the top of `gateway-guardian.sh`:
 
 ---
 
-## Quick Reference (v0.5)
+## Quick Reference (v0.6)
 
 | Action | Command |
 |--------|---------|
@@ -951,6 +951,134 @@ For Everclaw agents handling MOR tokens:
 2. **After setup and periodically:** Run ClawdStrike audit
 3. **In group chats or with untrusted input:** Enable PromptGuard detection
 4. **Always:** Follow Bagman patterns for key management (1Password, session keys, no keys on disk)
+
+---
+
+## 16. Model Router (v0.6)
+
+A lightweight, local prompt classifier that routes requests to the cheapest capable model. Runs in <1ms with zero external API calls.
+
+### Tiers
+
+| Tier | Primary Model | Fallback | Use Case |
+|------|--------------|----------|----------|
+| **LIGHT** | `morpheus/glm-4.7-flash` | `morpheus/kimi-k2.5` | Cron jobs, heartbeats, simple Q&A, status checks |
+| **STANDARD** | `morpheus/kimi-k2.5` | `venice/kimi-k2-5` | Research, drafting, summaries, most sub-agent tasks |
+| **HEAVY** | `venice/claude-opus-4-6` | `venice/claude-opus-45` | Complex reasoning, architecture, formal proofs, strategy |
+
+All LIGHT and STANDARD tier models run through Morpheus (free via staked MOR). Only HEAVY tier uses Venice (premium).
+
+### How Scoring Works
+
+The router scores prompts across 13 weighted dimensions:
+
+| Dimension | Weight | What It Detects |
+|-----------|--------|----------------|
+| `reasoningMarkers` | 0.20 | "prove", "theorem", "step by step", "chain of thought" |
+| `codePresence` | 0.14 | `function`, `class`, `import`, backticks, "refactor" |
+| `synthesis` | 0.11 | "summarize", "compare", "draft", "analyze", "review" |
+| `technicalTerms` | 0.10 | "algorithm", "architecture", "smart contract", "consensus" |
+| `multiStepPatterns` | 0.10 | "first...then", "step 1", numbered lists |
+| `simpleIndicators` | 0.08 | "what is", "hello", "weather" (negative score → pushes toward LIGHT) |
+| `agenticTask` | 0.06 | "edit", "deploy", "install", "debug", "fix" |
+| `creativeMarkers` | 0.04 | "story", "poem", "brainstorm" |
+| `questionComplexity` | 0.04 | Multiple question marks |
+| `tokenCount` | 0.04 | Short prompts skew LIGHT, long prompts skew HEAVY |
+| `constraintCount` | 0.04 | "at most", "at least", "maximum", "budget" |
+| `domainSpecificity` | 0.04 | "quantum", "zero-knowledge", "genomics" |
+| `outputFormat` | 0.03 | "json", "yaml", "table", "csv" |
+
+**Special override:** 2+ reasoning keywords in the user prompt → force HEAVY at 88%+ confidence. This prevents accidental cheap routing of genuinely hard problems.
+
+**Ambiguous prompts** (low confidence) default to STANDARD — the safe middle ground.
+
+### CLI Usage
+
+```bash
+# Test routing for a prompt
+node scripts/router.mjs "What is 2+2?"
+# → LIGHT (morpheus/glm-4.7-flash)
+
+node scripts/router.mjs "Summarize the meeting notes and draft a follow-up"
+# → STANDARD (morpheus/kimi-k2.5)
+
+node scripts/router.mjs "Design a distributed consensus algorithm and prove its correctness"
+# → HEAVY (venice/claude-opus-4-6)
+
+# JSON output for programmatic use
+node scripts/router.mjs --json "Build a React component"
+
+# Pipe from stdin
+echo '{"prompt":"hello","system":"You are helpful"}' | node scripts/router.mjs --stdin
+```
+
+### Programmatic Usage
+
+```javascript
+import { route, classify } from './scripts/router.mjs';
+
+const decision = route("Check the weather in Austin");
+// {
+//   tier: "LIGHT",
+//   model: "morpheus/glm-4.7-flash",
+//   fallback: "morpheus/kimi-k2.5",
+//   confidence: 0.87,
+//   score: -0.10,
+//   signals: ["short (7 tok)", "simple (weather)"],
+//   reasoning: "score=-0.100 → LIGHT"
+// }
+```
+
+### Applying to Cron Jobs
+
+Set the `model` field on cron job payloads to route to cheaper models:
+
+```json5
+{
+  "payload": {
+    "kind": "agentTurn",
+    "model": "morpheus/kimi-k2.5",   // STANDARD tier — free via Morpheus
+    "message": "Compile a morning briefing...",
+    "timeoutSeconds": 300
+  }
+}
+```
+
+For truly simple cron jobs (health checks, pings, status queries):
+
+```json5
+{
+  "payload": {
+    "kind": "agentTurn",
+    "model": "morpheus/glm-4.7-flash",  // LIGHT tier — fastest, free
+    "message": "Check proxy health and report any issues",
+    "timeoutSeconds": 60
+  }
+}
+```
+
+### Applying to Sub-Agent Spawns
+
+```javascript
+// Simple research task → STANDARD
+sessions_spawn({ task: "Search for X news", model: "morpheus/kimi-k2.5" });
+
+// Quick lookup → LIGHT
+sessions_spawn({ task: "What's the weather?", model: "morpheus/glm-4.7-flash" });
+
+// Complex analysis → let it use the default (HEAVY / Claude 4.6)
+sessions_spawn({ task: "Design the x402 payment integration..." });
+```
+
+### Cost Impact
+
+With the router in place, only complex reasoning tasks in the main session use premium models. All background work (cron jobs, sub-agents, heartbeats) runs on free Morpheus inference:
+
+| Before | After |
+|--------|-------|
+| All cron jobs → Claude 4.6 (premium) | Cron jobs → Kimi K2.5 / GLM Flash (free) |
+| All sub-agents → Claude 4.6 (premium) | Sub-agents → Kimi K2.5 (free) unless complex |
+| Main session → Claude 4.6 | Main session → Claude 4.6 (unchanged) |
 
 ---
 

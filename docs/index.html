@@ -213,7 +213,7 @@
 
     @media (max-width: 640px) {
       .features { grid-template-columns: 1fr; }
-      .whats-new-grid { grid-template-columns: 1fr !important; }
+      .whats-new-grid { grid-template-columns: 1fr 1fr !important; }
     }
 
     .feature {
@@ -329,7 +329,7 @@
     <div class="container">
       <div class="logo">♾️</div>
       <h1><span>Everclaw</span></h1>
-      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.5.0</p>
+      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.6.0</p>
       <p class="subtitle">AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network.</p>
     </div>
   </header>
@@ -354,19 +354,23 @@
   <!-- What's New -->
   <div class="container" style="margin-top: 32px;">
     <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
-      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.5</h3>
-      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.6</h3>
+      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+        <div>
+          <strong style="color: var(--green);">Model Router</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">3-tier local classifier scores prompts across 13 dimensions in &lt;1ms. Routes simple tasks to GLM Flash, standard to Kimi K2.5, complex to Claude.</p>
+        </div>
+        <div>
+          <strong style="color: var(--green);">GLM 4.7 Flash</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">New LIGHT tier model via Morpheus. Free, fast inference for cron jobs, heartbeats, and simple queries.</p>
+        </div>
         <div>
           <strong style="color: var(--green);">Cooldown-Safe Errors</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Proxy returns proper OpenAI error types so failover engines don't misclassify Morpheus errors as billing — preventing cascading outages.</p>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Proxy returns proper OpenAI error types so failover engines don't misclassify Morpheus errors as billing.</p>
         </div>
         <div>
           <strong style="color: var(--green);">Session Auto-Retry</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">If a blockchain session expires mid-request, the proxy opens a fresh one and retries automatically. No dropped requests.</p>
-        </div>
-        <div>
-          <strong style="color: var(--green);">Multi-Tier Fallback</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Documented pattern for 4-tier fallback chains across providers — so your agent always has a path to inference.</p>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">If a blockchain session expires mid-request, the proxy opens a fresh one and retries automatically.</p>
         </div>
       </div>
     </div>
@@ -598,6 +602,11 @@ curl http://127.0.0.1:8083/health</code>
         <p>Standard API format. Auto-opens 7-day sessions, renews before expiry, auto-retries on session errors, and returns cooldown-safe error codes.</p>
       </div>
       <div class="feature">
+        <div class="icon">🧭</div>
+        <h4>Model Router</h4>
+        <p>13-dimension prompt classifier runs in &lt;1ms. Routes cron jobs to GLM Flash (free), research to Kimi K2.5 (free), complex reasoning to Claude (premium).</p>
+      </div>
+      <div class="feature">
         <div class="icon">🛡️</div>
         <h4>Gateway Guardian</h4>
         <p>Monitors your agent every 2 minutes. Auto-restarts if unresponsive. Your agent self-heals.</p>
@@ -651,7 +660,7 @@ curl http://127.0.0.1:8083/health</code>
       <div class="footer-links">
         <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
         <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
-        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.5.0">v0.5.0 Release</a>
+        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.6.0">v0.6.0 Release</a>
         <a href="https://mor.org">Morpheus AI</a>
         <a href="https://openclaw.ai">OpenClaw</a>
         <a href="https://app.uniswap.org/explore/tokens/base/0x7431ada8a591c955a994a21710752ef9b882b8e3">Get MOR</a>

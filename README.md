@@ -79,9 +79,10 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **Auto-Session Manager** | Opens 7-day blockchain sessions on demand, renews before expiry, recycles MOR |
 | **Session Auto-Retry** | If a session expires mid-request, opens a fresh one and retries automatically (v0.5) |
 | **Cooldown-Safe Errors** | Returns proper OpenAI error types so failover engines don't misclassify Morpheus errors as billing errors (v0.5) |
+| **Model Router** | 3-tier local prompt classifier — routes simple tasks to GLM Flash, standard tasks to Kimi K2.5, complex tasks to Claude (v0.6) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
-**Benefit:** Your agent gets persistent access to 10+ open-source models (Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously. And since v0.5, if something goes wrong at the infrastructure level, the proxy handles it gracefully instead of triggering cascading cooldowns that take your agent offline for hours.
+**Benefit:** Your agent gets persistent access to 10+ open-source models (Kimi K2.5, GLM-4, Qwen3, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on free Morpheus models automatically.
 
 ### 🛡️ Gateway Guardian — Self-Healing Agent
 | Component | What It Does |
@@ -177,6 +178,8 @@ When a session ends, your MOR comes back. Open a new session with the same token
 | Install proxy + guardian | `bash skills/everclaw/scripts/install-proxy.sh` |
 | Start router | `bash skills/everclaw/scripts/start.sh` |
 | Proxy health | `curl http://127.0.0.1:8083/health` |
+| Route a prompt | `node scripts/router.mjs "your prompt here"` |
+| Route (JSON) | `node scripts/router.mjs --json "your prompt"` |
 | Scan a skill | `node security/skillguard/src/cli.js scan <path>` |
 | Security audit | `bash security/clawdstrike/scripts/collect_verified.sh` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
