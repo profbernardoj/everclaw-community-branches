@@ -83,6 +83,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **x402 Payment Client** | Automatic HTTP 402 payment handling — signs USDC on Base via EIP-712, with budget controls and dry-run mode (v0.7) |
 | **ERC-8004 Agent Registry** | Discover agents on-chain — reads Identity + Reputation registries on Base, resolves registration files, checks trust signals (v0.7) |
 | **API Gateway Bootstrap** | One-command setup for free Morpheus inference — no API key, no wallet, no node required. New users get instant AI access (v0.8) |
+| **Gateway Guardian v2** | Inference-level health probes + 4-stage self-healing restart with nuclear reinstall option. Detects brain-dead agents, not just crashed processes (v0.9) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
 **Benefit:** Your agent gets persistent access to 30+ open-source models (Kimi K2.5, GLM-4, Qwen3, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use continuously. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on free Morpheus models automatically. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get free inference from their very first launch — no API key needed.
@@ -98,14 +99,16 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 
 **Benefit:** Your agent can discover other agents on-chain, verify their reputation, and pay them for services — all without custodial intermediaries. USDC payments are signed with EIP-712 and settled via the Coinbase facilitator. Budget controls prevent surprise spending.
 
-### 🛡️ Gateway Guardian — Self-Healing Agent
+### 🛡️ Gateway Guardian v2 — Self-Healing Agent
 | Component | What It Does |
 |-----------|-------------|
-| **Health Monitor** | Probes your OpenClaw gateway every 2 minutes |
-| **Auto-Restart** | Three-stage restart if the gateway becomes unresponsive |
+| **HTTP + Inference Probes** | Checks both gateway process AND model provider availability every 2 minutes |
+| **Provider Health Checks** | Directly probes Venice API, Morpheus proxy, and mor-gateway — if any responds, inference is alive |
+| **4-Stage Restart Escalation** | Graceful restart → hard kill → kickstart → **nuclear reinstall** (`curl install.sh`) |
+| **Signal Notification** | Notifies you via Signal before executing nuclear restart |
 | **launchd Integration** | Survives reboots, auto-starts on macOS |
 
-**Benefit:** Your agent recovers from crashes automatically. No more waking up to find your assistant has been offline for 8 hours.
+**Benefit:** Your agent recovers from crashes AND from provider cooldown cascades. v1 only detected crashes — v2 detects when the gateway is alive but brain-dead (all providers in cooldown) and forces a restart to clear the cooldown state. The nuclear option runs the same reinstall command you'd run manually as a last resort.
 
 ### 🔍 SkillGuard — Skill Security Scanner
 | Component | What It Does |

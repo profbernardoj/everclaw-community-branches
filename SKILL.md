@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.8.0
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian watchdog, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 0.9.0
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian v2 with inference probes and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -769,19 +769,34 @@ When your primary provider (e.g., Venice) returns billing/credit errors:
 
 ---
 
-## 14. Gateway Guardian (v0.2)
+## 14. Gateway Guardian v2 (v0.9)
 
-A watchdog that monitors the OpenClaw gateway and restarts it if unresponsive. Runs every 2 minutes via launchd.
+A self-healing watchdog that monitors the OpenClaw gateway **and its ability to actually run inference**. Runs every 2 minutes via launchd.
+
+### The Problem v2 Solves
+
+v1 only checked if the gateway process was alive (HTTP 200 on dashboard). But the real failure mode is when the gateway is alive but **all model providers are in cooldown** — credits exhausted, billing errors cascading across providers. The gateway returns 200 while the agent is effectively brain-dead. v2 adds inference-level health checks and a nuclear self-healing option.
 
 ### How It Works
 
-1. **HTTP probe** against `http://127.0.0.1:18789/`
-2. **2 consecutive failures** required before restart (prevents flapping)
-3. Three-stage restart:
-   - `openclaw gateway restart` (graceful)
-   - Hard kill → launchd KeepAlive restarts (force)
-   - `launchctl kickstart` (nuclear option)
-4. Logs everything to `~/.openclaw/logs/guardian.log`
+1. **HTTP probe** — Is the gateway process running? (`http://127.0.0.1:18789/`)
+2. **Inference probe** — Can any model provider actually respond?
+   - Checks Venice API (`/api/v1/models`)
+   - Checks Morpheus local proxy (`/health`)
+   - Checks Morpheus API Gateway (`/api/v1/models`)
+   - If **any one** responds, inference is available
+3. **Separate failure counters** — HTTP failures (2 threshold) and inference failures (3 threshold, ~6 min) tracked independently
+4. **Four-stage restart escalation:**
+   - `openclaw gateway restart` (graceful — resets in-memory cooldown state)
+   - Hard kill (`kill -9`) → launchd KeepAlive restarts
+   - `launchctl kickstart -k` (force restart)
+   - **🔴 NUCLEAR:** `curl -fsSL https://clawd.bot/install.sh | bash` (full reinstall — guaranteed clean start)
+5. **Signal notification** before nuclear restart (via signal-cli if available)
+6. Logs everything to `~/.openclaw/logs/guardian.log`
+
+### Why Restart Fixes Cooldown
+
+OpenClaw's provider cooldown state is **in-memory**. When all providers enter cooldown (e.g., Venice credits exhausted + Morpheus errors misclassified), the agent stays offline until cooldowns expire naturally — which can take hours. **Restarting the gateway process clears all cooldown state immediately**, allowing the fallback chain to work again.
 
 ### Installation
 
@@ -793,6 +808,13 @@ chmod +x ~/.openclaw/workspace/scripts/gateway-guardian.sh
 
 # Install launchd plist (macOS)
 # See templates/ai.openclaw.guardian.plist
+```
+
+⚠️ **Important:** The launchd plist should include `OPENCLAW_GATEWAY_TOKEN` in its environment variables so the guardian can authenticate with the gateway for inference probes. Extract this from your gateway plist:
+
+```bash
+/usr/libexec/PlistBuddy -c "Print :EnvironmentVariables:OPENCLAW_GATEWAY_TOKEN" \
+  ~/Library/LaunchAgents/ai.openclaw.gateway.plist
 ```
 
 ### Manual Test
@@ -815,8 +837,20 @@ Edit variables at the top of `gateway-guardian.sh`:
 |----------|---------|-------------|
 | `GATEWAY_PORT` | `18789` | Gateway port to probe |
 | `PROBE_TIMEOUT` | `8` | HTTP timeout in seconds |
-| `FAIL_THRESHOLD` | `2` | Consecutive failures before restart |
-| `MAX_LOG_LINES` | `500` | Log file rotation threshold |
+| `INFERENCE_TIMEOUT` | `15` | Provider probe timeout in seconds |
+| `FAIL_THRESHOLD` | `2` | Consecutive HTTP failures before restart |
+| `INFERENCE_FAIL_THRESHOLD` | `3` | Consecutive inference failures before escalation (~6 min) |
+| `MAX_LOG_LINES` | `1000` | Log file rotation threshold |
+| `OWNER_SIGNAL` | `""` | Signal number for nuclear restart notifications |
+| `INSTALL_URL` | `https://clawd.bot/install.sh` | URL for nuclear reinstall script |
+
+### State Files
+
+| File | Purpose |
+|------|---------|
+| `~/.openclaw/logs/guardian.state` | HTTP failure counter |
+| `~/.openclaw/logs/guardian-inference.state` | Inference failure counter |
+| `~/.openclaw/logs/guardian.log` | Guardian activity log |
 
 ---
 
@@ -1033,7 +1067,7 @@ if (agent.x402Support && apiEndpoint) {
 
 ---
 
-## Quick Reference (v0.7)
+## Quick Reference (v0.9)
 
 | Action | Command |
 |--------|---------|
