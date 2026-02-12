@@ -1,6 +1,6 @@
 # MEMORY.md — Long-Term Memory
 
-Last updated: 2026-02-11
+Last updated: 2026-02-12
 
 ---
 
@@ -78,6 +78,15 @@ Kimi K2.5 via sub-agent choked on complex multi-file coding task (2s exit, no ou
 
 ### ClawRouter Evaluation (2026-02-11)
 Rejected BlockRunAI/ClawRouter: routes through BlockRun API (middleman), plaintext wallet keys, no Venice/Morpheus models. Extracted scoring concept (MIT) but built custom system.
+
+### Gateway Guardian: HTTP healthy ≠ inference healthy (2026-02-12)
+Guardian v1 only probed HTTP (gateway dashboard). Real failure: gateway alive but ALL providers in cooldown = brain-dead. Fix: probe providers directly (Venice `/api/v1/models`, Morpheus `/health`, mor-gateway). Restarting gateway clears in-memory cooldown state. Nuclear option: `curl install.sh | bash`.
+
+### openclaw agent CLI needs --to or --session-id (2026-02-12)
+Can't use `openclaw agent --message` headless without specifying a target. Direct provider HTTP probes are better for health checks — simpler, faster, no auth needed.
+
+### Venice DIEM credits (2026-02-12)
+Venice uses "DIEM" as credit unit (1:1 USD). When exhausted, returns billing errors. Credits appear to reset daily. Claude Opus 4.6 burns through them fast ($6/M input, $30/M output in DIEM).
 
 ---
 
