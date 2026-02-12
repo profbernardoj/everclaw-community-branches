@@ -1,6 +1,6 @@
 ---
 name: everclaw
-version: 0.9.1
+version: 0.9.2
 description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v2 with inference probes and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
@@ -16,6 +16,8 @@ metadata:
 *Powered by [Morpheus AI](https://mor.org)*
 
 Access Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and 10+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
+
+> ⚠️ **ClawHub Name Collision:** A different product ("Everclaw Vault" — encrypted cloud memory) uses the `everclaw` slug on ClawHub. **DO NOT run `clawhub update everclaw`** — it will overwrite this skill with an unrelated product. Updates for this skill come from GitHub: `cd skills/everclaw && git pull`. See `CLAWHUB_WARNING.md` for details and recovery steps.
 
 ## How It Works
 
@@ -59,7 +61,43 @@ Agent → proxy-router (localhost:8082) → Morpheus P2P Network → Provider �
 
 ## 1. Installation
 
-Run the install script:
+### Recommended: One-Command Installer (v0.9.2)
+
+The safe installer handles fresh installs, updates, and ClawHub collision detection:
+
+```bash
+# Fresh install
+curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash
+
+# Or if you already have the skill:
+bash skills/everclaw/scripts/install-everclaw.sh
+
+# Check for updates
+bash skills/everclaw/scripts/install-everclaw.sh --check
+```
+
+The installer will:
+- Detect and warn about the ClawHub "Everclaw Vault" name collision
+- Clone from GitHub (fresh install) or `git pull` (update)
+- Show next steps for router, proxy, and wallet setup
+
+### Alternative: Manual Git Clone
+
+```bash
+git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/skills/everclaw
+```
+
+### Updating
+
+⚠️ **DO NOT use `clawhub update everclaw`** — a different product uses that slug on ClawHub. Always update via git:
+
+```bash
+cd ~/.openclaw/workspace/skills/everclaw && git pull
+```
+
+### Install the Morpheus Router
+
+After cloning, install the proxy-router:
 
 ```bash
 bash skills/everclaw/scripts/install.sh
@@ -1145,10 +1183,13 @@ if (agent.x402Support && apiEndpoint) {
 
 ---
 
-## Quick Reference (v0.9.1)
+## Quick Reference (v0.9.2)
 
 | Action | Command |
 |--------|---------|
+| Install Everclaw | `bash skills/everclaw/scripts/install-everclaw.sh` |
+| Check for updates | `bash skills/everclaw/scripts/install-everclaw.sh --check` |
+| Update (git pull) | `cd skills/everclaw && git pull` |
 | Install router | `bash skills/everclaw/scripts/install.sh` |
 | Install proxy + guardian | `bash skills/everclaw/scripts/install-proxy.sh` |
 | Start router | `bash skills/everclaw/scripts/start.sh` |
