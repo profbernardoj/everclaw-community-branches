@@ -333,7 +333,7 @@
     <div class="container">
       <div class="logo">♾️</div>
       <h1><span>Everclaw</span></h1>
-      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.1</p>
+      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.2</p>
       <p class="subtitle">AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network.</p>
     </div>
   </header>
@@ -391,10 +391,10 @@
           <div class="step-number">3</div>
           <h3>Install Everclaw</h3>
         </div>
-        <p>Clone the Everclaw skill into your OpenClaw workspace:</p>
+        <p>Run the safe installer — it detects conflicts and sets up everything:</p>
         <div class="code-block">
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          <code>git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/skills/everclaw</code>
+          <code>curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code>
         </div>
       </div>
 
@@ -479,10 +479,10 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</
           <div class="step-number">1</div>
           <h3>Install Everclaw</h3>
         </div>
-        <p>Clone the Everclaw skill into your workspace:</p>
+        <p>Run the safe installer (handles collision detection and updates):</p>
         <div class="code-block">
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          <code>git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/skills/everclaw</code>
+          <code>curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code>
         </div>
       </div>
 
@@ -571,15 +571,15 @@ curl http://127.0.0.1:8083/health</code>
   <!-- What's New -->
   <div class="container" style="margin-top: 32px;">
     <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
-      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.1</h3>
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.2</h3>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
         <div>
-          <strong style="color: var(--green);">🔑 Multi-Key Auth Rotation</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Configure multiple Venice API keys with explicit rotation order. When one key's DIEM credits run out, OpenClaw automatically rotates to the next — same model, fresh credits. Keeps your agent on premium models (Claude, GPT-5.2) instead of falling to cheaper fallbacks. With 6 keys at 246 DIEM total, your agent stays on Claude all day.</p>
+          <strong style="color: var(--green);">🛡️ Safe Installer + ClawHub Collision Protection</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">One-command installer (<code>curl | bash</code>) with collision detection — warns if the ClawHub "Everclaw Vault" imposter is present. Safe updates via <code>git pull</code>, version checking, and recovery docs. Never get your skill overwritten again.</p>
         </div>
         <div>
-          <strong style="color: var(--green);">🛡️ Gateway Guardian v2 — Nuclear Self-Healing</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Detects brain-dead agents (gateway alive, all providers in cooldown). Probes Venice, Morpheus, and API Gateway directly. 4-stage restart escalation ending with <strong>nuclear reinstall</strong>. Signal notification before going nuclear. Your agent truly self-heals.</p>
+          <strong style="color: var(--green);">🔑 Multi-Key Auth Rotation + Guardian v2</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Configure multiple Venice API keys with explicit rotation order. When one key's DIEM credits run out, auto-rotate to the next. Plus: Guardian v2 detects brain-dead agents and self-heals with nuclear reinstall option.</p>
         </div>
       </div>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
@@ -704,7 +704,7 @@ curl http://127.0.0.1:8083/health</code>
       <div class="footer-links">
         <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
         <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
-        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.1">v0.9.1 Release</a>
+        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.2">v0.9.2 Release</a>
         <a href="https://mor.org">Morpheus AI</a>
         <a href="https://openclaw.ai">OpenClaw</a>
         <a href="https://x402.org">x402 Protocol</a>
