@@ -9,7 +9,7 @@
 
 SmartAgent is a **pre-configured, easy-to-install version of OpenClaw** that bundles Everclaw's decentralized inference capabilities. The target user has never opened a terminal, doesn't have a Claude API key, and wants a personal AI agent that "just works."
 
-**Key differentiator:** Free inference from day one via Morpheus API Gateway, with a natural upgrade path to self-sovereign MOR-staked inference.
+**Key differentiator:** Decentralized inference from day one via Morpheus API Gateway, with a natural upgrade path to self-sovereign MOR-staked inference where you own your compute forever.
 
 ---
 
@@ -81,7 +81,7 @@ SmartAgent is a **pre-configured, easy-to-install version of OpenClaw** that bun
 Start with an **installer/bootstrapper** that:
 1. Installs OpenClaw (upstream, untouched)
 2. Installs Everclaw skill
-3. Runs `bootstrap-gateway.mjs` for free inference
+3. Runs `bootstrap-gateway.mjs` for decentralized inference
 4. Pre-configures workspace (AGENTS.md, SOUL.md, etc.)
 5. Sets up Morpheus API Gateway as primary provider
 
@@ -98,7 +98,7 @@ Current OpenClaw onboarding requires:
 
 SmartAgent onboarding:
 1. Run SmartAgent installer
-2. **Immediately have free inference** (Morpheus API Gateway)
+2. **Immediately have decentralized inference** (Morpheus API Gateway)
 3. Agent guides user through getting their own key
 4. Agent guides user toward MOR staking for sovereignty
 
@@ -144,7 +144,7 @@ The script:
 1. Checks for Node.js 22+ (installs if missing via nvm/fnm)
 2. Installs OpenClaw globally: `npm install -g openclaw`
 3. Clones Everclaw skill into workspace
-4. Runs `bootstrap-gateway.mjs` (free Morpheus inference)
+4. Runs `bootstrap-gateway.mjs` (Morpheus decentralized inference)
 5. Copies pre-configured workspace files (AGENTS.md, SOUL.md, etc.)
 6. Starts the gateway daemon
 7. Opens WebChat in browser — user can talk immediately
@@ -159,9 +159,9 @@ The pre-configured BOOTSTRAP.md instructs the agent to:
 
 ### Step 3: Progressive Enhancement
 ```
-Day 1: Morpheus API Gateway (free, cloud)
+Day 1: Morpheus API Gateway (open access, cloud)
   ↓
-Week 1: Own API key from app.mor.org (free, personalized)
+Week 1: Own API key from app.mor.org (no cost, personalized)
   ↓
 Month 1: Venice subscription (premium models like Claude)
   ↓
@@ -201,7 +201,7 @@ Later: MOR staking + local Morpheus node (full sovereignty)
 ```
 
 ### Key Decisions
-- **Primary model: `mor-gateway/kimi-k2.5`** — free, strong, good for bootstrapping
+- **Primary model: `mor-gateway/kimi-k2.5`** — community-powered, strong, good for bootstrapping
 - **No Venice/Anthropic/OpenAI required at first** — zero-cost onboarding
 - **reasoning: false on all gateway models** — litellm rejects reasoning_effort
 - **WebChat as default surface** — no phone setup needed initially
