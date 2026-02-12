@@ -879,7 +879,7 @@ The complete failover chain with multi-key rotation:
 ```
 venice:key1 (98 DIEM) → venice:key2 (50 DIEM) → venice:key3 (40 DIEM) →
 venice:key4 (26 DIEM) → venice:key5 (20 DIEM) → venice:key6 (12 DIEM) →
-morpheus/kimi-k2.5 (free, staked MOR) → mor-gateway/kimi-k2.5 (free beta)
+morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gateway)
 ```
 
 **v0.5 improvement:** The Morpheus proxy returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the Morpheus provider into extended cooldown due to transient infrastructure issues. If a Morpheus session expires mid-request, the proxy automatically opens a fresh session and retries once.
@@ -1341,7 +1341,7 @@ A lightweight, local prompt classifier that routes requests to the cheapest capa
 | **STANDARD** | `morpheus/kimi-k2.5` | `venice/kimi-k2-5` | Research, drafting, summaries, most sub-agent tasks |
 | **HEAVY** | `venice/claude-opus-4-6` | `venice/claude-opus-45` | Complex reasoning, architecture, formal proofs, strategy |
 
-All LIGHT and STANDARD tier models run through Morpheus (free via staked MOR). Only HEAVY tier uses Venice (premium).
+All LIGHT and STANDARD tier models run through Morpheus (inference you own via staked MOR). Only HEAVY tier uses Venice (premium).
 
 ### How Scoring Works
 
@@ -1412,7 +1412,7 @@ Set the `model` field on cron job payloads to route to cheaper models:
 {
   "payload": {
     "kind": "agentTurn",
-    "model": "morpheus/kimi-k2.5",   // STANDARD tier — free via Morpheus
+    "model": "morpheus/kimi-k2.5",   // STANDARD tier — owned via Morpheus
     "message": "Compile a morning briefing...",
     "timeoutSeconds": 300
   }
@@ -1425,7 +1425,7 @@ For truly simple cron jobs (health checks, pings, status queries):
 {
   "payload": {
     "kind": "agentTurn",
-    "model": "morpheus/glm-4.7-flash",  // LIGHT tier — fastest, free
+    "model": "morpheus/glm-4.7-flash",  // LIGHT tier — fastest, owned
     "message": "Check proxy health and report any issues",
     "timeoutSeconds": 60
   }
@@ -1447,28 +1447,28 @@ sessions_spawn({ task: "Design the x402 payment integration..." });
 
 ### Cost Impact
 
-With the router in place, only complex reasoning tasks in the main session use premium models. All background work (cron jobs, sub-agents, heartbeats) runs on free Morpheus inference:
+With the router in place, only complex reasoning tasks in the main session use premium models. All background work (cron jobs, sub-agents, heartbeats) runs on Morpheus inference you own:
 
 | Before | After |
 |--------|-------|
-| All cron jobs → Claude 4.6 (premium) | Cron jobs → Kimi K2.5 / GLM Flash (free) |
-| All sub-agents → Claude 4.6 (premium) | Sub-agents → Kimi K2.5 (free) unless complex |
+| All cron jobs → Claude 4.6 (premium) | Cron jobs → Kimi K2.5 / GLM Flash (owned) |
+| All sub-agents → Claude 4.6 (premium) | Sub-agents → Kimi K2.5 (owned) unless complex |
 | Main session → Claude 4.6 | Main session → Claude 4.6 (unchanged) |
 
 ---
 
 ## 19. Morpheus API Gateway Bootstrap (v0.8)
 
-The Morpheus API Gateway (`api.mor.org`) provides free, OpenAI-compatible inference — no node, no staking, no wallet required. Everclaw v0.8 includes a bootstrap script that configures this as an OpenClaw provider, giving new users **instant access to AI from the first launch**.
+The Morpheus API Gateway (`api.mor.org`) provides community-powered, OpenAI-compatible inference — no node, no staking, no wallet required. Everclaw v0.8 includes a bootstrap script that configures this as an OpenClaw provider, giving new users **instant access to AI from the first launch**.
 
 ### Why This Matters
 
-New OpenClaw users face a cold-start problem: they need an API key (Claude, OpenAI, etc.) before their agent can do anything. Everclaw v0.8 solves this by bundling a community API key for the Morpheus inference marketplace, which is currently in free beta.
+New OpenClaw users face a cold-start problem: they need an API key (Claude, OpenAI, etc.) before their agent can do anything. Everclaw v0.8 solves this by bundling a community API key for the Morpheus inference marketplace, which is currently in open beta.
 
 **The bootstrap flow:**
 1. New user installs OpenClaw + Everclaw
-2. Run `node scripts/bootstrap-gateway.mjs` — agent gets free inference immediately
-3. Agent's first task: guide user to get their own free key at `app.mor.org`
+2. Run `node scripts/bootstrap-gateway.mjs` — agent gets inference immediately
+3. Agent's first task: guide user to get their own key at `app.mor.org`
 4. User upgrades to their own key → can then progress to full Morpheus node + MOR staking
 
 ### Quick Start
@@ -1503,7 +1503,7 @@ The bootstrap script:
 | Base URL | `https://api.mor.org/api/v1` |
 | API format | OpenAI-compatible |
 | Auth | Bearer token (`sk-...`) |
-| Free beta | Until March 1, 2026 |
+| Open beta | Until March 1, 2026 |
 | Models | 34 (LLMs, TTS, STT, embeddings) |
 | Provider name | `mor-gateway` |
 
@@ -1550,7 +1550,7 @@ All models also have `:web` variants with web search capability.
 
 ### Community Bootstrap Key
 
-The bootstrap script includes a community API key (base64-obfuscated) for the SmartAgentProtocol account. This provides free access during the beta period.
+The bootstrap script includes a community API key (base64-obfuscated) for the SmartAgentProtocol account. This provides open access during the beta period.
 
 **Getting your own key (recommended):**
 1. Go to [app.mor.org](https://app.mor.org)
@@ -1564,7 +1564,7 @@ The bootstrap script includes a community API key (base64-obfuscated) for the Sm
 | Feature | API Gateway (v0.8) | Local Proxy (v0.2) | P2P Node (v0.1) |
 |---------|-------------------|-------------------|-----------------|
 | Setup | One command | Install proxy + config | Full node install |
-| Cost | Free (beta) | Free (MOR staking) | Free (MOR staking) |
+| Cost | Open (beta) | Own (MOR staking) | Own (MOR staking) |
 | Requires MOR | No | Yes | Yes |
 | Requires wallet | No | Yes | Yes |
 | Decentralized | Gateway → providers | Direct P2P | Direct P2P |
@@ -1579,9 +1579,9 @@ With the gateway added, the recommended fallback chain becomes:
 ```
 venice/claude-opus-4-6      # Primary (premium)
   → venice/claude-opus-45   # Venice fallback
-  → venice/kimi-k2-5        # Venice free tier
+  → venice/kimi-k2-5        # Venice open tier
   → morpheus/kimi-k2.5      # Local proxy (MOR staking)
-  → mor-gateway/kimi-k2.5   # API Gateway (free beta)
+  → mor-gateway/kimi-k2.5   # API Gateway (open beta)
 ```
 
 For new users without Venice or a local proxy, the gateway is the **first and only** provider — making it the critical bootstrap path.
