@@ -104,11 +104,13 @@ Someone published "Everclaw Vault" (encrypted cloud memory, `everclaw.chong-eae.
 ## SmartAgentProtocol (GitHub Org)
 - Org: https://github.com/orgs/SmartAgentProtocol
 - Role: admin/owner (profbernardoj)
-- Description: "Open Source Chat Interface For Wallets, Dapps, DAOs, & Smart Contracts"
-- **Vision:** Full version of OpenClaw with Everclaw improvements, packaged for non-technical users
-- **Workflow:** PRs, code review, CI testing — higher bar than Everclaw's direct-push model
-- **Target users:** People not comfortable with Terminal — needs GUI installer / one-click setup
-- **Starting Feb 12, 2026**
+- **Repo:** https://github.com/SmartAgentProtocol/smartagent (live as of Feb 12)
+- **Domain:** smartagent.org (David owns, DNS pending)
+- **Vision:** OpenClaw + Everclaw + sensible defaults, packaged for non-technical users
+- **Architecture:** Installer-first (not fork). `curl install.sh | bash` → free inference immediately
+- **Primary model:** `mor-gateway/kimi-k2.5` (free via Morpheus API Gateway)
+- **Workflow:** PRs with 1 review, branch protection, CI (ShellCheck + syntax validation)
+- **Logo:** Futuristic AI face (provided by David, needs upload to assets/)
 
 ---
 
