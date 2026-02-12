@@ -1,6 +1,6 @@
 # ♾️ Everclaw — AI Inference You Own, Forever Powering Your OpenClaw Agents
 
-**Own your inference.** Everclaw connects your [OpenClaw](https://github.com/openclaw/openclaw) agent to the [Morpheus](https://mor.org) decentralized inference network — giving you consistent, self-sovereign access to Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and 10+ open-source models powered by staked MOR tokens that recycle back to you.
+**Own your inference.** Everclaw connects your [OpenClaw](https://github.com/openclaw/openclaw) agent to the [Morpheus](https://mor.org) decentralized inference network — giving you consistent, self-sovereign access to Kimi K2.5, GLM-4, Qwen3, and 10+ open-source models powered by staked MOR tokens that recycle back to you.
 
 When your primary API credits run out, Everclaw kicks in automatically. Your agent stays online. No interruptions, no downtime, no surprise bills. And because MOR is staked — not spent — you maintain access for as long as you hold your tokens.
 
@@ -101,7 +101,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **Gateway Guardian v2** | Inference-level health probes + 4-stage self-healing restart with nuclear reinstall option. Detects brain-dead agents, not just crashed processes (v0.9) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
-**Benefit:** Your agent gets persistent access to 30+ open-source models (Kimi K2.5, GLM-4, Qwen3, Llama 3.3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use forever. MOR tokens are staked, not consumed — they're returned when sessions close and can be restaked indefinitely. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on Morpheus inference you own. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get instant inference from their very first launch — no API key needed.
+**Benefit:** Your agent gets persistent access to 30+ open-source models (Kimi K2.5, GLM-4, Qwen3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use forever. MOR tokens are staked, not consumed — they're returned when sessions close and can be restaked indefinitely. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on Morpheus inference you own. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get instant inference from their very first launch — no API key needed.
 
 ### 💸 Agent Economy — x402 Payments + ERC-8004 Registry
 | Component | What It Does |
@@ -173,7 +173,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **GLM 4.7 Flash** | Fast | Quick responses, lower latency |
 | **GLM 4.7** | General | Full GLM model |
 | **Qwen3 235B** | General | Large parameter count |
-| **Llama 3.3 70B** | General | Meta's open model |
+| **GLM-4.7 Flash** | Fast tasks | Zhipu's fast model |
 | **GPT-OSS 120B** | General | OpenAI's open-source model |
 
 All models are accessed through the same proxy endpoint. Switch models by changing the model name in your request.
