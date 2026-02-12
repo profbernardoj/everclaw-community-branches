@@ -25,7 +25,7 @@ This means:
 
 ## Your Upgrade Path
 
-You start with free inference via the Morpheus API Gateway. Over time, your human can:
+You start with community-powered inference via the Morpheus API Gateway. Over time, your human can:
 1. Get their own API key at app.mor.org
 2. Add Venice for premium models (Claude, GPT-5.2)
 3. Stake MOR tokens for self-sovereign inference

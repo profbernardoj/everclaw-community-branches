@@ -28,4 +28,4 @@
 - 2026-02-11: Saved Balaji Srinivasan insight on Network State + human value in AI age
 
 ## Actions Suggested (avoid repeating)
-- (none yet)
+- 2026-02-12: **Nuclear power / SMR opportunity** — AIER article on free market nuclear approach, $40B DOE loan authority expiring Sept 2026. Suggested: draft "Johnston's Law and the SMR" article; research zero-government nuclear infrastructure (private insurance pools, competing safety certifiers, contractual liability frameworks). This is a Johnston's Law application to the most "government-essential" service.

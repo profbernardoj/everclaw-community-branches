@@ -1,6 +1,6 @@
 # 🤖 SmartAgent
 
-**Your personal AI agent with free decentralized inference.**
+**Your personal AI agent with decentralized inference you own.**
 
 SmartAgent gives you a personal AI assistant that works out of the box — no API key, no subscription, no corporate middleman. Powered by [OpenClaw](https://openclaw.ai) and [Morpheus](https://mor.org) decentralized inference.
 
@@ -17,17 +17,17 @@ That's it. The installer handles everything:
 1. ✅ Installs Node.js (if needed)
 2. ✅ Installs OpenClaw (the AI agent framework)
 3. ✅ Installs [Everclaw](https://everclaw.xyz) (decentralized inference)
-4. ✅ Bootstraps free inference via Morpheus API Gateway
+4. ✅ Bootstraps decentralized inference via Morpheus API Gateway
 5. ✅ Configures your agent with sensible defaults
 6. ✅ Opens WebChat in your browser — start talking immediately
 
-**No API key required.** Free inference from the Morpheus network.
+**No API key required.** Decentralized inference from the Morpheus network.
 
 ## What You Get
 
 | Feature | Description |
 |---------|-------------|
-| **Free AI inference** | Powered by Morpheus P2P network — no subscription needed |
+| **Inference You Own** | Powered by Morpheus P2P network — no subscription needed |
 | **Personal agent** | Remembers you across sessions, learns your preferences |
 | **Private** | Runs locally on your machine, no data harvesting |
 | **Decentralized** | No single company controls your access to AI |
@@ -39,9 +39,9 @@ That's it. The installer handles everything:
 SmartAgent grows with you:
 
 ```
-Day 1:   Free Morpheus API Gateway (kimi-k2.5)
+Day 1:   Morpheus API Gateway (kimi-k2.5, open access)
            ↓
-Week 1:  Own API key from app.mor.org (free, personalized)
+Week 1:  Own API key from app.mor.org (personalized, no cost)
            ↓
 Month 1: Venice subscription ($8/mo → Claude, GPT-5.2)
            ↓
@@ -86,7 +86,7 @@ SmartAgent
 │   ├── Channels (WebChat, Signal, Telegram, etc.)
 │   └── Skills (ClawHub ecosystem)
 ├── Everclaw (decentralized inference)
-│   ├── Morpheus API Gateway (free, cloud)
+│   ├── Morpheus API Gateway (open access, cloud)
 │   ├── Morpheus P2P Proxy (local, staked MOR)
 │   └── Gateway Guardian (self-healing watchdog)
 └── SmartAgent Config

@@ -6,7 +6,7 @@ Last updated: 2026-02-12
 
 ## Everclaw Skill (profbernardoj/everclaw)
 
-### Current Version: v0.9.2
+### Current Version: v0.9.2 (latest push removes Llama 3.3 refs)
 - OpenClaw skill for decentralized AI inference via Morpheus network
 - Website: everclaw.xyz (GitHub Pages from docs/)
 - Repo: profbernardoj/everclaw on GitHub
@@ -105,7 +105,8 @@ Someone published "Everclaw Vault" (encrypted cloud memory, `everclaw.chong-eae.
 - Org: https://github.com/orgs/SmartAgentProtocol
 - Role: admin/owner (profbernardoj)
 - **Repo:** https://github.com/SmartAgentProtocol/smartagent (live as of Feb 12)
-- **Domain:** smartagent.org (David owns, DNS pending)
+- **Website:** https://smartagent.org (live, GitHub Pages, HTTPS)
+- **DNS:** Direct A records at sav.com registrar (Cloudflare account exists as backup)
 - **Vision:** OpenClaw + Everclaw + sensible defaults, packaged for non-technical users
 - **Architecture:** Installer-first (not fork). `curl install.sh | bash` → free inference immediately
 - **Primary model:** `mor-gateway/kimi-k2.5` (free via Morpheus API Gateway)
@@ -121,11 +122,16 @@ Someone published "Everclaw Vault" (encrypted cloud memory, `everclaw.chong-eae.
   - Relevant to: Abolition of State goal + Family education framework
   - Full quote saved: `memory/insights/balaji-value-in-age-of-ai.md`
 
+## Language & Messaging (2026-02-12)
+- **NEVER say "free inference"** — David directive: say "own your inference" / "inference you own"
+- Morpheus = ownership, not rental. MOR staking = inference forever (tokens staked, returned, recycled)
+- Morpheus API Gateway during beta = "community-powered" / "open access" (not "free")
+- **Don't highlight Llama 3.3** — David considers it outdated. Focus on Kimi K2.5 and GLM-4 models
+
 ## Upcoming
-- **SmartAgentProtocol development** — Feb 12 (PRs, testing practices, easy-install packaging)
-- Publish Everclaw to ClawHub as `everclaw-inference` on Feb 16 (cron job `6ff30a74` scheduled) — needs David's GitHub account
-- ~~Everclaw v0.8 — Morpheus API Gateway bootstrap~~ DONE
-- ~~Version x402 + agent registry as v0.7~~ DONE
+- Add SmartAgent logo to assets/ (David to upload)
+- Test install.sh on clean macOS and Linux machines
+- Configure DNS for smartagent.org if issues persist
 - Investigate Signal-cli connection drops and thread starvation
 - Consider registering Everclaw as an ERC-8004 agent on Base
 

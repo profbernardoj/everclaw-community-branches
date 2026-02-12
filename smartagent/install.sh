@@ -1,14 +1,14 @@
 #!/bin/bash
 # SmartAgent Installer — https://smartagent.org
 #
-# One command to a personal AI agent with free inference:
+# One command to a personal AI agent with decentralized inference:
 #   curl -fsSL https://smartagent.org/install.sh | bash
 #
 # What this does:
 #   1. Checks/installs Node.js 22+
 #   2. Installs OpenClaw (the AI agent framework)
 #   3. Installs Everclaw (decentralized inference via Morpheus)
-#   4. Bootstraps free inference (Morpheus API Gateway — no API key needed)
+#   4. Bootstraps decentralized inference (Morpheus API Gateway — no API key needed)
 #   5. Pre-configures your agent with sensible defaults
 #   6. Starts the agent and opens WebChat in your browser
 #
@@ -208,16 +208,16 @@ install_everclaw() {
   log "Everclaw installed ✓"
 }
 
-# ─── Step 4: Bootstrap Free Inference ────────────────────────────────────────
+# ─── Step 4: Bootstrap Decentralized Inference ───────────────────────────────
 bootstrap_inference() {
-  log "Bootstrapping free inference via Morpheus API Gateway..."
+  log "Bootstrapping decentralized inference via Morpheus API Gateway..."
 
   local bootstrap_script="$SKILL_DIR/scripts/bootstrap-gateway.mjs"
 
   if [[ -f "$bootstrap_script" ]]; then
     if node "$bootstrap_script" 2>/dev/null; then
-      log "Free inference configured ✓"
-      log "Using: mor-gateway/kimi-k2.5 (free, no API key needed)"
+      log "Decentralized inference configured ✓"
+      log "Using: mor-gateway/kimi-k2.5 (no API key needed)"
       return 0
     else
       warn "Gateway bootstrap script returned an error"
@@ -331,7 +331,7 @@ open_webchat() {
   bold "  │                                             │"
   bold "  │   WebChat: ${webchat_url}            │"
   bold "  │                                             │"
-  bold "  │   Your agent is using free Morpheus          │"
+  bold "  │   Your agent is using Morpheus decentralized  │"
   bold "  │   inference — no API key needed.             │"
   bold "  │                                             │"
   bold "  │   Say hello to get started!                  │"
@@ -377,7 +377,7 @@ main() {
   install_everclaw
 
   echo ""
-  log "Step 4/6: Free Inference"
+  log "Step 4/6: Decentralized Inference"
   bootstrap_inference
 
   echo ""

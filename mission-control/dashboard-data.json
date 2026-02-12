@@ -1,5 +1,5 @@
 {
-  "generated": "2026-02-11T09:08:02.600Z",
+  "generated": "2026-02-12T09:07:14.513Z",
   "owner": "[REDACTED]",
   "lifeGoals": [
     {
@@ -17,10 +17,12 @@
           "source": "description"
         }
       ],
-      "actionsTaken": [],
+      "actionsTaken": [
+        "2026-02-11: Saved Balaji education framework for guiding children's skill development"
+      ],
       "actionsSuggested": [],
       "context": [],
-      "status": "tracking"
+      "status": "active"
     },
     {
       "id": "christ-centered",
@@ -43,10 +45,12 @@
           "source": "user-md"
         }
       ],
-      "actionsTaken": [],
+      "actionsTaken": [
+        "2026-02-11: Saved Balaji education framework for guiding children's skill development"
+      ],
       "actionsSuggested": [],
       "context": [],
-      "status": "tracking"
+      "status": "active"
     },
     {
       "id": "great-commission",
@@ -87,10 +91,12 @@
           "source": "user-md"
         }
       ],
-      "actionsTaken": [],
+      "actionsTaken": [
+        "2026-02-11: Saved Balaji education framework for guiding children's skill development"
+      ],
       "actionsSuggested": [],
       "context": [],
-      "status": "tracking"
+      "status": "active"
     },
     {
       "id": "space-settlement",
@@ -289,7 +295,9 @@
           "source": "vector"
         }
       ],
-      "actionsTaken": [],
+      "actionsTaken": [
+        "2026-02-11: Saved Balaji Srinivasan insight on Network State + human value in AI age"
+      ],
       "actionsSuggested": [],
       "context": [
         "Early contributor to Decentralized Applications (dApps) framework adopted by Ethereum",
@@ -298,7 +306,7 @@
         "Coined \"Johnston's Law\" (2014): \"Everything That Can Be Decentralized Will Be Decentralized\"",
         "100+ conference talks, 100+ articles"
       ],
-      "status": "tracking"
+      "status": "active"
     },
     {
       "id": "wealth-creation",
@@ -433,6 +441,55 @@
   ],
   "activities": [
     {
+      "time": "2026-02-12 23:53",
+      "date": "2026-02-12",
+      "type": "system",
+      "title": "SmartAgent Repo Created",
+      "desc": "URL: https://github.com/SmartAgentProtocol/smartagent Domain: smartagent.org (David owns it, DNS not configured yet) Logo: David provided a futuristic AI face image — needs to be added to assets/"
+    },
+    {
+      "time": "2026-02-12 23:19",
+      "date": "2026-02-12",
+      "type": "config",
+      "title": "Everclaw Published on ClawHub",
+      "desc": "Live at: https://clawhub.ai/DavidAJohnston/everclaw-inference Published by David from his GitHub account Updated all docs to make ClawHub the primary install method"
+    },
+    {
+      "time": "2026-02-12 22:26",
+      "date": "2026-02-12",
+      "type": "system",
+      "title": "ClawHub Name Collision + Safe Installer",
+      "desc": "User Barry installed Everclaw v0.7 via git. His agent Janet ran `clawhub update everclaw` to upgrade to v0.8. ClawHub fetched a COMPLETELY DIFFERENT product — \"Everclaw Vault\" (encrypted cloud memory,"
+    },
+    {
+      "time": "2026-02-12 22:16",
+      "date": "2026-02-12",
+      "type": "config",
+      "title": "Everclaw v0.9.1 Published",
+      "desc": "SKILL.md: Section 13 rewritten with multi-key setup guide, auth.order config, rotation mechanics, DIEM credit cost table, complete failover docs README: Multi-key rotation added to core features table"
+    },
+    {
+      "time": "2026-02-12 22:01",
+      "date": "2026-02-12",
+      "type": "system",
+      "title": "Multi-Key Auth Rotation Setup",
+      "desc": "David revealed he has 6 Venice API keys. Previously only one was configured, which is why the backup key was never used — OpenClaw's auth system was never told about it. OpenClaw supports multiple aut"
+    },
+    {
+      "time": "2026-02-12 21:47",
+      "date": "2026-02-12",
+      "type": "config",
+      "title": "Everclaw v0.9.0 Published",
+      "desc": "David requested v0.9.0 release. Tagged and pushed to GitHub. SKILL.md: v0.8.0 → v0.9.0, Gateway Guardian section rewritten for v2 (inference probes, 4-stage escalation, state files, config table) READ"
+    },
+    {
+      "time": "2026-02-12 21:20",
+      "date": "2026-02-12",
+      "type": "system",
+      "title": "Gateway Guardian v2",
+      "desc": "David reported being offline again — Venice DIEM credits ran out, all providers entered cooldown, and the agent was brain-dead. Had to manually run `sudo curl -fsSL https://clawd.bot/install.sh | bash"
+    },
+    {
       "time": "2026-02-11 23:33",
       "date": "2026-02-11",
       "type": "system",
@@ -487,6 +544,27 @@
       "type": "config",
       "title": "Provider Cooldown Cascade Fix",
       "desc": "David reported being offline for hours due to Venice + Morpheus both entering cooldown. Diagnosed and fixed the root cause. Venice ran out of API credits → billing error → cooldown Morpheus proxy retu"
+    },
+    {
+      "time": "2026-02-11 11:32",
+      "date": "2026-02-11",
+      "type": "config",
+      "title": "Everclaw v0.8 — Morpheus API Gateway Bootstrap",
+      "desc": "David wants to reduce friction for new OpenClaw users by providing free inference at startup. New users don't have a Claude API key — Everclaw v0.8 provides a free Morpheus API Gateway key to bootstra"
+    },
+    {
+      "time": "2026-02-11 09:16",
+      "date": "2026-02-11",
+      "type": "system",
+      "title": "Balaji Insight Saved",
+      "desc": "Saved @balajis X post about 10 durable skills in the age of AI (vision, verification, prompting, polishing, community, geography, scarcity, cryptography, physicality, resiliency). Cross-referenced to "
+    },
+    {
+      "time": "2026-02-11 00:00",
+      "date": "2026-02-11",
+      "type": "system",
+      "title": "Conversation Summary",
+      "desc": "assistant: No new deployment triggered yet. GitHub Pages deploys from the `docs/` folder on push — it might take a few minutes for GitHub to queue the build. Let me wait a bit longer: assistant: Pages"
     },
     {
       "time": "2026-02-11 00:00",
@@ -569,7 +647,7 @@
   "keyFacts": [
     {
       "heading": "Everclaw Skill (profbernardoj/everclaw)",
-      "content": "### Current Version: v0.7.0\n- OpenClaw skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz (GitHub Pages from docs/)\n- Repo: profbernardoj/everclaw on GitHub\n### Architecture\n- **Morpheus proxy:** `~/morpheus/proxy/morpheus-proxy.mjs` (port 8083, launchd: com.morpheus.proxy)\n- **Morpheus proxy-router (Go):** `~/morpheus/` (port 8082)\n- **Proxy auth:** Bearer token `morpheus-local`\n- **OpenClaw provider name:** `morpheus` (e.g., `morpheus/kimi-k2.5`)\n- Venice IDs use"
+      "content": "### Current Version: v0.9.2\n- OpenClaw skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz (GitHub Pages from docs/)\n- Repo: profbernardoj/everclaw on GitHub\n### Architecture\n- **Morpheus proxy:** `~/morpheus/proxy/morpheus-proxy.mjs` (port 8083, launchd: com.morpheus.proxy)\n- **Morpheus proxy-router (Go):** `~/morpheus/` (port 8082)\n- **Proxy auth:** Bearer token `morpheus-local`\n- **OpenClaw provider name:** `morpheus` (e.g., `morpheus/kimi-k2.5`)\n- Venice IDs use"
     },
     {
       "heading": "David's Model Preferences",
@@ -577,21 +655,29 @@
     },
     {
       "heading": "Lessons Learned",
-      "content": "### Morpheus Proxy Error Classification (2026-02-11)\nMorpheus infrastructure failures (502s) must return `type: \"server_error\"` not `\"billing\"` — otherwise OpenClaw triggers extended cooldown and cascades across all providers.\n### Sub-agent Task Complexity (2026-02-11)\nKimi K2.5 via sub-agent choked on complex multi-file coding task (2s exit, no output). Heavy coding work should stay on Claude. This validates the HEAVY tier in the router.\n### ERC-8004 Contract Quirks (2026-02-11)\n- `totalSupply("
+      "content": "### Morpheus models need reasoning: false in OpenClaw config (2026-02-11)\nAll Morpheus provider models (kimi-k2.5, kimi-k2-thinking, glm-4.7-flash) must have `\"reasoning\": false` in openclaw.json. The upstream litellm rejects the `reasoning_effort` parameter — if set to true, cron jobs using Morpheus models fail with HTTP 400. Fixed via config.patch.\n### Morpheus Proxy Error Classification (2026-02-11)\nMorpheus infrastructure failures (502s) must return `type: \"server_error\"` not `\"billing\"` — o"
     },
     {
       "heading": "SmartAgentProtocol (GitHub Org)",
-      "content": "- Org: https://github.com/orgs/SmartAgentProtocol\n- Role: admin/owner (profbernardoj)\n- Description: \"Open Source Chat Interface For Wallets, Dapps, DAOs, & Smart Contracts\"\n- **Vision:** Full version of OpenClaw with Everclaw improvements, packaged for non-technical users\n- **Workflow:** PRs, code review, CI testing — higher bar than Everclaw's direct-push model\n- **Target users:** People not comfortable with Terminal — needs GUI installer / one-click setup\n- **Starting Feb 12, 2026**\n---"
+      "content": "- Org: https://github.com/orgs/SmartAgentProtocol\n- Role: admin/owner (profbernardoj)\n- **Repo:** https://github.com/SmartAgentProtocol/smartagent (live as of Feb 12)\n- **Domain:** smartagent.org (David owns, DNS pending)\n- **Vision:** OpenClaw + Everclaw + sensible defaults, packaged for non-technical users\n- **Architecture:** Installer-first (not fork). `curl install.sh | bash` → free inference immediately\n- **Primary model:** `mor-gateway/kimi-k2.5` (free via Morpheus API Gateway)\n- **Workflo"
+    },
+    {
+      "heading": "Key People & Thinkers",
+      "content": "- **Balaji Srinivasan** (@balajis) — Network School founder, *The Network State* author\n  - Network State = voluntary smart contract governance (opt-in, replaces nation-state force model)\n  - 10 durable skills in AI age: vision, verification, prompting, polishing, community, geography, scarcity, cryptography, physicality, resiliency\n  - Relevant to: Abolition of State goal + Family education framework\n  - Full quote saved: `memory/insights/balaji-value-in-age-of-ai.md`"
     },
     {
       "heading": "Upcoming",
-      "content": "- **SmartAgentProtocol development** — Feb 12 (PRs, testing practices, easy-install packaging)\n- Publish Everclaw to ClawHub on Feb 16 (cron job `6ff30a74` scheduled)\n- ~~Version x402 + agent registry as v0.7~~ DONE\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
+      "content": "- **SmartAgentProtocol development** — Feb 12 (PRs, testing practices, easy-install packaging)\n- Publish Everclaw to ClawHub as `everclaw-inference` on Feb 16 (cron job `6ff30a74` scheduled) — needs David's GitHub account\n- ~~Everclaw v0.8 — Morpheus API Gateway bootstrap~~ DONE\n- ~~Version x402 + agent registry as v0.7~~ DONE\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
+    },
+    {
+      "heading": "Key Users",
+      "content": "- **Barry** — Everclaw user, agent named Janet. Hit ClawHub collision bug upgrading v0.7→v0.8. Runtime infra survived but skill dir got nuked. First external user to report a bug."
     }
   ],
   "stats": {
-    "totalActivities": 19,
+    "totalActivities": 29,
     "totalGoals": 8,
-    "activeGoals": 1,
-    "memoryFiles": 7
+    "activeGoals": 5,
+    "memoryFiles": 13
   }
 }

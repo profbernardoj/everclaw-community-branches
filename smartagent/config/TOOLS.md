@@ -9,8 +9,8 @@ Skills define _how_ tools work. This file is for _your_ specifics.
 SmartAgent uses decentralized inference powered by the Morpheus network.
 
 **Current setup:**
-- Primary model: `mor-gateway/kimi-k2.5` (free via Morpheus API Gateway)
-- Fallback: `mor-gateway/glm-4.7-flash` (free, fast)
+- Primary model: `mor-gateway/kimi-k2.5` (community-powered via Morpheus API Gateway)
+- Fallback: `mor-gateway/glm-4.7-flash` (community-powered, fast)
 
 **Upgrade path:**
 - Venice subscription ($8/month) → Claude, GPT-5.2, premium models
