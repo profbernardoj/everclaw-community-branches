@@ -6,7 +6,7 @@ Last updated: 2026-02-12
 
 ## Everclaw Skill (profbernardoj/everclaw)
 
-### Current Version: v0.9.0
+### Current Version: v0.9.1
 - OpenClaw skill for decentralized AI inference via Morpheus network
 - Website: everclaw.xyz (GitHub Pages from docs/)
 - Repo: profbernardoj/everclaw on GitHub
@@ -20,6 +20,14 @@ Last updated: 2026-02-12
 
 ### Fallback Chain
 `venice/claude-opus-4-6` → `venice/claude-opus-45` → `venice/kimi-k2-5` → `morpheus/kimi-k2.5`
+
+### Multi-Key Auth Rotation (v0.9.1)
+- 6 Venice API keys configured as separate auth profiles (venice:key1 through venice:key6)
+- Explicit rotation order via `auth.order.venice` in openclaw.json (most DIEM to least)
+- Total DIEM: 246 (98+50+40+26+20+12)
+- When one key's credits exhaust → billing disable on that profile only → rotates to next key
+- Same model, fresh credits — agent stays on Claude instead of falling to cheaper models
+- Only after ALL 6 keys are disabled does OpenClaw fall to model fallback chain (Morpheus)
 
 ### Model Router (v0.6)
 - `scripts/router.mjs` — 13-dimension weighted prompt classifier, <1ms
