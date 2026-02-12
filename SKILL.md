@@ -17,7 +17,9 @@ metadata:
 
 Access Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and 10+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
 
-> ⚠️ **ClawHub Name Collision:** A different product ("Everclaw Vault" — encrypted cloud memory) uses the `everclaw` slug on ClawHub. **DO NOT run `clawhub update everclaw`** — it will overwrite this skill with an unrelated product. Updates for this skill come from GitHub: `cd skills/everclaw && git pull`. See `CLAWHUB_WARNING.md` for details and recovery steps.
+> 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/DavidAJohnston/everclaw-inference](https://clawhub.ai/DavidAJohnston/everclaw-inference)
+>
+> ⚠️ **Name Collision Warning:** A different product ("Everclaw Vault") uses the bare `everclaw` slug on ClawHub. **Always use `everclaw-inference`** — never `clawhub install everclaw` or `clawhub update everclaw`. See `CLAWHUB_WARNING.md` for details.
 
 ## How It Works
 
@@ -61,7 +63,17 @@ Agent → proxy-router (localhost:8082) → Morpheus P2P Network → Provider �
 
 ## 1. Installation
 
-### Recommended: One-Command Installer (v0.9.2)
+### Option A: ClawHub (Easiest)
+
+```bash
+clawhub install everclaw-inference
+```
+
+To update: `clawhub update everclaw-inference`
+
+⚠️ **Use `everclaw-inference`** — not `everclaw`. The bare `everclaw` slug belongs to a different, unrelated product on ClawHub.
+
+### Option B: One-Command Installer
 
 The safe installer handles fresh installs, updates, and ClawHub collision detection:
 
@@ -76,24 +88,13 @@ bash skills/everclaw/scripts/install-everclaw.sh
 bash skills/everclaw/scripts/install-everclaw.sh --check
 ```
 
-The installer will:
-- Detect and warn about the ClawHub "Everclaw Vault" name collision
-- Clone from GitHub (fresh install) or `git pull` (update)
-- Show next steps for router, proxy, and wallet setup
-
-### Alternative: Manual Git Clone
+### Option C: Manual Git Clone
 
 ```bash
 git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/skills/everclaw
 ```
 
-### Updating
-
-⚠️ **DO NOT use `clawhub update everclaw`** — a different product uses that slug on ClawHub. Always update via git:
-
-```bash
-cd ~/.openclaw/workspace/skills/everclaw && git pull
-```
+To update: `cd ~/.openclaw/workspace/skills/everclaw && git pull`
 
 ### Install the Morpheus Router
 

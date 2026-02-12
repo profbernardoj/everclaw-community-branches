@@ -391,11 +391,12 @@
           <div class="step-number">3</div>
           <h3>Install Everclaw</h3>
         </div>
-        <p>Run the safe installer — it detects conflicts and sets up everything:</p>
+        <p>Install from ClawHub (easiest) or the command-line installer:</p>
         <div class="code-block">
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          <code>curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code>
+          <code>clawhub install everclaw-inference</code>
         </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Or: <code style="font-size: 12px;">curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code></p>
       </div>
 
       <div class="step">
@@ -479,11 +480,12 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</
           <div class="step-number">1</div>
           <h3>Install Everclaw</h3>
         </div>
-        <p>Run the safe installer (handles collision detection and updates):</p>
+        <p>Install from <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference" style="color: var(--accent);">ClawHub</a> or the command-line installer:</p>
         <div class="code-block">
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          <code>curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code>
+          <code>clawhub install everclaw-inference</code>
         </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Or: <code style="font-size: 12px;">curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code></p>
       </div>
 
       <div class="step">
@@ -574,8 +576,8 @@ curl http://127.0.0.1:8083/health</code>
       <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.2</h3>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
         <div>
-          <strong style="color: var(--green);">🛡️ Safe Installer + ClawHub Collision Protection</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">One-command installer (<code>curl | bash</code>) with collision detection — warns if the ClawHub "Everclaw Vault" imposter is present. Safe updates via <code>git pull</code>, version checking, and recovery docs. Never get your skill overwritten again.</p>
+          <strong style="color: var(--green);">📦 Now on ClawHub + Collision Protection</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"><code>clawhub install everclaw-inference</code> — officially live on <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference" style="color: var(--accent);">ClawHub</a>. Includes collision detection against the unrelated "Everclaw Vault" imposter, safe installer, version checking, and recovery docs.</p>
         </div>
         <div>
           <strong style="color: var(--green);">🔑 Multi-Key Auth Rotation + Guardian v2</strong>
@@ -702,6 +704,7 @@ curl http://127.0.0.1:8083/health</code>
   <footer>
     <div class="container">
       <div class="footer-links">
+        <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference">ClawHub</a>
         <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
         <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
         <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.2">v0.9.2 Release</a>

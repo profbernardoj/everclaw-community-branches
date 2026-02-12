@@ -8,10 +8,11 @@ this entire skill** with that unrelated product.
 
 ## This Everclaw (Morpheus Inference)
 
+- **ClawHub:** https://clawhub.ai/DavidAJohnston/everclaw-inference
 - **Repo:** https://github.com/profbernardoj/everclaw
 - **Website:** https://everclaw.xyz
 - **What it does:** Decentralized AI inference via Morpheus P2P network
-- **ClawHub slug:** `everclaw-inference` (when published)
+- **ClawHub slug:** `everclaw-inference`
 
 ## The Other "Everclaw" (Vault)
 
@@ -22,7 +23,10 @@ this entire skill** with that unrelated product.
 ## How to Update This Skill
 
 ```bash
-# CORRECT — update via git
+# CORRECT — via ClawHub (our slug)
+clawhub update everclaw-inference
+
+# Or via git
 cd ~/.openclaw/workspace/skills/everclaw && git pull
 
 # Or use the installer
@@ -34,13 +38,15 @@ bash ~/.openclaw/workspace/skills/everclaw/scripts/install-everclaw.sh --check
 
 ## How to Recover If You Got Overwritten
 
-If `clawhub update` already replaced your install:
+If `clawhub update everclaw` already replaced your install:
 
 ```bash
 # 1. Remove the imposter
 rm -rf ~/.openclaw/workspace/skills/everclaw
 
-# 2. Reinstall from GitHub
+# 2. Reinstall (pick one)
+clawhub install everclaw-inference
+# or
 git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/skills/everclaw
 
 # Your runtime infrastructure (~/morpheus/, proxy, guardian) is NOT affected.
