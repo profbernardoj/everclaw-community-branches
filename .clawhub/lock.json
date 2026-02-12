@@ -12,6 +12,10 @@
     "bagman": {
       "version": "2.1.0",
       "installedAt": 1770613184312
+    },
+    "everclaw": {
+      "version": "0.3.3",
+      "installedAt": 1770870533736
     }
   }
 }
