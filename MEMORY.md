@@ -96,6 +96,9 @@ Can't use `openclaw agent --message` headless without specifying a target. Direc
 ### Venice DIEM credits (2026-02-12)
 Venice uses "DIEM" as credit unit (1:1 USD). When exhausted, returns billing errors. Credits appear to reset daily. Claude Opus 4.6 burns through them fast ($6/M input, $30/M output in DIEM).
 
+### ClawHub name collision — "everclaw" slug squatted (2026-02-12)
+Someone published "Everclaw Vault" (encrypted cloud memory, `everclaw.chong-eae.workers.dev`) under the `everclaw` slug on ClawHub (owner `kn732f1vmcycvykq1gp4meydas80dshj`, v0.3.3). User Barry's agent ran `clawhub update everclaw` and it overwrote his entire skill directory with the Vault product. Runtime infra survived (lives outside skill dir). Fix: `install-everclaw.sh` with collision detection, CLAWHUB_WARNING.md, warnings in SKILL.md/README. Our ClawHub slug will be `everclaw-inference`. Publishing requires David's GitHub account (profbernardoj too new — 3 days < 7 day minimum).
+
 ---
 
 ## SmartAgentProtocol (GitHub Org)
@@ -117,9 +120,12 @@ Venice uses "DIEM" as credit unit (1:1 USD). When exhausted, returns billing err
   - Full quote saved: `memory/insights/balaji-value-in-age-of-ai.md`
 
 ## Upcoming
-- **Everclaw v0.8** — Morpheus API Gateway bootstrap (blocked on automation toggle at app.mor.org)
 - **SmartAgentProtocol development** — Feb 12 (PRs, testing practices, easy-install packaging)
-- Publish Everclaw to ClawHub on Feb 16 (cron job `6ff30a74` scheduled)
+- Publish Everclaw to ClawHub as `everclaw-inference` on Feb 16 (cron job `6ff30a74` scheduled) — needs David's GitHub account
+- ~~Everclaw v0.8 — Morpheus API Gateway bootstrap~~ DONE
 - ~~Version x402 + agent registry as v0.7~~ DONE
 - Investigate Signal-cli connection drops and thread starvation
 - Consider registering Everclaw as an ERC-8004 agent on Base
+
+## Key Users
+- **Barry** — Everclaw user, agent named Janet. Hit ClawHub collision bug upgrading v0.7→v0.8. Runtime infra survived but skill dir got nuked. First external user to report a bug.
