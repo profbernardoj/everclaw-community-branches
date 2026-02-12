@@ -8,19 +8,25 @@ When your primary API credits run out, Everclaw kicks in automatically. Your age
 
 ## Install
 
-One command:
+**From ClawHub:**
+
+```bash
+clawhub install everclaw-inference
+```
+
+**Or one-command installer:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash
 ```
 
-Or manually clone inside your OpenClaw workspace:
+**Or manual clone:**
 
 ```bash
 git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/skills/everclaw
 ```
 
-> ⚠️ **DO NOT use `clawhub install everclaw` or `clawhub update everclaw`** — a different product ("Everclaw Vault") uses that slug on ClawHub. Our ClawHub slug is `everclaw-inference`. Always install/update via git or the installer above.
+> ⚠️ **Use `everclaw-inference`** — not `everclaw`. The bare `everclaw` slug on ClawHub belongs to a different, unrelated product ("Everclaw Vault"). See [CLAWHUB_WARNING.md](CLAWHUB_WARNING.md).
 
 Then set up your wallet, proxy, and guardian:
 
@@ -194,8 +200,10 @@ When a session ends, your MOR comes back. Open a new session with the same token
 
 | Action | Command |
 |--------|---------|
-| Install Everclaw | `curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh \| bash` |
-| Update Everclaw | `cd skills/everclaw && git pull` |
+| Install (ClawHub) | `clawhub install everclaw-inference` |
+| Install (script) | `curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh \| bash` |
+| Update (ClawHub) | `clawhub update everclaw-inference` |
+| Update (git) | `cd skills/everclaw && git pull` |
 | Check version | `bash skills/everclaw/scripts/install-everclaw.sh --check` |
 | Install router | `bash skills/everclaw/scripts/install.sh` |
 | Create wallet | `node scripts/everclaw-wallet.mjs setup` |
