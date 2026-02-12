@@ -83,6 +83,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **x402 Payment Client** | Automatic HTTP 402 payment handling — signs USDC on Base via EIP-712, with budget controls and dry-run mode (v0.7) |
 | **ERC-8004 Agent Registry** | Discover agents on-chain — reads Identity + Reputation registries on Base, resolves registration files, checks trust signals (v0.7) |
 | **API Gateway Bootstrap** | One-command setup for free Morpheus inference — no API key, no wallet, no node required. New users get instant AI access (v0.8) |
+| **Multi-Key Auth Rotation** | Configure multiple Venice API keys — OpenClaw rotates through them automatically when credits drain, keeping you on premium models longer (v0.9.1) |
 | **Gateway Guardian v2** | Inference-level health probes + 4-stage self-healing restart with nuclear reinstall option. Detects brain-dead agents, not just crashed processes (v0.9) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 

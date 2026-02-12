@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.9.0
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, Gateway Guardian v2 with inference probes and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 0.9.1
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v2 with inference probes and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -725,12 +725,21 @@ Configure a multi-tier fallback chain (recommended since v0.5):
 
 ⚠️ **Why multi-tier?** A single fallback creates a single point of failure. If both the primary provider and the single fallback enter cooldown simultaneously (e.g., billing error triggers cooldown on both), your agent goes offline. Multiple fallback tiers across different models and providers ensure at least one path remains available.
 
-### Step 3: Add Auth Profile
+### Step 3: Add Auth Profiles
+
+OpenClaw supports **multiple API keys per provider** with automatic rotation. When one key's credits run out (billing error), OpenClaw disables *that key only* and rotates to the next one — same model, fresh credits. This is the single most effective way to prevent downtime.
+
+#### Single Key (Minimum Setup)
 
 Add to `~/.openclaw/agents/main/agent/auth-profiles.json`:
 
 ```json
 {
+  "venice:default": {
+    "type": "api_key",
+    "provider": "venice",
+    "key": "VENICE-INFERENCE-KEY-YOUR_KEY_HERE"
+  },
   "morpheus:default": {
     "type": "api_key",
     "provider": "morpheus",
@@ -739,33 +748,102 @@ Add to `~/.openclaw/agents/main/agent/auth-profiles.json`:
 }
 ```
 
-And in `openclaw.json` under `auth.profiles`:
+#### Multiple Keys (Recommended — v0.9.1)
 
-```json5
+If you have multiple Venice API keys (e.g., from different accounts or plans), add them all as separate profiles. Order them from most credits to least:
+
+**auth-profiles.json:**
+
+```json
 {
-  "auth": {
-    "profiles": {
-      "morpheus:default": {
-        "provider": "morpheus",
-        "mode": "api_key"
-      }
+  "version": 1,
+  "profiles": {
+    "venice:key1": {
+      "type": "api_key",
+      "provider": "venice",
+      "key": "VENICE-INFERENCE-KEY-YOUR_PRIMARY_KEY"
+    },
+    "venice:key2": {
+      "type": "api_key",
+      "provider": "venice",
+      "key": "VENICE-INFERENCE-KEY-YOUR_SECOND_KEY"
+    },
+    "venice:key3": {
+      "type": "api_key",
+      "provider": "venice",
+      "key": "VENICE-INFERENCE-KEY-YOUR_THIRD_KEY"
+    },
+    "morpheus:default": {
+      "type": "api_key",
+      "provider": "morpheus",
+      "key": "morpheus-local"
     }
   }
 }
 ```
 
-### Failover Behavior
+**openclaw.json** — register the profiles and set explicit rotation order:
 
-When your primary provider (e.g., Venice) returns billing/credit errors:
-1. OpenClaw marks the primary model's profile as **in cooldown**
-2. Tries fallback 1 (`venice/claude-opus-45`) — different model, same provider
-3. If that also fails, tries fallback 2 (`venice/kimi-k2-5`) — open-source model
-4. If all Venice models fail, falls back to `morpheus/kimi-k2.5`
-5. The proxy auto-opens a 7-day Morpheus session (if none exists)
-6. Inference routes through the Morpheus P2P network
-7. When primary credits refill, OpenClaw switches back automatically
+```json5
+{
+  "auth": {
+    "profiles": {
+      "venice:key1": { "provider": "venice", "mode": "api_key" },
+      "venice:key2": { "provider": "venice", "mode": "api_key" },
+      "venice:key3": { "provider": "venice", "mode": "api_key" },
+      "morpheus:default": { "provider": "morpheus", "mode": "api_key" }
+    },
+    "order": {
+      "venice": ["venice:key1", "venice:key2", "venice:key3"]
+    }
+  }
+}
+```
 
-**v0.5 improvement:** The Morpheus proxy now returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the Morpheus provider into extended cooldown due to transient infrastructure issues. If a Morpheus session expires mid-request, the proxy automatically opens a fresh session and retries once.
+⚠️ **`auth.order`** is critical. Without it, OpenClaw uses round-robin (oldest-used first), which may not match your credit balances. With an explicit order, keys are tried in the exact sequence you specify — highest credits first.
+
+#### How Multi-Key Rotation Works
+
+OpenClaw's auth engine handles rotation automatically:
+
+1. **Session stickiness:** A key is pinned per session to keep provider caches warm. It won't flip-flop mid-conversation.
+2. **Billing disable:** When a key returns a billing/credit error, that *profile* is disabled with exponential backoff (starts at 5 hours). Other profiles for the same provider remain active.
+3. **Rotation on failure:** After disabling a profile, OpenClaw immediately tries the next key in `auth.order`. Same model, same provider — just fresh credits.
+4. **Model fallback:** Only after ALL profiles for Venice are disabled does OpenClaw move to the next model in the fallback chain (e.g., Morpheus).
+5. **Auto-recovery:** Disabled profiles auto-recover after backoff expires. If credits refill (e.g., daily reset), the profile becomes available again.
+
+#### Venice DIEM Credits
+
+Venice uses "DIEM" as its internal credit unit (1 DIEM ≈ $1 USD). Each API key has its own DIEM balance. Credits appear to reset daily. Expensive models drain credits faster:
+
+| Model | Input Cost | Output Cost | ~Messages per 10 DIEM |
+|-------|-----------|-------------|----------------------|
+| Claude Opus 4.6 | 6 DIEM/M tokens | 30 DIEM/M tokens | ~5-10 |
+| Claude Opus 4.5 | 6 DIEM/M tokens | 30 DIEM/M tokens | ~5-10 |
+| Kimi K2.5 | 0.75 DIEM/M tokens | 3.75 DIEM/M tokens | ~50-100 |
+| GLM 4.7 Flash | 0.125 DIEM/M tokens | 0.5 DIEM/M tokens | ~500+ |
+
+**Tip:** With multiple keys, the agent can stay on Claude Opus across key rotations. Without multi-key, it would fall to cheaper models or Morpheus after one key's credits run out.
+
+### Failover Behavior (v0.9.1)
+
+The complete failover chain with multi-key rotation:
+
+1. **Key rotation within Venice** — Key 1 credits exhausted → billing disable on *that profile only* → immediately rotates to Key 2 → Key 3 → etc. Same model, fresh credits.
+2. **Model fallback** — Only after ALL Venice keys are disabled → tries `venice/claude-opus-45` (all keys again) → `venice/kimi-k2-5` (all keys) → `morpheus/kimi-k2.5`
+3. **Morpheus fallback** — The proxy auto-opens a 7-day Morpheus session (if none exists). Inference routes through the Morpheus P2P network.
+4. **Gateway Guardian v2** — If all providers enter cooldown despite multi-key rotation → detects brain-dead state → restarts gateway (clears cooldowns) → nuclear reinstall if needed.
+5. **Auto-recovery** — When credits refill (daily reset) or backoff expires, OpenClaw switches back to Venice automatically.
+
+**Example with 6 keys (246 DIEM total):**
+
+```
+venice:key1 (98 DIEM) → venice:key2 (50 DIEM) → venice:key3 (40 DIEM) →
+venice:key4 (26 DIEM) → venice:key5 (20 DIEM) → venice:key6 (12 DIEM) →
+morpheus/kimi-k2.5 (free, staked MOR) → mor-gateway/kimi-k2.5 (free beta)
+```
+
+**v0.5 improvement:** The Morpheus proxy returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the Morpheus provider into extended cooldown due to transient infrastructure issues. If a Morpheus session expires mid-request, the proxy automatically opens a fresh session and retries once.
 
 ---
 
@@ -1067,7 +1145,7 @@ if (agent.x402Support && apiEndpoint) {
 
 ---
 
-## Quick Reference (v0.9)
+## Quick Reference (v0.9.1)
 
 | Action | Command |
 |--------|---------|
