@@ -18,10 +18,8 @@ set -euo pipefail
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 SMARTAGENT_VERSION="0.1.0"
-OPENCLAW_MIN_VERSION="2026.2"
 NODE_MIN_VERSION="22"
 EVERCLAW_REPO="https://github.com/profbernardoj/everclaw.git"
-SMARTAGENT_REPO="https://github.com/SmartAgentProtocol/smartagent.git"
 WORKSPACE="${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}"
 SKILL_DIR="$WORKSPACE/skills/everclaw"
 
@@ -72,8 +70,8 @@ check_os() {
   local arch
   arch="$(uname -m)"
   case "$arch" in
-    x86_64|amd64) ARCH="x64" ;;
-    arm64|aarch64) ARCH="arm64" ;;
+    x86_64|amd64) ;; # supported
+    arm64|aarch64) ;; # supported
     *)
       err "Unsupported architecture: $arch"
       exit 1
