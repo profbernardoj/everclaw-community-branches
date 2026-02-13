@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.9.2
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v2 with inference probes and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 0.9.3
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v3 with through-OpenClaw inference probes, circuit breaker for stuck sub-agents, and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -886,34 +886,44 @@ morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gate
 
 ---
 
-## 14. Gateway Guardian v2 (v0.9)
+## 14. Gateway Guardian v3 (v0.9.3)
 
-A self-healing watchdog that monitors the OpenClaw gateway **and its ability to actually run inference**. Runs every 2 minutes via launchd.
+A self-healing watchdog that monitors the OpenClaw gateway **and its ability to actually run inference through the full stack**. Runs every 2 minutes via launchd.
 
-### The Problem v2 Solves
+### The Problem v3 Solves
 
-v1 only checked if the gateway process was alive (HTTP 200 on dashboard). But the real failure mode is when the gateway is alive but **all model providers are in cooldown** — credits exhausted, billing errors cascading across providers. The gateway returns 200 while the agent is effectively brain-dead. v2 adds inference-level health checks and a nuclear self-healing option.
+v1 only checked if the gateway process was alive (HTTP 200 on dashboard). v2 added inference-level health checks by probing provider URLs directly — but **provider APIs always return 200** even when OpenClaw's auth profiles are disabled or in cooldown. The real failure mode: the gateway is alive, all providers respond to health checks, but OpenClaw has no working auth profiles. The agent is brain-dead, but traditional health checks pass.
+
+v3 probes **through OpenClaw itself** using `openclaw agent` with a throwaway session. This tests the complete chain: gateway → auth selection → provider → inference → response. If the agent can't get a response through the full stack, inference is truly dead.
+
+**New in v3:** Circuit breaker for stuck sub-agents. Sub-agents that timeout repeatedly burn through API credits and disable all auth profiles. The circuit breaker detects runs stuck >30 min with repeated timeouts and triggers a graceful restart to clear them.
 
 ### How It Works
 
 1. **HTTP probe** — Is the gateway process running? (`http://127.0.0.1:18789/`)
-2. **Inference probe** — Can any model provider actually respond?
-   - Checks Venice API (`/api/v1/models`)
-   - Checks Morpheus local proxy (`/health`)
-   - Checks Morpheus API Gateway (`/api/v1/models`)
-   - If **any one** responds, inference is available
-3. **Separate failure counters** — HTTP failures (2 threshold) and inference failures (3 threshold, ~6 min) tracked independently
-4. **Four-stage restart escalation:**
-   - `openclaw gateway restart` (graceful — resets in-memory cooldown state)
+2. **Inference probe (v3)** — Can the agent actually run inference through OpenClaw?
+   - Launches `openclaw agent --session-id guardian-health-probe`
+   - Tests the full stack: gateway → auth profile selection → provider → response
+   - Uses GLM-4.7 Flash (cheapest model) to minimize cost
+   - If the agent responds, inference is truly available
+3. **Circuit breaker** — Checks for sub-agents stuck >30 min with repeated timeout errors
+   - Parses gateway error logs for runs with multiple "embedded run timeout" errors
+   - If estimated stuck duration exceeds threshold, triggers graceful restart
+   - Runs every 5 minutes (not every 2 min guardian cycle) to avoid log spam
+4. **Separate failure counters** — HTTP failures (2 threshold) and inference failures (3 threshold, ~6 min) tracked independently
+5. **Four-stage restart escalation:**
+   - `openclaw gateway restart` (graceful — resets in-memory cooldown state + clears stuck runs)
    - Hard kill (`kill -9`) → launchd KeepAlive restarts
    - `launchctl kickstart -k` (force restart)
    - **🔴 NUCLEAR:** `curl -fsSL https://clawd.bot/install.sh | bash` (full reinstall — guaranteed clean start)
-5. **Signal notification** before nuclear restart (via signal-cli if available)
-6. Logs everything to `~/.openclaw/logs/guardian.log`
+6. **Signal notification** before nuclear restart (via signal-cli if available)
+7. Logs everything to `~/.openclaw/logs/guardian.log`
 
 ### Why Restart Fixes Cooldown
 
-OpenClaw's provider cooldown state is **in-memory**. When all providers enter cooldown (e.g., Venice credits exhausted + Morpheus errors misclassified), the agent stays offline until cooldowns expire naturally — which can take hours. **Restarting the gateway process clears all cooldown state immediately**, allowing the fallback chain to work again.
+OpenClaw's provider cooldown state is **in-memory**. When all providers enter cooldown (e.g., Venice credits exhausted across all keys + Morpheus errors misclassified), the agent stays offline until cooldowns expire naturally — which can take hours. **Restarting the gateway process clears all cooldown state immediately**, allowing the fallback chain to work again.
+
+**v3 addition:** Restarting also clears stuck sub-agents that are burning credits in timeout loops.
 
 ### Installation
 
@@ -954,9 +964,11 @@ Edit variables at the top of `gateway-guardian.sh`:
 |----------|---------|-------------|
 | `GATEWAY_PORT` | `18789` | Gateway port to probe |
 | `PROBE_TIMEOUT` | `8` | HTTP timeout in seconds |
-| `INFERENCE_TIMEOUT` | `15` | Provider probe timeout in seconds |
+| `INFERENCE_TIMEOUT` | `45` | OpenClaw agent probe timeout (needs more time for full stack) |
 | `FAIL_THRESHOLD` | `2` | Consecutive HTTP failures before restart |
 | `INFERENCE_FAIL_THRESHOLD` | `3` | Consecutive inference failures before escalation (~6 min) |
+| `MAX_STUCK_DURATION_SEC` | `1800` | Kill sub-agents stuck longer than 30 min (circuit breaker) |
+| `STUCK_CHECK_INTERVAL` | `300` | Circuit breaker check interval (5 min) |
 | `MAX_LOG_LINES` | `1000` | Log file rotation threshold |
 | `OWNER_SIGNAL` | `""` | Signal number for nuclear restart notifications |
 | `INSTALL_URL` | `https://clawd.bot/install.sh` | URL for nuclear reinstall script |
@@ -967,6 +979,7 @@ Edit variables at the top of `gateway-guardian.sh`:
 |------|---------|
 | `~/.openclaw/logs/guardian.state` | HTTP failure counter |
 | `~/.openclaw/logs/guardian-inference.state` | Inference failure counter |
+| `~/.openclaw/logs/guardian-circuit-breaker.state` | Last circuit breaker check timestamp |
 | `~/.openclaw/logs/guardian.log` | Guardian activity log |
 
 ---
