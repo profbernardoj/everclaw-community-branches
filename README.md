@@ -98,7 +98,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **ERC-8004 Agent Registry** | Discover agents on-chain — reads Identity + Reputation registries on Base, resolves registration files, checks trust signals (v0.7) |
 | **API Gateway Bootstrap** | One-command setup for community-powered Morpheus inference — no API key, no wallet, no node required. New users get instant AI access (v0.8) |
 | **Multi-Key Auth Rotation** | Configure multiple Venice API keys — OpenClaw rotates through them automatically when credits drain, keeping you on premium models longer (v0.9.1) |
-| **Gateway Guardian v2** | Inference-level health probes + 4-stage self-healing restart with nuclear reinstall option. Detects brain-dead agents, not just crashed processes (v0.9) |
+| **Gateway Guardian v3** | Through-OpenClaw inference probes test the full stack (gateway → auth → provider → response). Circuit breaker kills sub-agents stuck >30 min burning credits. 4-stage self-healing with nuclear reinstall. Detects brain-dead agents, not just crashed processes (v0.9.3) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
 **Benefit:** Your agent gets persistent access to 30+ open-source models (Kimi K2.5, GLM-4.7 Flash, Qwen3, and more) that you own through staked MOR tokens. No API bills, no credit limits — stake once, use forever. MOR tokens are staked, not consumed — they're returned when sessions close and can be restaked indefinitely. The model router (v0.6) ensures you only use expensive models when you need to — cron jobs, heartbeats, and simple tasks run on Morpheus inference you own. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get instant inference from their very first launch — no API key needed.
@@ -114,16 +114,18 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 
 **Benefit:** Your agent can discover other agents on-chain, verify their reputation, and pay them for services — all without custodial intermediaries. USDC payments are signed with EIP-712 and settled via the Coinbase facilitator. Budget controls prevent surprise spending.
 
-### 🛡️ Gateway Guardian v2 — Self-Healing Agent
+### 🛡️ Gateway Guardian v3 — Self-Healing Agent
 | Component | What It Does |
 |-----------|-------------|
-| **HTTP + Inference Probes** | Checks both gateway process AND model provider availability every 2 minutes |
-| **Provider Health Checks** | Directly probes Venice API, Morpheus proxy, and mor-gateway — if any responds, inference is alive |
+| **HTTP + Through-OpenClaw Inference Probes** | Checks gateway process AND actual inference capability every 2 minutes |
+| **Full-Stack Health Check** | Uses `openclaw agent` with throwaway session to test gateway → auth → provider → response. Unlike v2's provider URL probes, this catches when auth profiles are disabled/cooldown |
+| **Circuit Breaker** | Detects sub-agents stuck >30 min with repeated timeouts and triggers graceful restart to kill them |
+| **macOS-Compatible Timeout** | Uses portable `perl alarm` instead of `timeout`/`gtimeout` for macOS compatibility |
 | **4-Stage Restart Escalation** | Graceful restart → hard kill → kickstart → **nuclear reinstall** (`curl install.sh`) |
 | **Signal Notification** | Notifies you via Signal before executing nuclear restart |
 | **launchd Integration** | Survives reboots, auto-starts on macOS |
 
-**Benefit:** Your agent recovers from crashes AND from provider cooldown cascades. v1 only detected crashes — v2 detects when the gateway is alive but brain-dead (all providers in cooldown) and forces a restart to clear the cooldown state. The nuclear option runs the same reinstall command you'd run manually as a last resort.
+**Benefit:** Your agent recovers from crashes AND from provider cooldown cascades. v1 only detected crashes — v2 added provider health checks but couldn't see when OpenClaw's auth profiles were all disabled. v3 tests the full inference stack through OpenClaw itself. The circuit breaker kills stuck sub-agents that would otherwise burn through all your API keys. The nuclear option runs the same reinstall command you'd run manually as a last resort.
 
 ### 🔍 SkillGuard — Skill Security Scanner
 | Component | What It Does |
