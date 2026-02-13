@@ -170,10 +170,13 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 |-------|------|-------|
 | **Kimi K2.5** | General | Recommended primary fallback — most reliable |
 | **Kimi K2 Thinking** | Reasoning | Extended thinking for complex problems |
+| **GLM-5** | General | Zhipu's latest flagship model (NEW) |
+| **GLM-5:web** | General + Web | GLM-5 with web search (NEW) |
+| **MiniMax M2.5** | General | MiniMax's latest model (NEW) |
+| **MiniMax M2.5:web** | General + Web | M2.5 with web search (NEW) |
 | **GLM 4.7 Flash** | Fast | Quick responses, lower latency |
 | **GLM 4.7** | General | Full GLM model |
 | **Qwen3 235B** | General | Large parameter count |
-| **GLM-4.7 Flash** | Fast tasks | Zhipu's fast model |
 | **GPT-OSS 120B** | General | OpenAI's open-source model |
 
 All models are accessed through the same proxy endpoint. Switch models by changing the model name in your request.
