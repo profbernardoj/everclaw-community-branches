@@ -4,6 +4,8 @@
 
 When your primary API credits run out, Everclaw kicks in automatically. Your agent stays online. No interruptions, no downtime, no surprise bills. And because MOR is staked — not spent — you maintain access for as long as you hold your tokens.
 
+> **New: [DIY Setup Guide](https://github.com/betterbrand/Mac-Mini-Morpheus-Agent-DIY-Guide)** — Want to build an always-on Morpheus-powered agent from scratch on a Mac mini? Complete walkthrough with identity separation, on-chain guardrails, three-tier inference fallback, and 8 documented gotchas. Every step tested on real hardware.
+
 ---
 
 ## Install
