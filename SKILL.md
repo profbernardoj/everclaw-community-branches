@@ -1,7 +1,7 @@
 ---
 name: everclaw
 version: 0.9.3
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v3 with through-OpenClaw inference probes, circuit breaker for stuck sub-agents, and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -871,7 +871,7 @@ The complete failover chain with multi-key rotation:
 1. **Key rotation within Venice** — Key 1 credits exhausted → billing disable on *that profile only* → immediately rotates to Key 2 → Key 3 → etc. Same model, fresh credits.
 2. **Model fallback** — Only after ALL Venice keys are disabled → tries `venice/claude-opus-45` (all keys again) → `venice/kimi-k2-5` (all keys) → `morpheus/kimi-k2.5`
 3. **Morpheus fallback** — The proxy auto-opens a 7-day Morpheus session (if none exists). Inference routes through the Morpheus P2P network.
-4. **Gateway Guardian v2** — If all providers enter cooldown despite multi-key rotation → detects brain-dead state → restarts gateway (clears cooldowns) → nuclear reinstall if needed.
+4. **Gateway Guardian v4** — If all providers enter cooldown despite multi-key rotation → classifies error (billing vs transient) → billing: backs off + notifies owner (restart is useless for empty credits) → transient: restarts gateway (clears cooldowns) → nuclear reinstall if needed. Proactively monitors Venice DIEM balance.
 5. **Auto-recovery** — When credits refill (daily reset) or backoff expires, OpenClaw switches back to Venice automatically.
 
 **Example with 6 keys (246 DIEM total):**
@@ -886,44 +886,61 @@ morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gate
 
 ---
 
-## 14. Gateway Guardian v3 (v0.9.3)
+## 14. Gateway Guardian v4 (v0.9.3)
 
-A self-healing watchdog that monitors the OpenClaw gateway **and its ability to actually run inference through the full stack**. Runs every 2 minutes via launchd.
+A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and its ability to run inference. Runs every 2 minutes via launchd.
 
-### The Problem v3 Solves
+### Evolution
 
-v1 only checked if the gateway process was alive (HTTP 200 on dashboard). v2 added inference-level health checks by probing provider URLs directly — but **provider APIs always return 200** even when OpenClaw's auth profiles are disabled or in cooldown. The real failure mode: the gateway is alive, all providers respond to health checks, but OpenClaw has no working auth profiles. The agent is brain-dead, but traditional health checks pass.
+| Version | What it checked | Fatal flaw |
+|---------|----------------|------------|
+| v1 | HTTP dashboard alive | Providers in cooldown = brain-dead but HTTP 200 |
+| v2 | Raw provider URLs | Provider APIs always return 200 regardless of internal state |
+| v3 | Through-OpenClaw inference probe | Billing exhaustion → restart → instant re-disable = dead loop. Also: `set -e` + pkill self-kill = silent no-op restarts |
+| **v4** | Through-OpenClaw + **billing classification** + **credit monitoring** | Current version |
 
-v3 probes **through OpenClaw itself** using `openclaw agent` with a throwaway session. This tests the complete chain: gateway → auth selection → provider → inference → response. If the agent can't get a response through the full stack, inference is truly dead.
+### What v4 Fixes Over v3
 
-**New in v3:** Circuit breaker for stuck sub-agents. Sub-agents that timeout repeatedly burn through API credits and disable all auth profiles. The circuit breaker detects runs stuck >30 min with repeated timeouts and triggers a graceful restart to clear them.
+1. **Billing-aware escalation** — Classifies inference errors as `billing` vs `transient` vs `timeout`. Billing errors trigger backoff + notification instead of useless restarts.
+2. **Silent restart bug** — Replaced `set -euo pipefail` with `set -uo pipefail` + explicit ERR trap. Restart failures are now logged instead of silently exiting.
+3. **pkill self-kill** — Hard restart now iterates PIDs and excludes the Guardian's own PID. No more accidentally killing the watchdog.
+4. **Proactive credit monitoring** — Checks Venice DIEM balance via `x-venice-balance-diem` response header every 10 min. Warns when balance drops below threshold.
+5. **DIEM reset awareness** — Calculates hours to midnight UTC (when Venice DIEM resets daily). When billing-dead, enters 30-min backoff instead of hammering every 2 min. Auto-clears when UTC day rolls over.
+6. **Signal notifications** — Notifies owner on: billing exhaustion (with ETA to reset), billing recovery, nuclear restart, and total failure.
 
 ### How It Works
 
-1. **HTTP probe** — Is the gateway process running? (`http://127.0.0.1:18789/`)
-2. **Inference probe (v3)** — Can the agent actually run inference through OpenClaw?
-   - Launches `openclaw agent --session-id guardian-health-probe`
-   - Tests the full stack: gateway → auth profile selection → provider → response
-   - Uses GLM-4.7 Flash (cheapest model) to minimize cost
-   - If the agent responds, inference is truly available
-3. **Circuit breaker** — Checks for sub-agents stuck >30 min with repeated timeout errors
-   - Parses gateway error logs for runs with multiple "embedded run timeout" errors
-   - If estimated stuck duration exceeds threshold, triggers graceful restart
-   - Runs every 5 minutes (not every 2 min guardian cycle) to avoid log spam
-4. **Separate failure counters** — HTTP failures (2 threshold) and inference failures (3 threshold, ~6 min) tracked independently
-5. **Four-stage restart escalation:**
-   - `openclaw gateway restart` (graceful — resets in-memory cooldown state + clears stuck runs)
-   - Hard kill (`kill -9`) → launchd KeepAlive restarts
-   - `launchctl kickstart -k` (force restart)
-   - **🔴 NUCLEAR:** `curl -fsSL https://clawd.bot/install.sh | bash` (full reinstall — guaranteed clean start)
-6. **Signal notification** before nuclear restart (via signal-cli if available)
-7. Logs everything to `~/.openclaw/logs/guardian.log`
+1. **Billing backoff gate** — If in billing-dead state, check if midnight UTC has passed. If yes, re-probe. If no, skip this run (30-min intervals).
+2. **Credit monitoring** — Every 10 min, makes a cheap Kimi K2.5 call to Venice and reads the `x-venice-balance-diem` response header. Warns below 15 DIEM.
+3. **Circuit breaker** — Kills sub-agents stuck >30 min with repeated timeouts.
+4. **HTTP probe** — Is the gateway process running?
+5. **Inference probe** — Can the agent run inference through the full stack?
+6. **Error classification** — Parses probe output:
+   - `billing` → 402, Insufficient DIEM/USD/balance → **don't restart**, enter billing backoff, notify owner
+   - `transient` → auth cooldown without billing keywords → restart (clears cooldown)
+   - `timeout` → probe timed out → restart
+   - `unknown` → restart (safe default)
+7. **Four-stage restart escalation** (for non-billing errors only):
+   - `openclaw gateway restart` (graceful — resets cooldown state)
+   - Hard kill (excludes own PID) → launchd KeepAlive
+   - `launchctl kickstart -k`
+   - **🔴 NUCLEAR:** `curl -fsSL https://clawd.bot/install.sh | bash`
 
-### Why Restart Fixes Cooldown
+### Recommended Config
 
-OpenClaw's provider cooldown state is **in-memory**. When all providers enter cooldown (e.g., Venice credits exhausted across all keys + Morpheus errors misclassified), the agent stays offline until cooldowns expire naturally — which can take hours. **Restarting the gateway process clears all cooldown state immediately**, allowing the fallback chain to work again.
+Pair with reduced billing backoff in `openclaw.json` to minimize downtime:
 
-**v3 addition:** Restarting also clears stuck sub-agents that are burning credits in timeout loops.
+```json
+{
+  "auth": {
+    "cooldowns": {
+      "billingBackoffHoursByProvider": { "venice": 1 },
+      "billingMaxHours": 6,
+      "failureWindowHours": 12
+    }
+  }
+}
+```
 
 ### Installation
 
@@ -937,12 +954,7 @@ chmod +x ~/.openclaw/workspace/scripts/gateway-guardian.sh
 # See templates/ai.openclaw.guardian.plist
 ```
 
-⚠️ **Important:** The launchd plist should include `OPENCLAW_GATEWAY_TOKEN` in its environment variables so the guardian can authenticate with the gateway for inference probes. Extract this from your gateway plist:
-
-```bash
-/usr/libexec/PlistBuddy -c "Print :EnvironmentVariables:OPENCLAW_GATEWAY_TOKEN" \
-  ~/Library/LaunchAgents/ai.openclaw.gateway.plist
-```
+⚠️ **Important:** The launchd plist should include `OPENCLAW_GATEWAY_TOKEN` in its environment variables.
 
 ### Manual Test
 
@@ -958,20 +970,20 @@ tail -f ~/.openclaw/logs/guardian.log
 
 ### Configuration
 
-Edit variables at the top of `gateway-guardian.sh`:
-
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `GATEWAY_PORT` | `18789` | Gateway port to probe |
 | `PROBE_TIMEOUT` | `8` | HTTP timeout in seconds |
-| `INFERENCE_TIMEOUT` | `45` | OpenClaw agent probe timeout (needs more time for full stack) |
-| `FAIL_THRESHOLD` | `2` | Consecutive HTTP failures before restart |
-| `INFERENCE_FAIL_THRESHOLD` | `3` | Consecutive inference failures before escalation (~6 min) |
-| `MAX_STUCK_DURATION_SEC` | `1800` | Kill sub-agents stuck longer than 30 min (circuit breaker) |
+| `INFERENCE_TIMEOUT` | `45` | Agent probe timeout |
+| `FAIL_THRESHOLD` | `2` | HTTP failures before restart |
+| `INFERENCE_FAIL_THRESHOLD` | `3` | Inference failures before escalation (~6 min) |
+| `BILLING_BACKOFF_INTERVAL` | `1800` | Seconds between probes when billing-dead (30 min) |
+| `CREDIT_CHECK_INTERVAL` | `600` | Seconds between Venice DIEM balance checks (10 min) |
+| `CREDIT_WARN_THRESHOLD` | `15` | DIEM balance warning threshold |
+| `MAX_STUCK_DURATION_SEC` | `1800` | Circuit breaker: kill sub-agents stuck >30 min |
 | `STUCK_CHECK_INTERVAL` | `300` | Circuit breaker check interval (5 min) |
-| `MAX_LOG_LINES` | `1000` | Log file rotation threshold |
-| `OWNER_SIGNAL` | `""` | Signal number for nuclear restart notifications |
-| `INSTALL_URL` | `https://clawd.bot/install.sh` | URL for nuclear reinstall script |
+| `OWNER_SIGNAL` | `+14432859111` | Signal number for notifications |
+| `SIGNAL_ACCOUNT` | `+15129488566` | Signal sender account |
 
 ### State Files
 
@@ -979,7 +991,10 @@ Edit variables at the top of `gateway-guardian.sh`:
 |------|---------|
 | `~/.openclaw/logs/guardian.state` | HTTP failure counter |
 | `~/.openclaw/logs/guardian-inference.state` | Inference failure counter |
-| `~/.openclaw/logs/guardian-circuit-breaker.state` | Last circuit breaker check timestamp |
+| `~/.openclaw/logs/guardian-circuit-breaker.state` | Circuit breaker timestamp |
+| `~/.openclaw/logs/guardian-billing.state` | Billing exhaustion start timestamp (0 = healthy) |
+| `~/.openclaw/logs/guardian-billing-notified.state` | Whether owner was notified (0/1) |
+| `~/.openclaw/logs/guardian-credit-check.state` | Last credit check timestamp |
 | `~/.openclaw/logs/guardian.log` | Guardian activity log |
 
 ---
