@@ -576,8 +576,8 @@ curl http://127.0.0.1:8083/health</code>
       <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.3</h3>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
         <div>
-          <strong style="color: var(--green);">🛡️ Gateway Guardian v3</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Probes through OpenClaw itself using <code>openclaw agent</code> — tests the full stack: gateway → auth → provider → response. Catches when auth profiles are disabled even if providers respond 200. New circuit breaker kills sub-agents stuck >30 min burning credits. Uses macOS-compatible perl alarm.</p>
+          <strong style="color: var(--green);">🛡️ Gateway Guardian v4 — Billing-Aware</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Classifies errors as billing vs transient. Billing exhaustion → backs off + notifies owner with DIEM reset ETA (restart is useless). Fixed silent restart bug (<code>set -e</code> + pkill self-kill). Through-OpenClaw inference probes, circuit breaker, proactive credit monitoring. Max downtime from credit exhaustion drops from 12h to ~1h.</p>
         </div>
         <div>
           <strong style="color: var(--green);">🔑 Multi-Key Auth Rotation + Circuit Breaker</strong>
@@ -654,8 +654,8 @@ curl http://127.0.0.1:8083/health</code>
       </div>
       <div class="feature">
         <div class="icon">🛡️</div>
-        <h4>Gateway Guardian v3</h4>
-        <p>Through-OpenClaw inference probes test the full stack. Circuit breaker kills stuck sub-agents >30 min. 4-stage restart with nuclear reinstall. Catches auth profile failures, not just process crashes.</p>
+        <h4>Gateway Guardian v4</h4>
+        <p>Billing-aware escalation — classifies errors, skips useless restarts for credit exhaustion. Through-OpenClaw probes, credit monitoring, circuit breaker, fixed restart chain. Signal notifications with DIEM reset ETA.</p>
       </div>
       <div class="feature">
         <div class="icon">🔐</div>
