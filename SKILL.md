@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.9.3
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 0.9.4
+description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, smart session archiver to prevent dashboard overload, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -999,6 +999,95 @@ tail -f ~/.openclaw/logs/guardian.log
 
 ---
 
+## 15. Smart Session Archiver (v0.9.4)
+
+OpenClaw stores every conversation as a `.jsonl` file in `~/.openclaw/agents/main/sessions/`. Over time, these accumulate — and when the dashboard loads, it parses **all** session history into the DOM. At ~17MB (134+ sessions), browsers hit "Page Unresponsive" because the renderer chokes on thousands of chat message elements.
+
+### The Problem
+
+The bottleneck isn't raw memory — Chrome gives each tab 1.4-4GB of V8 heap. The real limit is **DOM rendering performance**. Chrome Lighthouse warns at 800 DOM nodes and errors at 1,400. A hundred sessions with tool calls, code blocks, and long conversations easily generate 5,000+ DOM elements. The browser's layout engine can't keep up.
+
+| Sessions Dir Size | Dashboard Behavior |
+|------------------|--------------------|
+| < 5 MB | ✅ Loads instantly |
+| 5-10 MB | ⚡ Slight delay, usable |
+| 10-15 MB | ⚠️ Sluggish, noticeable lag |
+| 15-20 MB | 🔴 "Page Unresponsive" likely |
+| 20+ MB | 💀 Dashboard won't load |
+
+### Solution: Size-Triggered Archiving
+
+Instead of archiving on a fixed schedule (which may fire too early or too late depending on usage), the session archiver monitors the **actual size** of the sessions directory and only moves files when they exceed a threshold.
+
+**Default threshold: 10MB** — provides good headroom before hitting the ~15MB danger zone, without firing unnecessarily on light usage days.
+
+### Usage
+
+```bash
+# Archive if over threshold (default 10MB)
+bash skills/everclaw/scripts/session-archive.sh
+
+# Check size without archiving
+bash skills/everclaw/scripts/session-archive.sh --check
+
+# Force archive regardless of size
+bash skills/everclaw/scripts/session-archive.sh --force
+
+# Detailed output
+bash skills/everclaw/scripts/session-archive.sh --verbose
+```
+
+### What It Protects
+
+The archiver never moves:
+- **Active sessions** — referenced in `sessions.json` (the index file)
+- **Guardian health probe** — `guardian-health-probe.jsonl`
+- **Recent sessions** — keeps the 5 most recent by modification time (configurable via `KEEP_RECENT`)
+
+Everything else gets moved to `sessions/archive/` — not deleted. You can always move files back if needed.
+
+### Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ARCHIVE_THRESHOLD_MB` | `10` | Trigger threshold in MB |
+| `SESSIONS_DIR` | `~/.openclaw/agents/main/sessions` | Sessions directory path |
+| `KEEP_RECENT` | `5` | Number of recent sessions to always keep |
+
+### Cron Integration
+
+Set up a cron job that runs the archiver periodically. The script is a no-op when under threshold, so it's safe to run frequently:
+
+```json5
+{
+  "name": "Smart session archiver",
+  "schedule": { "kind": "cron", "expr": "0 */6 * * *", "tz": "America/Chicago" },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "model": "morpheus/kimi-k2.5",
+    "message": "Run the smart session archiver: bash skills/everclaw/scripts/session-archive.sh --verbose. Report the results. If sessions were archived, mention the before/after size.",
+    "timeoutSeconds": 60
+  }
+}
+```
+
+**Recommended: every 6 hours.** Frequent enough to catch growth spurts, cheap enough to run on the LIGHT tier since it's a no-op most of the time.
+
+### Output
+
+The script outputs a JSON summary for programmatic consumption:
+
+```json
+{"archived":42,"freedMB":8.2,"beforeMB":12.4,"afterMB":4.2,"threshold":10}
+```
+
+### Why 10MB?
+
+Based on real-world testing: 134 sessions totaling 17MB caused "Page Unresponsive" in Chrome, Safari, and Brave on macOS. The dashboard uses a standard web renderer that parses all session JSONL into DOM elements — there's no virtualization or lazy loading. 10MB gives ~50% headroom before the ~15-20MB danger zone where most browsers start struggling.
+
+---
+
 ## 17. x402 Payment Client (v0.7)
 
 Everclaw v0.7 includes an x402 payment client that lets your agent make USDC payments to any x402-enabled endpoint. The [x402 protocol](https://x402.org) is an HTTP-native payment standard: when a server returns HTTP 402, your agent automatically signs a USDC payment and retries.
@@ -1212,7 +1301,7 @@ if (agent.x402Support && apiEndpoint) {
 
 ---
 
-## Quick Reference (v0.9.2)
+## Quick Reference (v0.9.4)
 
 | Action | Command |
 |--------|---------|
@@ -1233,6 +1322,9 @@ if (agent.x402Support && apiEndpoint) {
 | Proxy health | `curl http://127.0.0.1:8083/health` |
 | Guardian test | `bash scripts/gateway-guardian.sh --verbose` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
+| Archive sessions | `bash skills/everclaw/scripts/session-archive.sh` |
+| Check session size | `bash skills/everclaw/scripts/session-archive.sh --check` |
+| Force archive | `bash skills/everclaw/scripts/session-archive.sh --force` |
 | x402 request | `node scripts/x402-client.mjs GET <url>` |
 | x402 dry-run | `node scripts/x402-client.mjs --dry-run GET <url>` |
 | x402 budget | `node scripts/x402-client.mjs --budget` |
