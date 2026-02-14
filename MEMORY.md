@@ -1,6 +1,6 @@
 # MEMORY.md — Long-Term Memory
 
-Last updated: 2026-02-12
+Last updated: 2026-02-14
 
 ---
 
@@ -89,6 +89,15 @@ Rejected BlockRunAI/ClawRouter: routes through BlockRun API (middleman), plainte
 
 ### Gateway Guardian: HTTP healthy ≠ inference healthy (2026-02-12)
 Guardian v1 only probed HTTP (gateway dashboard). Real failure: gateway alive but ALL providers in cooldown = brain-dead. Fix: probe providers directly (Venice `/api/v1/models`, Morpheus `/health`, mor-gateway). Restarting gateway clears in-memory cooldown state. Nuclear option: `curl install.sh | bash`.
+
+### Venice billing backoff config — 1h not 5h (2026-02-14)
+Applied `auth.cooldowns.billingBackoffHoursByProvider.venice: 1` (down from default 5h). Also `billingMaxHours: 6`, `failureWindowHours: 12`. DIEM resets daily at midnight UTC — 1h backoff means keys get retried promptly instead of being locked out for most of the day.
+
+### Guardian v3 restart chain silently fails (2026-02-14)
+`set -euo pipefail` + `openclaw gateway restart` returning non-zero = silent exit. Also `pkill -9 -f "openclaw.*gateway"` matches the Guardian's own process path. Fix: `set -uo pipefail`, ERR trap, exclude own PID. Guardian v4 needed with billing-aware escalation (don't restart for billing — useless).
+
+### Claude Opus 4.6 costs 30-50+ DIEM per request with full workspace context (2026-02-14)
+At $6/M input + $30/M output, a single main session request with full AGENTS/SOUL/USER/TOOLS/MEMORY context can cost 30-50+ DIEM. 50 DIEM on a key is essentially 1-2 Claude requests. Venice refuses preemptively when balance is insufficient for the estimated cost.
 
 ### openclaw agent CLI needs --to or --session-id (2026-02-12)
 Can't use `openclaw agent --message` headless without specifying a target. Direct provider HTTP probes are better for health checks — simpler, faster, no auth needed.

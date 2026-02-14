@@ -1,5 +1,5 @@
 {
-  "generated": "2026-02-12T09:07:14.513Z",
+  "generated": "2026-02-13T09:13:25.311Z",
   "owner": "[REDACTED]",
   "lifeGoals": [
     {
@@ -647,7 +647,7 @@
   "keyFacts": [
     {
       "heading": "Everclaw Skill (profbernardoj/everclaw)",
-      "content": "### Current Version: v0.9.2\n- OpenClaw skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz (GitHub Pages from docs/)\n- Repo: profbernardoj/everclaw on GitHub\n### Architecture\n- **Morpheus proxy:** `~/morpheus/proxy/morpheus-proxy.mjs` (port 8083, launchd: com.morpheus.proxy)\n- **Morpheus proxy-router (Go):** `~/morpheus/` (port 8082)\n- **Proxy auth:** Bearer token `morpheus-local`\n- **OpenClaw provider name:** `morpheus` (e.g., `morpheus/kimi-k2.5`)\n- Venice IDs use"
+      "content": "### Current Version: v0.9.2 (latest push removes Llama 3.3 refs)\n- OpenClaw skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz (GitHub Pages from docs/)\n- Repo: profbernardoj/everclaw on GitHub\n### Architecture\n- **Morpheus proxy:** `~/morpheus/proxy/morpheus-proxy.mjs` (port 8083, launchd: com.morpheus.proxy)\n- **Morpheus proxy-router (Go):** `~/morpheus/` (port 8082)\n- **Proxy auth:** Bearer token `morpheus-local`\n- **OpenClaw provider name:** `morpheus` (e.g., `"
     },
     {
       "heading": "David's Model Preferences",
@@ -659,15 +659,19 @@
     },
     {
       "heading": "SmartAgentProtocol (GitHub Org)",
-      "content": "- Org: https://github.com/orgs/SmartAgentProtocol\n- Role: admin/owner (profbernardoj)\n- **Repo:** https://github.com/SmartAgentProtocol/smartagent (live as of Feb 12)\n- **Domain:** smartagent.org (David owns, DNS pending)\n- **Vision:** OpenClaw + Everclaw + sensible defaults, packaged for non-technical users\n- **Architecture:** Installer-first (not fork). `curl install.sh | bash` → free inference immediately\n- **Primary model:** `mor-gateway/kimi-k2.5` (free via Morpheus API Gateway)\n- **Workflo"
+      "content": "- Org: https://github.com/orgs/SmartAgentProtocol\n- Role: admin/owner (profbernardoj)\n- **Repo:** https://github.com/SmartAgentProtocol/smartagent (live as of Feb 12)\n- **Website:** https://smartagent.org (live, GitHub Pages, HTTPS)\n- **DNS:** Direct A records at sav.com registrar (Cloudflare account exists as backup)\n- **Vision:** OpenClaw + Everclaw + sensible defaults, packaged for non-technical users\n- **Architecture:** Installer-first (not fork). `curl install.sh | bash` → free inference im"
     },
     {
       "heading": "Key People & Thinkers",
       "content": "- **Balaji Srinivasan** (@balajis) — Network School founder, *The Network State* author\n  - Network State = voluntary smart contract governance (opt-in, replaces nation-state force model)\n  - 10 durable skills in AI age: vision, verification, prompting, polishing, community, geography, scarcity, cryptography, physicality, resiliency\n  - Relevant to: Abolition of State goal + Family education framework\n  - Full quote saved: `memory/insights/balaji-value-in-age-of-ai.md`"
     },
     {
+      "heading": "Language & Messaging (2026-02-12)",
+      "content": "- **NEVER say \"free inference\"** — David directive: say \"own your inference\" / \"inference you own\"\n- Morpheus = ownership, not rental. MOR staking = inference forever (tokens staked, returned, recycled)\n- Morpheus API Gateway during beta = \"community-powered\" / \"open access\" (not \"free\")\n- **Don't highlight Llama 3.3** — David considers it outdated. Focus on Kimi K2.5 and GLM-4 models"
+    },
+    {
       "heading": "Upcoming",
-      "content": "- **SmartAgentProtocol development** — Feb 12 (PRs, testing practices, easy-install packaging)\n- Publish Everclaw to ClawHub as `everclaw-inference` on Feb 16 (cron job `6ff30a74` scheduled) — needs David's GitHub account\n- ~~Everclaw v0.8 — Morpheus API Gateway bootstrap~~ DONE\n- ~~Version x402 + agent registry as v0.7~~ DONE\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
+      "content": "- Add SmartAgent logo to assets/ (David to upload)\n- Test install.sh on clean macOS and Linux machines\n- Configure DNS for smartagent.org if issues persist\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
     },
     {
       "heading": "Key Users",
@@ -678,6 +682,6 @@
     "totalActivities": 29,
     "totalGoals": 8,
     "activeGoals": 5,
-    "memoryFiles": 13
+    "memoryFiles": 14
   }
 }

@@ -88,7 +88,7 @@ SmartAgent
 ├── Everclaw (decentralized inference)
 │   ├── Morpheus API Gateway (open access, cloud)
 │   ├── Morpheus P2P Proxy (local, staked MOR)
-│   └── Gateway Guardian (self-healing watchdog)
+│   └── Gateway Guardian v3 (self-healing watchdog with circuit breaker)
 └── SmartAgent Config
     ├── SOUL.md (agent personality)
     ├── AGENTS.md (workspace conventions)
