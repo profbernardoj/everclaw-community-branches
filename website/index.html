@@ -580,8 +580,8 @@ curl http://127.0.0.1:8083/health</code>
           <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"><code>clawhub install everclaw-inference</code> — officially live on <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference" style="color: var(--accent);">ClawHub</a>. Includes collision detection against the unrelated "Everclaw Vault" imposter, safe installer, version checking, and recovery docs.</p>
         </div>
         <div>
-          <strong style="color: var(--green);">🔑 Multi-Key Auth Rotation + Guardian v2</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Configure multiple Venice API keys with explicit rotation order. When one key's DIEM credits run out, auto-rotate to the next. Plus: Guardian v2 detects brain-dead agents and self-heals with nuclear reinstall option.</p>
+          <strong style="color: var(--green);">🛡️ Gateway Guardian v4 — Billing-Aware</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Classifies errors as billing vs transient. Billing exhaustion → backs off + notifies owner with DIEM reset ETA (restart is useless). Fixed silent restart bug. Through-OpenClaw inference probes, circuit breaker, proactive credit monitoring. Max downtime from credit exhaustion drops from 12h to ~1h.</p>
         </div>
       </div>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
@@ -654,8 +654,8 @@ curl http://127.0.0.1:8083/health</code>
       </div>
       <div class="feature">
         <div class="icon">🛡️</div>
-        <h4>Gateway Guardian v2</h4>
-        <p>Probes gateway + all providers every 2 min. 4-stage restart with nuclear reinstall fallback. Detects brain-dead agents, not just crashes.</p>
+        <h4>Gateway Guardian v4</h4>
+        <p>Billing-aware escalation — classifies errors, skips useless restarts for credit exhaustion. Through-OpenClaw probes, credit monitoring, circuit breaker, fixed restart chain. Signal notifications with DIEM reset ETA.</p>
       </div>
       <div class="feature">
         <div class="icon">🔐</div>
