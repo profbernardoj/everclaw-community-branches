@@ -116,16 +116,105 @@ else
   echo "   Guardian: bash $OPENCLAW_DIR/workspace/scripts/gateway-guardian.sh"
 fi
 
+# --- Post-Install: Validate OpenClaw Config ---
+echo ""
+echo "🔍 Validating OpenClaw configuration..."
+
+OPENCLAW_CONFIG="$OPENCLAW_DIR/openclaw.json"
+CONFIG_ISSUES=0
+
+if [[ -f "$OPENCLAW_CONFIG" ]]; then
+  # Check for invalid provider prefixes in model config
+  # "everclaw/" is NOT a valid provider — Everclaw is a skill, not a provider.
+  # Valid Morpheus providers: "morpheus", "mor-gateway"
+  INVALID_PROVIDERS=$(python3 -c "
+import json, sys
+try:
+    config = json.load(open('$OPENCLAW_CONFIG'))
+    issues = []
+    # Check primary model
+    primary = config.get('agents',{}).get('defaults',{}).get('model',{}).get('primary','')
+    if primary.startswith('everclaw/'):
+        issues.append(f'primary model: {primary}')
+    # Check fallbacks
+    for fb in config.get('agents',{}).get('defaults',{}).get('model',{}).get('fallbacks',[]):
+        if fb.startswith('everclaw/'):
+            issues.append(f'fallback model: {fb}')
+    # Check provider names
+    for pname in config.get('models',{}).get('providers',{}).keys():
+        if pname == 'everclaw':
+            issues.append(f'provider named \"everclaw\"')
+    if issues:
+        print('|'.join(issues))
+except:
+    pass
+" 2>/dev/null)
+
+  if [[ -n "$INVALID_PROVIDERS" ]]; then
+    echo ""
+    echo "   ⚠️  MISCONFIGURATION DETECTED!"
+    echo ""
+    echo "   Your config uses 'everclaw/' as a provider prefix."
+    echo "   Everclaw is a SKILL, not an inference provider."
+    echo "   This will route requests to Venice (billing errors) instead of Morpheus."
+    echo ""
+    echo "   Issues found:"
+    IFS='|' read -ra ISSUES <<< "$INVALID_PROVIDERS"
+    for issue in "${ISSUES[@]}"; do
+      echo "     ❌ $issue"
+    done
+    echo ""
+    echo "   VALID provider names for Morpheus inference:"
+    echo "     • morpheus/kimi-k2.5     — local P2P (needs proxy-router running)"
+    echo "     • mor-gateway/kimi-k2.5  — hosted API Gateway (needs API key)"
+    echo ""
+    echo "   To fix, change your model in openclaw.json:"
+    echo "     \"primary\": \"mor-gateway/kimi-k2.5\"    ← Morpheus API Gateway"
+    echo "     \"primary\": \"morpheus/kimi-k2.5\"       ← Local Morpheus P2P"
+    echo ""
+    echo "   Then restart: openclaw gateway restart"
+    echo ""
+    CONFIG_ISSUES=1
+  fi
+
+  # Check if any Morpheus provider is configured
+  HAS_MORPHEUS=$(python3 -c "
+import json
+config = json.load(open('$OPENCLAW_CONFIG'))
+providers = config.get('models',{}).get('providers',{})
+has = 'morpheus' in providers or 'mor-gateway' in providers
+print('yes' if has else 'no')
+" 2>/dev/null || echo "no")
+
+  if [[ "$HAS_MORPHEUS" == "no" ]]; then
+    echo "   ⚠️  No Morpheus provider configured in openclaw.json"
+    echo "   Run: node $SKILL_DIR/scripts/bootstrap-gateway.mjs"
+    echo "   This adds mor-gateway as a fallback (no API key needed)."
+    CONFIG_ISSUES=1
+  fi
+
+  if [[ "$CONFIG_ISSUES" -eq 0 ]]; then
+    echo "   ✓ OpenClaw config looks good"
+  fi
+else
+  echo "   ⚠️  openclaw.json not found at $OPENCLAW_CONFIG"
+  echo "   Run 'openclaw onboard' first, then re-run this installer."
+fi
+
 echo ""
 echo "╔══════════════════════════════════════════╗"
 echo "║  Installation complete!                  ║"
 echo "╠══════════════════════════════════════════╣"
 echo "║                                          ║"
+echo "║  Router:   http://127.0.0.1:8082         ║"
 echo "║  Proxy:    http://127.0.0.1:8083         ║"
 echo "║  Health:   curl localhost:8083/health     ║"
 echo "║  Guardian: ~/.openclaw/logs/guardian.log  ║"
 echo "║                                          ║"
-echo "║  Next: Configure OpenClaw to use the     ║"
-echo "║  Morpheus provider as a fallback model.  ║"
-echo "║  See SKILL.md § OpenClaw Integration.    ║"
+if [[ "$CONFIG_ISSUES" -gt 0 ]]; then
+echo "║  ⚠️  Config issues found — see above      ║"
+else
+echo "║  ✅ Config validated — ready to go!        ║"
+fi
+echo "║                                          ║"
 echo "╚══════════════════════════════════════════╝"

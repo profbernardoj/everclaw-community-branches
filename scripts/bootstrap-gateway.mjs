@@ -147,6 +147,37 @@ function patchOpenClawConfig(configPath, apiKey) {
   if (!config.models) config.models = {};
   if (!config.models.providers) config.models.providers = {};
 
+  // ── Fix "everclaw/" misconfiguration (v0.9.6) ──────────────────────────
+  // "everclaw" is a skill, not a provider. If someone set their model to
+  // "everclaw/kimi-k2.5:web", requests go to Venice (billing errors) instead
+  // of Morpheus. Detect and fix this automatically.
+  const primary = config.agents?.defaults?.model?.primary || '';
+  if (primary.startsWith('everclaw/')) {
+    const fixedModel = primary.replace('everclaw/', `${PROVIDER_NAME}/`);
+    config.agents.defaults.model.primary = fixedModel;
+    console.log(`  ⚠️  Fixed misconfigured primary model:`);
+    console.log(`     ${primary} → ${fixedModel}`);
+    console.log(`     ("everclaw/" is a skill, not a provider)`);
+  }
+
+  if (config.agents?.defaults?.model?.fallbacks) {
+    config.agents.defaults.model.fallbacks = config.agents.defaults.model.fallbacks.map(fb => {
+      if (fb.startsWith('everclaw/')) {
+        const fixed = fb.replace('everclaw/', `${PROVIDER_NAME}/`);
+        console.log(`  ⚠️  Fixed misconfigured fallback: ${fb} → ${fixed}`);
+        return fixed;
+      }
+      return fb;
+    });
+  }
+
+  // Remove invalid "everclaw" provider entry if present
+  if (config.models.providers.everclaw) {
+    console.log(`  ⚠️  Removing invalid "everclaw" provider (not a real endpoint)`);
+    delete config.models.providers.everclaw;
+  }
+  // ── End fix ────────────────────────────────────────────────────────────
+
   // Add or update the mor-gateway provider
   config.models.providers[PROVIDER_NAME] = {
     baseUrl: GATEWAY_BASE_URL,
