@@ -255,15 +255,249 @@ else:
 }
 
 # ═════════════════════════════════════════════════════════════════════════════
-# GROUP B — Infrastructure & Connectivity (Step 2 — placeholder)
+# GROUP B — Infrastructure & Connectivity
 # ═════════════════════════════════════════════════════════════════════════════
 run_infra_checks() {
   echo ""
   echo -e "${BOLD}Infrastructure & Connectivity${NC}"
   echo ""
-  echo -e "  ${YELLOW}⏳${NC} Step 2 not yet implemented — coming in next release"
-  echo "     Will check: proxy-router, proxy, sessions, MOR balance,"
-  echo "     launchd services, gateway status, and live inference."
+
+  # B1: Is the proxy-router process running? (port 8082)
+  local router_health
+  local cookie_pass=""
+  if [[ -f "$MORPHEUS_DIR/.cookie" ]]; then
+    cookie_pass=$(cut -d: -f2 < "$MORPHEUS_DIR/.cookie" 2>/dev/null)
+  fi
+
+  if [[ -n "$cookie_pass" ]]; then
+    router_health=$(curl -s --max-time 5 -u "admin:$cookie_pass" http://localhost:8082/healthcheck 2>/dev/null || echo "")
+  else
+    router_health=$(curl -s --max-time 5 http://localhost:8082/healthcheck 2>/dev/null || echo "")
+  fi
+
+  if echo "$router_health" | grep -q '"healthy"' 2>/dev/null; then
+    local router_uptime
+    router_uptime=$(echo "$router_health" | python3 -c "import json,sys; print(json.load(sys.stdin).get('Uptime','?'))" 2>/dev/null || echo "?")
+    pass "Proxy-router healthy (port 8082, uptime $router_uptime)"
+  else
+    fail "Proxy-router not responding (port 8082)"
+    if pgrep -f proxy-router >/dev/null 2>&1; then
+      info "  Process is running but not responding on HTTP"
+      fix "Check logs: tail ~/morpheus/data/logs/router-stdout.log"
+    else
+      fix "Start it: launchctl load ~/Library/LaunchAgents/com.morpheus.router.plist"
+      fix "Or manually: cd ~/morpheus && bash mor-launch-headless.sh"
+    fi
+  fi
+
+  # B2: Is the JS proxy running? (port 8083)
+  local proxy_health
+  proxy_health=$(curl -s --max-time 5 http://127.0.0.1:8083/health 2>/dev/null || echo "")
+
+  if echo "$proxy_health" | grep -q '"ok"' 2>/dev/null; then
+    pass "Morpheus proxy healthy (port 8083)"
+  else
+    fail "Morpheus proxy not responding (port 8083)"
+    if pgrep -f morpheus-proxy >/dev/null 2>&1; then
+      fix "Process running but not healthy — check ~/morpheus/proxy/proxy.log"
+    else
+      fix "Start it: launchctl load ~/Library/LaunchAgents/com.morpheus.proxy.plist"
+    fi
+  fi
+
+  # B3: Does the proxy have active blockchain sessions?
+  # B4: Are sessions expiring soon?
+  if [[ -n "$proxy_health" ]] && echo "$proxy_health" | grep -q '"ok"' 2>/dev/null; then
+    local session_info
+    session_info=$(echo "$proxy_health" | python3 -c "
+import json, sys
+from datetime import datetime, timezone
+d = json.load(sys.stdin)
+sessions = d.get('activeSessions', [])
+if not sessions:
+    print('NONE|0')
+else:
+    active = [s for s in sessions if s.get('active')]
+    soonest_h = 999
+    soonest_model = ''
+    for s in active:
+        exp = s.get('expiresAt','')
+        if exp:
+            try:
+                exp_dt = datetime.fromisoformat(exp.replace('Z','+00:00'))
+                now = datetime.now(timezone.utc)
+                hours_left = (exp_dt - now).total_seconds() / 3600
+                if hours_left < soonest_h:
+                    soonest_h = hours_left
+                    soonest_model = s.get('model','?')
+            except: pass
+    if soonest_h == 999:
+        soonest_h = -1
+    print(f'OK|{len(active)}|{soonest_h:.1f}|{soonest_model}')
+" 2>/dev/null)
+
+    local sess_status="${session_info%%|*}"
+    local sess_rest="${session_info#*|}"
+
+    if [[ "$sess_status" == "NONE" ]]; then
+      fail "No active blockchain sessions"
+      fix "Open one: bash scripts/session.sh open kimi-k2.5 604800"
+      fix "Or send any request — proxy auto-opens sessions on demand"
+    else
+      local sess_count="${sess_rest%%|*}"
+      sess_rest="${sess_rest#*|}"
+      local hours_left="${sess_rest%%|*}"
+      local soonest_model="${sess_rest#*|}"
+      local hours_int="${hours_left%%.*}"
+
+      pass "$sess_count active session(s)"
+
+      if (( hours_int < 2 )); then
+        warn "Session for $soonest_model expires in ${hours_left}h"
+        fix "Renew: bash scripts/session.sh open $soonest_model 604800"
+      elif (( hours_int < 24 )); then
+        pass "Nearest expiry: ${hours_left}h ($soonest_model)"
+      else
+        pass "Nearest expiry: ${hours_left}h ($soonest_model) — plenty of time"
+      fi
+    fi
+  fi
+
+  # B5: MOR wallet balance
+  if [[ -n "$cookie_pass" ]] && echo "$router_health" | grep -q '"healthy"' 2>/dev/null; then
+    local balance_json
+    balance_json=$(curl -s --max-time 5 -u "admin:$cookie_pass" http://localhost:8082/blockchain/balance 2>/dev/null || echo "")
+
+    if [[ -n "$balance_json" ]]; then
+      local balance_info
+      balance_info=$(echo "$balance_json" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+mor_wei = int(d.get('mor', '0'))
+eth_wei = int(d.get('eth', '0'))
+mor = mor_wei / 1e18
+eth = eth_wei / 1e18
+if mor < 1:
+    print(f'LOW|{mor:.2f} MOR, {eth:.6f} ETH')
+elif eth < 0.0001:
+    print(f'LOW_GAS|{mor:.2f} MOR, {eth:.6f} ETH')
+else:
+    print(f'OK|{mor:.2f} MOR, {eth:.6f} ETH')
+" 2>/dev/null)
+
+      local bal_status="${balance_info%%|*}"
+      local bal_detail="${balance_info#*|}"
+
+      case "$bal_status" in
+        OK)
+          pass "Wallet balance: $bal_detail"
+          ;;
+        LOW)
+          warn "Low MOR balance: $bal_detail"
+          fix "Need MOR to open sessions. Swap: bash scripts/swap.sh eth 0.01"
+          ;;
+        LOW_GAS)
+          warn "Low ETH (gas): $bal_detail"
+          fix "Need ETH on Base for transaction fees"
+          ;;
+      esac
+    fi
+  fi
+
+  # B6: Is the Morpheus API Gateway reachable?
+  local gw_status
+  gw_status=$(curl -s --max-time 10 -o /dev/null -w "%{http_code}" https://api.mor.org/api/v1/models 2>/dev/null || echo "000")
+
+  if [[ "$gw_status" == "200" || "$gw_status" == "401" || "$gw_status" == "403" ]]; then
+    pass "Morpheus API Gateway reachable (api.mor.org → HTTP $gw_status)"
+  elif [[ "$gw_status" == "000" ]]; then
+    warn "Cannot reach Morpheus API Gateway (network issue or DNS)"
+    fix "Check internet connection. Try: curl https://api.mor.org/api/v1/models"
+  else
+    warn "Morpheus API Gateway returned HTTP $gw_status"
+    fix "Gateway may be down. Check: https://mor.org"
+  fi
+
+  # B7: Live inference test (skip with --quick)
+  if [[ "$QUICK" == true ]]; then
+    echo ""
+    info "  Skipping inference test (--quick mode)"
+  else
+    echo ""
+    echo -e "  ${BLUE}🔬${NC} Testing live inference (morpheus/kimi-k2.5)..."
+
+    local infer_result
+    infer_result=$(curl -s --max-time 60 http://127.0.0.1:8083/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer morpheus-local" \
+      -d '{"model":"kimi-k2.5","messages":[{"role":"user","content":"Reply with exactly: DIAG_OK"}],"stream":false,"max_tokens":50}' 2>/dev/null || echo "")
+
+    if echo "$infer_result" | grep -q "DIAG_OK" 2>/dev/null; then
+      pass "Live inference working — Kimi K2.5 responded via Morpheus P2P"
+    elif echo "$infer_result" | grep -q '"choices"' 2>/dev/null; then
+      pass "Live inference working — got response (model may not have followed instruction exactly)"
+    elif echo "$infer_result" | grep -q "billing\|Insufficient\|402" 2>/dev/null; then
+      fail "Inference returned billing error — this shouldn't happen on Morpheus"
+      fix "Requests may be routing to Venice. Run: bash scripts/diagnose.sh --config"
+    elif echo "$infer_result" | grep -q "session" 2>/dev/null; then
+      warn "Inference failed — possible session issue"
+      fix "Try opening a fresh session: bash scripts/session.sh open kimi-k2.5 604800"
+    elif [[ -z "$infer_result" ]]; then
+      fail "Inference test timed out (60s) — proxy may be stuck"
+      fix "Check proxy logs: tail ~/morpheus/proxy/proxy.log"
+      fix "Check router logs: tail ~/morpheus/data/logs/router-stdout.log"
+    else
+      fail "Inference test failed"
+      info "  Response: $(echo "$infer_result" | head -c 200)"
+      fix "Check proxy and router logs"
+    fi
+  fi
+
+  # B8: Are launchd services loaded? (macOS only)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    echo ""
+    local services=("com.morpheus.router" "com.morpheus.proxy" "ai.openclaw.guardian")
+    local svc_names=("Proxy-router" "Morpheus proxy" "Gateway Guardian")
+    local all_loaded=true
+
+    for i in "${!services[@]}"; do
+      local svc="${services[$i]}"
+      local name="${svc_names[$i]}"
+
+      if launchctl list 2>/dev/null | grep -q "$svc"; then
+        local pid
+        pid=$(launchctl list 2>/dev/null | grep "$svc" | awk '{print $1}')
+        if [[ "$pid" == "-" || -z "$pid" ]]; then
+          warn "$name ($svc) loaded but not running"
+          fix "Check: launchctl kickstart gui/$(id -u)/$svc"
+        else
+          pass "$name ($svc) running (PID $pid)"
+        fi
+      else
+        local plist="$HOME/Library/LaunchAgents/${svc}.plist"
+        if [[ -f "$plist" ]]; then
+          warn "$name ($svc) plist exists but not loaded"
+          fix "Load: launchctl load $plist"
+        else
+          warn "$name ($svc) not installed"
+          fix "Run: bash skills/everclaw/scripts/install-proxy.sh"
+        fi
+        all_loaded=false
+      fi
+    done
+  fi
+
+  # B9: Is the OpenClaw gateway running?
+  local gw_port="${OPENCLAW_GATEWAY_PORT:-18789}"
+  local gw_http
+  gw_http=$(curl -s --max-time 3 -o /dev/null -w "%{http_code}" "http://127.0.0.1:${gw_port}/" 2>/dev/null || echo "000")
+
+  if [[ "$gw_http" != "000" ]]; then
+    pass "OpenClaw gateway responding (port $gw_port)"
+  else
+    fail "OpenClaw gateway not responding (port $gw_port)"
+    fix "Start it: openclaw gateway start"
+  fi
 }
 
 # ─── Run ─────────────────────────────────────────────────────────────────────
