@@ -30,7 +30,13 @@ mkdir -p "$PROXY_DIR"
 cp "$SCRIPT_DIR/morpheus-proxy.mjs" "$PROXY_DIR/morpheus-proxy.mjs"
 echo "   ✓ Copied morpheus-proxy.mjs → $PROXY_DIR/"
 
-# --- 2. Install Gateway Guardian ---
+# --- 2. Install Router Launch Script ---
+echo "🔧 Installing proxy-router headless launcher..."
+cp "$SCRIPT_DIR/mor-launch-headless.sh" "$MORPHEUS_DIR/mor-launch-headless.sh"
+chmod +x "$MORPHEUS_DIR/mor-launch-headless.sh"
+echo "   ✓ Copied mor-launch-headless.sh → $MORPHEUS_DIR/"
+
+# --- 3. Install Gateway Guardian ---
 echo "🛡️  Installing Gateway Guardian..."
 mkdir -p "$OPENCLAW_DIR/workspace/scripts"
 mkdir -p "$OPENCLAW_DIR/logs"
@@ -45,8 +51,16 @@ if [[ "$(uname)" == "Darwin" ]]; then
   mkdir -p "$LAUNCH_AGENTS"
 
   # Unload existing if present
+  launchctl unload "$LAUNCH_AGENTS/com.morpheus.router.plist" 2>/dev/null || true
   launchctl unload "$LAUNCH_AGENTS/com.morpheus.proxy.plist" 2>/dev/null || true
   launchctl unload "$LAUNCH_AGENTS/ai.openclaw.guardian.plist" 2>/dev/null || true
+
+  # Morpheus router plist (the Go proxy-router binary)
+  sed \
+    -e "s|__MORPHEUS_DIR__|$MORPHEUS_DIR|g" \
+    -e "s|__HOME__|$HOME|g" \
+    "$SKILL_DIR/templates/com.morpheus.router.plist" > "$LAUNCH_AGENTS/com.morpheus.router.plist"
+  echo "   ✓ Installed com.morpheus.router.plist"
 
   # Morpheus proxy plist
   sed \
@@ -65,12 +79,22 @@ if [[ "$(uname)" == "Darwin" ]]; then
     "$SKILL_DIR/templates/ai.openclaw.guardian.plist" > "$LAUNCH_AGENTS/ai.openclaw.guardian.plist"
   echo "   ✓ Installed ai.openclaw.guardian.plist"
 
-  # Load services
+  # Load services (router first — proxy depends on it)
+  launchctl load "$LAUNCH_AGENTS/com.morpheus.router.plist" 2>/dev/null
+  sleep 3  # Give router time to start before proxy tries to connect
   launchctl load "$LAUNCH_AGENTS/com.morpheus.proxy.plist" 2>/dev/null
   launchctl load "$LAUNCH_AGENTS/ai.openclaw.guardian.plist" 2>/dev/null
-  echo "   ✓ Services loaded"
+  echo "   ✓ Services loaded (router → proxy → guardian)"
 
   sleep 2
+
+  # Verify router is running
+  if curl -s --max-time 5 -u "admin:$(cat "$MORPHEUS_DIR/.cookie" 2>/dev/null | cut -d: -f2)" http://localhost:8082/healthcheck 2>/dev/null | grep -q healthy; then
+    echo "   ✓ Proxy-router is healthy (port 8082)"
+  else
+    echo "   ⚠️  Proxy-router not responding — check ~/morpheus/data/logs/router-stdout.log"
+    echo "      (May need wallet key in 1Password or Keychain)"
+  fi
 
   # Verify proxy is running
   if curl -s --max-time 3 http://127.0.0.1:8083/health > /dev/null 2>&1; then
