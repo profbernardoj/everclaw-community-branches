@@ -8,6 +8,59 @@ metadata:
     emoji: "♾️"
     requires:
       bins: ["curl", "node"]
+      env:
+        - name: WALLET_PRIVATE_KEY
+          optional: true
+          description: "Morpheus wallet private key — injected at runtime from 1Password or macOS Keychain. NEVER stored on disk."
+        - name: ETH_NODE_ADDRESS
+          optional: true
+          default: "https://base-mainnet.public.blastapi.io"
+          description: "Base mainnet RPC endpoint for blockchain operations."
+        - name: OP_SERVICE_ACCOUNT_TOKEN
+          optional: true
+          description: "1Password service account token (retrieved from macOS Keychain at runtime)."
+    credentials:
+      - name: "Wallet Private Key"
+        storage: "macOS Keychain or 1Password (never on disk)"
+        required: false
+        description: "Required only for local P2P inference (MOR staking). Not needed for API Gateway mode."
+      - name: "Morpheus API Gateway Key"
+        storage: "openclaw.json providers config"
+        required: false
+        description: "Free API key from app.mor.org. Community bootstrap key included for initial setup."
+    network:
+      outbound:
+        - host: "api.mor.org"
+          purpose: "Morpheus API Gateway — model inference and session management"
+        - host: "base-mainnet.public.blastapi.io"
+          purpose: "Base L1 RPC — blockchain transactions (session open/close, MOR staking)"
+        - host: "provider.mor.org"
+          purpose: "Morpheus P2P network — direct inference via staked sessions"
+        - host: "api.venice.ai"
+          purpose: "Venice API — primary inference provider (when configured)"
+      local:
+        - port: 8082
+          purpose: "Morpheus proxy-router (Go binary) — blockchain session management"
+        - port: 8083
+          purpose: "Morpheus-to-OpenAI proxy (Node.js) — translates OpenAI API to proxy-router"
+    persistence:
+      services:
+        - name: "com.morpheus.router"
+          purpose: "Proxy-router for Morpheus P2P inference"
+          mechanism: "launchd KeepAlive (macOS)"
+        - name: "com.morpheus.proxy"
+          purpose: "OpenAI-compatible proxy translating to Morpheus"
+          mechanism: "launchd KeepAlive (macOS)"
+        - name: "ai.openclaw.guardian"
+          purpose: "Gateway health watchdog with billing-aware escalation"
+          mechanism: "launchd StartInterval (macOS)"
+      directories:
+        - "~/morpheus/ — proxy-router binary, config, session data"
+        - "~/.openclaw/workspace/skills/everclaw/ — skill files"
+        - "~/.openclaw/logs/ — guardian logs"
+    install:
+      method: "git clone (recommended) or clawhub install everclaw-inference"
+      note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
     tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security"]
 ---
 
