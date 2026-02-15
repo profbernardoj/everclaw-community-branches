@@ -333,8 +333,8 @@
     <div class="container">
       <div class="logo">♾️</div>
       <h1><span>Everclaw</span></h1>
-      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.2</p>
-      <p class="subtitle">AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network.</p>
+      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.8</p>
+      <p class="subtitle">Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. AI inference you own, via the Morpheus decentralized network.</p>
     </div>
   </header>
 
@@ -573,18 +573,26 @@ curl http://127.0.0.1:8083/health</code>
   <!-- What's New -->
   <div class="container" style="margin-top: 32px;">
     <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
-      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.2</h3>
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.8 — Open-Source First</h3>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
         <div>
-          <strong style="color: var(--green);">📦 Now on ClawHub + Collision Protection</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"><code>clawhub install everclaw-inference</code> — officially live on <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference" style="color: var(--accent);">ClawHub</a>. Includes collision detection against the unrelated "Everclaw Vault" imposter, safe installer, version checking, and recovery docs.</p>
+          <strong style="color: var(--green);">⭐ GLM-5 as Default Model</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Zhipu's GLM-5 (744B MoE, 40B active) replaces Kimi K2.5 as the default for all tiers. Matches Claude Opus 4.5 on benchmarks: 92.7% AIME 2026, 86% GPQA-Diamond, industry-leading hallucination resistance. Handles reasoning, coding, structured output, and agentic tasks — all through Morpheus inference you own.</p>
         </div>
         <div>
-          <strong style="color: var(--green);">🛡️ Gateway Guardian v4 — Billing-Aware</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Classifies errors as billing vs transient. Billing exhaustion → backs off + notifies owner with DIEM reset ETA (restart is useless). Fixed silent restart bug. Through-OpenClaw inference probes, circuit breaker, proactive credit monitoring. Max downtime from credit exhaustion drops from 12h to ~1h.</p>
+          <strong style="color: var(--green);">🧭 Open-Source First Router</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Every tier now defaults to Morpheus. LIGHT → GLM-4.7 Flash, STANDARD → GLM-5, HEAVY → GLM-5 with Claude as fallback only. Zero DIEM burn for the vast majority of tasks. Claude is the escape hatch, not the default. Own your inference at every tier.</p>
         </div>
       </div>
-      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
+      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
+        <div>
+          <strong style="color: var(--text-muted);">v0.9.7 — Diagnostics</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">18-check diagnostic tool + provider guard</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.9.4 — Session Archiver</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Size-triggered archiving + Guardian v4</p>
+        </div>
         <div>
           <strong style="color: var(--text-muted);">v0.8 — Gateway Bootstrap</strong>
           <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Zero-config instant inference startup</p>
@@ -630,7 +638,7 @@ curl http://127.0.0.1:8083/health</code>
       <div class="feature">
         <div class="icon">♾️</div>
         <h4>Decentralized Inference</h4>
-        <p>Access Kimi K2.5, GLM-4.7 Flash, Qwen3, and 30+ models through the Morpheus P2P network.</p>
+        <p>Access GLM-5 (Opus 4.5-level), GLM-4.7 Flash, Kimi K2.5, and 30+ models through the Morpheus P2P network.</p>
       </div>
       <div class="feature">
         <div class="icon">🔌</div>
@@ -639,8 +647,8 @@ curl http://127.0.0.1:8083/health</code>
       </div>
       <div class="feature">
         <div class="icon">🧭</div>
-        <h4>Model Router</h4>
-        <p>13-dimension prompt classifier runs in &lt;1ms. Routes cron jobs to GLM Flash (owned), research to Kimi K2.5 (owned), complex reasoning to Claude (premium).</p>
+        <h4>Open-Source First Router</h4>
+        <p>13-dimension classifier, &lt;1ms. Routes trivial tasks to GLM Flash, everything else to GLM-5 — all on Morpheus. Claude is fallback only.</p>
       </div>
       <div class="feature">
         <div class="icon">💸</div>
@@ -661,6 +669,11 @@ curl http://127.0.0.1:8083/health</code>
         <div class="icon">🔐</div>
         <h4>Zero-Dependency Wallet</h4>
         <p>Private keys stored in macOS Keychain. No 1Password, no external accounts. Generate, swap, and stake in one script.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📦</div>
+        <h4>Smart Session Archiver</h4>
+        <p>Size-triggered archiving prevents dashboard overload. Monitors session size, archives old sessions above 10MB. Runs as cron — no-op when healthy.</p>
       </div>
       <div class="feature">
         <div class="icon">🔍</div>
@@ -688,13 +701,11 @@ curl http://127.0.0.1:8083/health</code>
           </tr>
         </thead>
         <tbody>
-          <tr><td><strong>Kimi K2.5</strong></td><td>General</td><td>Recommended — most reliable</td></tr>
+          <tr><td><strong>GLM-5 ⭐</strong></td><td>General</td><td>Default — Opus 4.5-level, STANDARD + HEAVY tier</td></tr>
+          <tr><td><strong>GLM 4.7 Flash</strong></td><td>Fast</td><td>LIGHT tier — cron, heartbeats, simple lookups</td></tr>
+          <tr><td>Kimi K2.5</td><td>General</td><td>Solid general model</td></tr>
           <tr><td>Kimi K2 Thinking</td><td>Reasoning</td><td>Extended thinking for complex tasks</td></tr>
-          <tr><td><strong>GLM-5</strong></td><td>General</td><td>Zhipu's latest flagship 🆕</td></tr>
-          <tr><td>GLM-5:web</td><td>General + Web</td><td>GLM-5 with web search 🆕</td></tr>
-          <tr><td><strong>MiniMax M2.5</strong></td><td>General</td><td>MiniMax's latest model 🆕</td></tr>
-          <tr><td>MiniMax M2.5:web</td><td>General + Web</td><td>M2.5 with web search 🆕</td></tr>
-          <tr><td>GLM 4.7 Flash</td><td>Fast</td><td>Lower latency</td></tr>
+          <tr><td>GLM-5:web</td><td>General + Web</td><td>GLM-5 with web search</td></tr>
           <tr><td>GLM 4.7</td><td>General</td><td>Full GLM model</td></tr>
           <tr><td>Qwen3 235B</td><td>General</td><td>Large parameter count</td></tr>
           <tr><td>GPT-OSS 120B</td><td>General</td><td>OpenAI's open-source model</td></tr>
@@ -710,7 +721,7 @@ curl http://127.0.0.1:8083/health</code>
         <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference">ClawHub</a>
         <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
         <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
-        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.2">v0.9.2 Release</a>
+        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.8">v0.9.8 Release</a>
         <a href="https://mor.org">Morpheus AI</a>
         <a href="https://openclaw.ai">OpenClaw</a>
         <a href="https://x402.org">x402 Protocol</a>

@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.9.7
-description: AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network. Stake MOR tokens, access Kimi K2.5 and 30+ models, and maintain persistent inference by recycling staked MOR. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver to prevent dashboard overload, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 0.9.8
+description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver to prevent dashboard overload, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -68,7 +68,7 @@ metadata:
 
 *Powered by [Morpheus AI](https://mor.org)*
 
-Access Kimi K2.5, Qwen3, GLM-4, Llama 3.3, and 10+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
+Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. Access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
 
 > 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/DavidAJohnston/everclaw-inference](https://clawhub.ai/DavidAJohnston/everclaw-inference)
 >
