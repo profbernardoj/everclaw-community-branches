@@ -4,8 +4,12 @@
  *
  * Scores a prompt across weighted dimensions and maps to one of three tiers:
  *   LIGHT    → morpheus/glm-4.7-flash  (free, fast — cron, heartbeats, simple Q&A)
- *   STANDARD → morpheus/kimi-k2.5      (free, capable — drafting, research, most tasks)
- *   HEAVY    → venice/claude-opus-4-6   (premium — complex reasoning, strategy, architecture)
+ *   STANDARD → morpheus/glm-5           (free, capable — coding, analysis, most tasks)
+ *   HEAVY    → morpheus/glm-5           (free, frontier — complex reasoning, strategy)
+ *              → venice/claude-opus-4-6  (fallback only — when GLM-5 can't complete)
+ *
+ * Design: Open-source first. Morpheus handles everything it can.
+ * Claude is the escape hatch for tasks that exceed GLM-5's capabilities.
  *
  * Runs in <1ms, zero external calls. Inspired by ClawRouter's 14-dimension
  * weighted scoring (MIT license), adapted for a 3-tier private model stack.
@@ -26,10 +30,23 @@
 
 // ─── Tier → Model Mapping ───────────────────────────────────────────────────
 
+// ─── Open-Source First Design ────────────────────────────────────────────
+// Philosophy: Own your inference. Morpheus (GLM-5) handles everything it can.
+// Claude is the escape hatch, not the default.
+//
+//   LIGHT    → glm-4.7-flash  (trivial: greetings, time, simple lookups)
+//   STANDARD → glm-5          (most real work: coding, analysis, drafting)
+//   HEAVY    → glm-5 first    (complex reasoning — GLM-5 matches Opus 4.5)
+//              claude fallback (only if GLM-5 can't complete the task)
+//
+// When does Claude kick in? Only via the fallback path — if a HEAVY task
+// fails or the caller explicitly requests escalation. The router itself
+// never defaults to a paid model.
+
 const TIER_MODELS = {
-  LIGHT:    { primary: "morpheus/glm-4.7-flash", fallback: "morpheus/kimi-k2.5" },
-  STANDARD: { primary: "morpheus/kimi-k2.5",     fallback: "venice/kimi-k2-5" },
-  HEAVY:    { primary: "venice/claude-opus-4-6",  fallback: "venice/claude-opus-45" },
+  LIGHT:    { primary: "morpheus/glm-4.7-flash", fallback: "morpheus/glm-5" },
+  STANDARD: { primary: "morpheus/glm-5",         fallback: "morpheus/glm-4.7-flash" },
+  HEAVY:    { primary: "morpheus/glm-5",          fallback: "venice/claude-opus-4-6" },
 };
 
 // ─── Scoring Config ─────────────────────────────────────────────────────────
