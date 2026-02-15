@@ -119,10 +119,57 @@ install_or_update() {
 }
 
 # ─── Post-Install ────────────────────────────────────────────────────────────
+validate_config() {
+  local openclaw_config="${OPENCLAW_WORKSPACE:-$HOME/.openclaw}/openclaw.json"
+  
+  if [[ ! -f "$openclaw_config" ]]; then
+    return  # No config yet — that's fine for fresh installs
+  fi
+
+  # Check for "everclaw/" provider prefix — the #1 misconfiguration
+  local bad_provider
+  bad_provider=$(python3 -c "
+import json
+try:
+    c = json.load(open('$openclaw_config'))
+    bad = []
+    p = c.get('agents',{}).get('defaults',{}).get('model',{}).get('primary','')
+    if p.startswith('everclaw/'): bad.append(p)
+    for f in c.get('agents',{}).get('defaults',{}).get('model',{}).get('fallbacks',[]):
+        if f.startswith('everclaw/'): bad.append(f)
+    if 'everclaw' in c.get('models',{}).get('providers',{}): bad.append('provider:everclaw')
+    print(' '.join(bad))
+except: pass
+" 2>/dev/null)
+
+  if [[ -n "$bad_provider" ]]; then
+    echo ""
+    warn "═══════════════════════════════════════════════════"
+    warn "  MISCONFIGURATION: 'everclaw/' is not a provider!"
+    warn "═══════════════════════════════════════════════════"
+    echo ""
+    err "Your openclaw.json uses 'everclaw/' as a model prefix."
+    err "Everclaw is a SKILL (tooling), not an inference provider."
+    err "This routes requests to Venice → billing errors."
+    echo ""
+    log "Fix: change your model to one of these:"
+    echo "  • mor-gateway/kimi-k2.5  — Morpheus API Gateway (easiest)"
+    echo "  • morpheus/kimi-k2.5     — Local Morpheus P2P (needs router)"
+    echo ""
+    log "Quick fix:"
+    echo "  node $SKILL_DIR/scripts/bootstrap-gateway.mjs"
+    echo "  openclaw gateway restart"
+    echo ""
+  fi
+}
+
 post_install() {
   local version
   version=$(grep "^version:" "$SKILL_DIR/SKILL.md" | head -1 | awk '{print $2}' || echo "?")
   
+  # Validate config before showing success
+  validate_config
+
   echo ""
   log "╔══════════════════════════════════════════════════╗"
   log "║  ♾️  Everclaw v${version} installed                  ║"
@@ -140,6 +187,9 @@ post_install() {
   echo ""
   echo "  4. Or bootstrap with free inference (no wallet needed):"
   echo "     node $SKILL_DIR/scripts/bootstrap-gateway.mjs"
+  echo ""
+  warn "IMPORTANT: Valid model prefixes are 'morpheus/' or 'mor-gateway/'"
+  warn "  NOT 'everclaw/' — that will route to Venice instead of Morpheus."
   echo ""
   warn "DO NOT run 'clawhub update everclaw' — a different product"
   warn "uses the same name on ClawHub. Updates come from GitHub:"
