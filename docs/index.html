@@ -333,7 +333,7 @@
     <div class="container">
       <div class="logo">♾️</div>
       <h1><span>Everclaw</span></h1>
-      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.5</p>
+      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.6</p>
       <p class="subtitle">AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network.</p>
     </div>
   </header>
@@ -573,15 +573,15 @@ curl http://127.0.0.1:8083/health</code>
   <!-- What's New -->
   <div class="container" style="margin-top: 32px;">
     <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
-      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.5</h3>
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.6</h3>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
         <div>
-          <strong style="color: var(--green);">🔄 Always-On Proxy-Router</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">The Morpheus proxy-router (Go binary) now runs under launchd with KeepAlive — if it crashes or gets killed, macOS restarts it within 30 seconds. Previously, the router dying silently meant Morpheus fallback was broken until manually restarted. Three launchd services now form a resilient stack: router (8082) → proxy (8083) → guardian.</p>
+          <strong style="color: var(--green);">🛡️ Provider Misconfiguration Guard</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Three layers of defense against the #1 onboarding issue: using <code>everclaw/</code> as a model prefix (it's a skill, not a provider). The bootstrap script auto-fixes it, and both install scripts validate your config post-install with clear fix instructions. No more silent routing to Venice when MOR is staked and ready.</p>
         </div>
         <div>
-          <strong style="color: var(--green);">🔑 Secure Headless Launcher</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">New <code>mor-launch-headless.sh</code> injects the wallet private key from 1Password at runtime (falls back to macOS Keychain). Runs in foreground for launchd process tracking. No keys ever touch disk — retrieved fresh on each launch.</p>
+          <strong style="color: var(--green);">🔄 Always-On Proxy-Router (v0.9.5)</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">The Morpheus proxy-router now runs under launchd with KeepAlive — if it crashes or gets killed, macOS restarts it within 30 seconds. Three launchd services form a resilient stack: router (8082) → proxy (8083) → guardian. Secure headless launcher injects wallet key from 1Password at runtime.</p>
         </div>
       </div>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
@@ -723,7 +723,7 @@ curl http://127.0.0.1:8083/health</code>
         <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference">ClawHub</a>
         <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
         <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
-        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.5">v0.9.5 Release</a>
+        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.6">v0.9.6 Release</a>
         <a href="https://mor.org">Morpheus AI</a>
         <a href="https://openclaw.ai">OpenClaw</a>
         <a href="https://x402.org">x402 Protocol</a>
