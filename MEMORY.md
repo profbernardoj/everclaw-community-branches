@@ -174,9 +174,11 @@ After any `openclaw update.run` or git pull:
 ---
 
 ## Upcoming
-- Add SmartAgent logo to assets/ (David to upload)
+- ~~Add SmartAgent logo to assets/~~ ✅ Merged
+- **Follow Scott's DIY Guide for new Mac Mini setup** — Reminder set for tomorrow 9 AM
 - Test install.sh on clean macOS and Linux machines
-- Configure DNS for smartagent.org if issues persist
+- ~~Configure DNS for smartagent.org~~ ✅ Working (browser cache issue)
+- ~~Redesign SmartAgent.org website~~ ✅ Done (Lovable, light theme, deployed)
 - Investigate Signal-cli connection drops and thread starvation
 - Consider registering Everclaw as an ERC-8004 agent on Base
 
