@@ -676,9 +676,9 @@ Sessions stake MOR tokens for their duration. Longer sessions = more MOR locked 
 
 | Duration | MOR Staked (approx) | Transactions |
 |----------|--------------------:|:-------------|
-| 1 hour | ~11 MOR | Every hour |
-| 1 day | ~274 MOR | Daily |
-| 7 days | ~1,915 MOR | Weekly |
+| 1 hour | ~0.011 MOR | Every hour |
+| 1 day | ~0.274 MOR | Daily |
+| 7 days | ~1.9 MOR | Weekly |
 
 MOR is **returned** when the session closes or expires. The proxy auto-renews before expiry, so you get continuous inference with minimal staking overhead.
 
