@@ -160,6 +160,19 @@ if [[ ! -f "$INSTALL_DIR/models-config.json" ]]; then
 MODEOF
 fi
 
+# Install Node.js dependencies (viem for wallet/contract interaction)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EVERCLAW_ROOT="$(dirname "$SCRIPT_DIR")"
+
+if command -v npm &>/dev/null; then
+  echo "📦 Installing Node.js dependencies..."
+  (cd "$EVERCLAW_ROOT" && npm install --production 2>/dev/null) || {
+    echo "⚠️  npm install failed. Run manually: cd $EVERCLAW_ROOT && npm install"
+  }
+else
+  echo "⚠️  npm not found. Install Node.js, then run: cd $EVERCLAW_ROOT && npm install"
+fi
+
 echo ""
 echo "✅ Everclaw (Morpheus Lumerin Node) installed to ${INSTALL_DIR}"
 echo ""
