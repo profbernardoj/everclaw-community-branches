@@ -230,6 +230,46 @@ bootstrap_inference() {
   configure_smartagent_defaults
 }
 
+# ─── Post-Bootstrap: Validate Config (v0.9.6) ────────────────────────────────
+validate_config() {
+  local config_file="$HOME/.openclaw/openclaw.json"
+  [[ -f "$config_file" ]] || return 0
+
+  # Detect "everclaw/" provider prefix — the #1 misconfiguration
+  local bad
+  bad=$(python3 -c "
+import json
+try:
+    c = json.load(open('$config_file'))
+    bad = []
+    p = c.get('agents',{}).get('defaults',{}).get('model',{}).get('primary','')
+    if p.startswith('everclaw/'): bad.append(p)
+    for f in c.get('agents',{}).get('defaults',{}).get('model',{}).get('fallbacks',[]):
+        if f.startswith('everclaw/'): bad.append(f)
+    if 'everclaw' in c.get('models',{}).get('providers',{}): bad.append('provider:everclaw')
+    print(' '.join(bad))
+except: pass
+" 2>/dev/null)
+
+  if [[ -n "$bad" ]]; then
+    warn "═══════════════════════════════════════════════════"
+    warn "  MISCONFIGURATION: 'everclaw/' is not a provider!"
+    warn "═══════════════════════════════════════════════════"
+    err ""
+    err "Your config uses 'everclaw/' as a model prefix."
+    err "Everclaw is a SKILL, not an inference provider."
+    err "This routes to Venice (billing errors) instead of Morpheus."
+    err ""
+    log "Fix: change your model to:"
+    info "  mor-gateway/kimi-k2.5  — Morpheus API Gateway"
+    info "  morpheus/kimi-k2.5     — Local Morpheus P2P"
+    err ""
+    log "Or re-run the bootstrap to auto-fix:"
+    info "  node ~/.openclaw/workspace/skills/everclaw/scripts/bootstrap-gateway.mjs"
+    err ""
+  fi
+}
+
 # ─── Step 5: Configure Workspace ─────────────────────────────────────────────
 configure_workspace() {
   log "Configuring SmartAgent workspace..."
@@ -379,6 +419,7 @@ main() {
   echo ""
   log "Step 4/6: Decentralized Inference"
   bootstrap_inference
+  validate_config
 
   echo ""
   log "Step 5/6: Workspace"
