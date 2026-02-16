@@ -1,6 +1,6 @@
 ---
 name: everclaw
-version: 0.9.8
+version: 0.9.8.2
 description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver to prevent dashboard overload, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
@@ -62,6 +62,56 @@ metadata:
       method: "git clone (recommended) or clawhub install everclaw-inference"
       note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
     tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security"]
+---
+
+<!-- ─── AGENT INSTRUCTIONS (read by OpenClaw agents) ─────────────── -->
+
+## 🤖 Agent Setup Instructions
+
+**If your human asks you to set up Everclaw / Morpheus inference, follow these steps exactly.**
+
+### Quick Setup (Gateway Only — easiest)
+
+```bash
+node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --template gateway-only --key <API_KEY> --apply --test --restart
+```
+
+### Full Setup (Local P2P + Gateway)
+
+```bash
+node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key <API_KEY> --apply --test --restart
+```
+
+### What setup.mjs does:
+1. Detects OS → picks the right config template (mac/linux/gateway-only)
+2. Deep-merges Morpheus providers into existing `openclaw.json` (preserves all other config)
+3. Substitutes the API key into the `mor-gateway` provider
+4. Updates `auth-profiles.json` with the new provider credentials
+5. Tests gateway connectivity (with `--test`)
+6. Restarts OpenClaw gateway (with `--restart`)
+
+### Flags:
+| Flag | What it does |
+|------|-------------|
+| `--template <name>` | Override OS auto-detection (`mac`, `linux`, `gateway-only`) |
+| `--key <key>` | Morpheus API Gateway key (free from app.mor.org) |
+| `--apply` | Write changes (default is dry-run) |
+| `--test` | Ping gateway after setup |
+| `--restart` | Restart OpenClaw gateway after apply |
+
+### ⚠️ Critical Guardrails
+
+- **NEVER use `everclaw/` as a model prefix.** Everclaw is a skill, not a provider. Use `morpheus/` or `mor-gateway/`.
+- **Always dry-run first** (omit `--apply`) to preview changes before writing.
+- **Don't edit openclaw.json by hand** when setup.mjs can do it — the merge logic handles edge cases.
+- **API keys:** Get a free key at https://app.mor.org — don't use the community bootstrap key for production.
+
+### Getting an API key:
+1. Go to https://app.mor.org
+2. Create an account and sign in
+3. Click "Create API Key" and enable automation
+4. Pass the key to setup.mjs with `--key`
+
 ---
 
 # ♾️ Everclaw — AI Inference You Own, Forever Powering Your OpenClaw Agents

@@ -28,7 +28,19 @@ git clone https://github.com/profbernardoj/everclaw.git ~/.openclaw/workspace/sk
 
 > ⚠️ **Use `everclaw-inference`** — not `everclaw`. The bare `everclaw` slug on ClawHub belongs to a different, unrelated product ("Everclaw Vault"). See [CLAWHUB_WARNING.md](CLAWHUB_WARNING.md).
 
-Then set up your wallet, proxy, and guardian:
+Then configure your OpenClaw agent:
+
+```bash
+# Easiest: Gateway only (no local proxy needed)
+node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --template gateway-only --key YOUR_KEY --apply --test --restart
+
+# Full: Local P2P + Gateway (auto-detects OS)
+node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key YOUR_KEY --apply --test --restart
+```
+
+Get a free API key at [app.mor.org](https://app.mor.org). Run without `--apply` first to preview changes.
+
+**Want local P2P inference too?** Set up the wallet, proxy, and guardian:
 
 ```bash
 # Step 1: Install the Morpheus proxy-router
@@ -47,7 +59,7 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve
 bash ~/.openclaw/workspace/skills/everclaw/scripts/install-proxy.sh
 ```
 
-That's it. Your agent now has a fallback inference provider that runs on decentralized infrastructure. No API keys, no external accounts, no subscriptions.
+That's it. Your agent now has decentralized inference — either via the API Gateway (instant) or local P2P (stake MOR for persistent access you own).
 
 ---
 
@@ -207,6 +219,8 @@ When a session ends, your MOR comes back. Open a new session with the same token
 
 | Action | Command |
 |--------|---------|
+| **Setup (recommended)** | `node scripts/setup.mjs --key YOUR_KEY --apply --test --restart` |
+| Setup (dry-run) | `node scripts/setup.mjs` |
 | Install (ClawHub) | `clawhub install everclaw-inference` |
 | Install (script) | `curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh \| bash` |
 | Update (ClawHub) | `clawhub update everclaw-inference` |
