@@ -6,7 +6,8 @@ Last updated: 2026-02-14
 
 ## Everclaw Skill (profbernardoj/everclaw)
 
-### Current Version: v0.9.4 (smart session archiver)
+### Current Version: v0.9.8.3 (community contributions)
+- Merged 7 PRs from Scott Berenzweig (betterbrand): dynamic model discovery, install.sh v5.11.0 fix, bash 3.2 compat, agent integration docs, DIY guide link, viem dependency, staking economics fix
 - OpenClaw skill for decentralized AI inference via Morpheus network
 - Website: everclaw.xyz (GitHub Pages from docs/)
 - Repo: profbernardoj/everclaw on GitHub
@@ -149,6 +150,28 @@ Someone published "Everclaw Vault" (encrypted cloud memory, `everclaw.chong-eae.
 - Morpheus = ownership, not rental. MOR staking = inference forever (tokens staked, returned, recycled)
 - Morpheus API Gateway during beta = "community-powered" / "open access" (not "free")
 - **Don't highlight Llama 3.3** — David considers it outdated. Focus on Kimi K2.5 and GLM-4 models
+
+## OpenClaw Update Security Checks (2026-02-15)
+
+**Context:** OpenClaw creator Peter was hired by OpenAI (Feb 2026). OpenAI has a track record of pivoting from open-source mission to closed, for-profit model. Foundation promises notwithstanding, we must verify on EVERY update:
+
+**Fork:** https://github.com/profbernardoj/openclaw — preserved pre-OpenAI version as backup
+
+### Mandatory Pre-Update Checks
+1. **License verification:** `git log --follow -p -- LICENSE | head -50` — confirm MIT license unchanged
+2. **No OpenAI defaults:** `grep -ri "openai" packages/ --include="*.js" --include="*.json" | grep -v node_modules` — check for OpenAI API endpoints, model defaults, or auth integration
+3. **Package dependencies:** Check for new dependencies on `openai` npm package or OpenAI-specific SDKs
+4. **Default model config:** Verify default provider/model hasn't changed to OpenAI
+
+### Post-Update Verification
+After any `openclaw update.run` or git pull:
+- Run `openclaw status` and verify providers
+- Check `~/.openclaw/openclaw.json` for any new OpenAI-related fields
+- Review changelog for concerning changes
+
+**If any check fails:** Do NOT update. Investigate further. Consider forking from last known-good commit.
+
+---
 
 ## Upcoming
 - Add SmartAgent logo to assets/ (David to upload)
