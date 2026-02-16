@@ -4,6 +4,8 @@
 
 SmartAgent gives you a personal AI assistant that works out of the box — no API key, no subscription, no corporate middleman. Powered by [OpenClaw](https://openclaw.ai) and [Morpheus](https://mor.org) decentralized inference.
 
+> **New: [DIY Setup Guide](https://github.com/SmartAgentProtocol/Mac-Mini-Morpheus-Agent-DIY-Guide)** — Want to build a Smart Agent from scratch on a Mac mini? Complete walkthrough with identity separation, on-chain guardrails, three-tier inference fallback, and 8 documented gotchas. Every step tested on real hardware.
+
 ## Install
 
 One command:
@@ -39,7 +41,7 @@ That's it. The installer handles everything:
 SmartAgent grows with you:
 
 ```
-Day 1:   Morpheus API Gateway (kimi-k2.5, open access)
+Day 1:   Morpheus API Gateway (Kimi K2.5, GLM-5, MiniMax M2.5, open access)
            ↓
 Week 1:  Own API key from app.mor.org (personalized, no cost)
            ↓
@@ -75,6 +77,7 @@ After installation:
 | Check status | `openclaw status` |
 | Update OpenClaw | `openclaw update` |
 | Update Everclaw | `cd ~/.openclaw/workspace/skills/everclaw && git pull` |
+| **Diagnose** | `bash ~/.openclaw/workspace/skills/everclaw/scripts/diagnose.sh` |
 
 ## Architecture
 
@@ -88,7 +91,10 @@ SmartAgent
 ├── Everclaw (decentralized inference)
 │   ├── Morpheus API Gateway (open access, cloud)
 │   ├── Morpheus P2P Proxy (local, staked MOR)
-│   └── Gateway Guardian v3 (self-healing watchdog with circuit breaker)
+│   ├── Diagnostic Tool (18-check health scanner)
+│   ├── Always-On Proxy-Router (launchd KeepAlive, auto-restart)
+│   ├── Gateway Guardian v4 (billing-aware self-healing watchdog)
+│   └── Smart Session Archiver (prevents dashboard overload)
 └── SmartAgent Config
     ├── SOUL.md (agent personality)
     ├── AGENTS.md (workspace conventions)

@@ -53,12 +53,13 @@ The depositor's principal is **never sold or spent**. Only the yield (interest, 
 
 | Contract | Chain | Address |
 |----------|-------|---------|
-| Diamond (Inference) | Base | `0x6aBE1d282f72B474E54527D93b979A4f64d3030a` |
+| **Distribution (Capital)** | Ethereum | `0x47176B2Af9885dC6C4575d4eFd63895f7Aaa4790` |
+| Diamond (Compute/Inference) | Base | `0x6aBE1d282f72B474E54527D93b979A4f64d3030a` |
 | MOR Token | Base | `0x7431aDa8a591C955a994a21710752EF9b882b8e3` |
 | MOR Token | Arbitrum | OFT standard (bridged via LayerZero) |
 | MOR Token | Ethereum | OFT standard |
 
-Note: Capital deposit contracts are on **Ethereum L1**, while inference (Diamond) is on **Base**. MOR token is cross-chain via LayerZero OFT.
+**Important distinction:** The Diamond contract on Base (`0x6aBE...`) is the **Compute Marketplace Router** (Lumerin integration) for inference. Capital deposit contracts live on **Ethereum L1**. MOR token is cross-chain via LayerZero OFT.
 
 ---
 
@@ -81,8 +82,9 @@ Note: Capital deposit contracts are on **Ethereum L1**, while inference (Diamond
 1. Each `DepositPool` tracks total deposits and generated yield
 2. Chainlink oracles convert all yields to USD-equivalent base
 3. MOR emissions for capital providers (24% of daily emissions) are split proportionally based on each depositor's share of total USD-normalized yield
-4. **Lock multipliers** boost rewards for longer lock durations (e.g., lock for 6 months = higher multiplier)
+4. **Power Factor multipliers** boost rewards for long-term reward staking (up to 10.7x for longest durations)
 5. **Referral multipliers** provide additional boost
+6. **Yield split:** 50% of captured yield buys MOR on open market, 50% pairs with MOR in Uniswap V3 as Protocol Owned Liquidity
 
 ### Capital Contract v2 (Sept 2025 Upgrade)
 

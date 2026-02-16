@@ -15,4 +15,4 @@
 - (tracking starts Feb 2026)
 
 ## Venues/Events Suggested (avoid repeating)
-- (none yet)
+- **2026-02-14/15**: Austin Lunar New Year Festival (Webb Middle School), Lady Bird Lake/Zilker Park, Thinkery Children's Museum, Texas Farmers' Market at Mueller

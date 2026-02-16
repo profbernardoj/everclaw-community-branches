@@ -4,6 +4,36 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 
 ---
 
+## OpenClaw Update Security Protocol
+
+**Background:** OpenClaw creator Peter was hired by OpenAI (Feb 2026). Must verify trust on every update.
+
+**Fork:** https://github.com/profbernardoj/openclaw — preserved pre-OpenAI version as backup
+
+### Before ANY OpenClaw Update
+```bash
+# 1. Check MIT license unchanged
+git log --follow -p -- LICENSE | head -50
+
+# 2. Scan for OpenAI integration
+grep -ri "openai" packages/ --include="*.js" --include="*.json" | grep -v node_modules
+
+# 3. Check for openai npm dependency
+grep -r '"openai"' package.json package-lock.json
+
+# 4. Review recent commits
+git log --oneline -20
+```
+
+### After Update
+- Run `openclaw status` — verify providers unchanged
+- Check `~/.openclaw/openclaw.json` for new OpenAI fields
+- Test basic inference works as expected
+
+**If checks fail:** Do NOT proceed. Investigate. Consider pinning to last known-good version.
+
+---
+
 ## Security Protocols
 
 ### After Installing Any New Skill
