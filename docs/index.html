@@ -333,7 +333,7 @@
     <div class="container">
       <div class="logo">♾️</div>
       <h1><span>Everclaw</span></h1>
-      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.8</p>
+      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.8.2</p>
       <p class="subtitle">Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. AI inference you own, via the Morpheus decentralized network.</p>
     </div>
   </header>
@@ -491,9 +491,26 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</
       <div class="step">
         <div class="step-header">
           <div class="step-number">2</div>
+          <h3>Configure Your Agent (setup.mjs)</h3>
+        </div>
+        <p>One command configures Morpheus providers in your OpenClaw config. Get a free API key at <a href="https://app.mor.org" style="color: var(--accent);">app.mor.org</a>, then:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key YOUR_KEY --apply --test --restart</code>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Gateway-only (no local proxy): add <code style="font-size: 12px;">--template gateway-only</code>. Dry-run first (omit <code style="font-size: 12px;">--apply</code>) to preview changes.</p>
+      </div>
+
+      <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin: 24px 0 16px; border-top: 1px solid var(--border); padding-top: 24px;">
+        <strong>Optional:</strong> For local P2P inference (stake MOR tokens), continue with steps 3–6:
+      </p>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">3</div>
           <h3>Install Router, Proxy &amp; Guardian</h3>
         </div>
-        <p>Two commands set up everything — the Morpheus router, OpenAI-compatible proxy, and gateway health monitor:</p>
+        <p>Two commands set up the Morpheus router, OpenAI-compatible proxy, and gateway health monitor:</p>
         <div class="code-block">
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
           <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/install.sh
@@ -503,7 +520,7 @@ bash ~/.openclaw/workspace/skills/everclaw/scripts/install-proxy.sh</code>
 
       <div class="step">
         <div class="step-header">
-          <div class="step-number">3</div>
+          <div class="step-number">4</div>
           <h3>Create Your Wallet</h3>
         </div>
         <p>Generates a wallet and stores the key in macOS Keychain. No 1Password, no external accounts.</p>
@@ -515,7 +532,7 @@ bash ~/.openclaw/workspace/skills/everclaw/scripts/install-proxy.sh</code>
 
       <div class="step">
         <div class="step-header">
-          <div class="step-number">4</div>
+          <div class="step-number">5</div>
           <h3>Fund &amp; Swap</h3>
         </div>
         <p>Send ETH (on Base) to your wallet address, then swap for MOR:</p>
@@ -531,19 +548,14 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</
 
       <div class="step">
         <div class="step-header">
-          <div class="step-number">5</div>
-          <h3>Start &amp; Configure Fallback</h3>
+          <div class="step-number">6</div>
+          <h3>Start Inference</h3>
         </div>
-        <p>Launch the router, then tell your agent to use Morpheus as a fallback model:</p>
+        <p>Launch the Morpheus router:</p>
         <div class="code-block">
           <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          <code><span class="comment"># Start the Morpheus router</span>
-bash ~/.openclaw/workspace/skills/everclaw/scripts/start.sh
-
-<span class="comment"># Check it's working</span>
-curl http://127.0.0.1:8083/health</code>
+          <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/start.sh</code>
         </div>
-        <p style="margin-top: 12px;">Then add Morpheus as a fallback in your <code>openclaw.json</code> — see the <a href="https://github.com/profbernardoj/everclaw#readme" style="color: var(--accent);">full configuration guide</a>.</p>
       </div>
 
       <div class="economics">
@@ -573,15 +585,15 @@ curl http://127.0.0.1:8083/health</code>
   <!-- What's New -->
   <div class="container" style="margin-top: 32px;">
     <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
-      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.8 — Open-Source First</h3>
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.8.2 — One-Command Setup</h3>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
         <div>
-          <strong style="color: var(--green);">⭐ GLM-5 as Default Model</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Zhipu's GLM-5 (744B MoE, 40B active) replaces Kimi K2.5 as the default for all tiers. Matches Claude Opus 4.5 on benchmarks: 92.7% AIME 2026, 86% GPQA-Diamond, industry-leading hallucination resistance. Handles reasoning, coding, structured output, and agentic tasks — all through Morpheus inference you own.</p>
+          <strong style="color: var(--green);">⚡ One-Command Setup (setup.mjs)</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">New <code>setup.mjs</code> auto-detects your OS, picks the right config template, merges Morpheus providers into your OpenClaw config, updates auth profiles, tests the gateway, and restarts — all in one command. Config templates for macOS, Linux, and gateway-only setups included.</p>
         </div>
         <div>
-          <strong style="color: var(--green);">🧭 Open-Source First Router</strong>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Every tier now defaults to Morpheus. LIGHT → GLM-4.7 Flash, STANDARD → GLM-5, HEAVY → GLM-5 with Claude as fallback only. Zero DIEM burn for the vast majority of tasks. Claude is the escape hatch, not the default. Own your inference at every tier.</p>
+          <strong style="color: var(--green);">⭐ GLM-5 as Default Model</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Zhipu's GLM-5 (744B MoE, 40B active) replaces Kimi K2.5 as the default for all tiers. Matches Claude Opus 4.5 on benchmarks: 92.7% AIME 2026, 86% GPQA-Diamond, industry-leading hallucination resistance. All through Morpheus inference you own.</p>
         </div>
       </div>
       <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
@@ -721,7 +733,7 @@ curl http://127.0.0.1:8083/health</code>
         <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference">ClawHub</a>
         <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
         <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
-        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.8">v0.9.8 Release</a>
+        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.8.2">v0.9.8.2 Release</a>
         <a href="https://mor.org">Morpheus AI</a>
         <a href="https://openclaw.ai">OpenClaw</a>
         <a href="https://x402.org">x402 Protocol</a>
