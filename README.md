@@ -4,6 +4,8 @@
 
 Your agent runs on inference you own: GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models powered by staked MOR tokens that recycle back to you. No API bills, no credit limits, no surprise costs. MOR is staked — not spent — so you maintain access for as long as you hold your tokens.
 
+> **New: [DIY Setup Guide](https://github.com/betterbrand/Mac-Mini-Morpheus-Agent-DIY-Guide)** — Want to build an always-on Morpheus-powered agent from scratch on a Mac mini? Complete walkthrough with identity separation, on-chain guardrails, three-tier inference fallback, and 9 documented gotchas. Every step tested on real hardware.
+
 ---
 
 ## Install
