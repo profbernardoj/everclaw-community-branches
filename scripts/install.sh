@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-# Everclaw — Install Script
+# Everclaw -- Install Script
 # Downloads the latest proxy-router release and sets up ~/morpheus/
 
 INSTALL_DIR="$HOME/morpheus"
 REPO="MorpheusAIs/Morpheus-Lumerin-Node"
 
-echo "♾️  Everclaw — Installer"
+echo "Everclaw -- Installer"
 echo "======================================"
 
 # Detect OS and architecture
@@ -17,65 +17,114 @@ ARCH=$(uname -m)
 case "$OS" in
   darwin) PLATFORM="darwin" ;;
   linux)  PLATFORM="linux" ;;
-  *)      echo "❌ Unsupported OS: $OS"; exit 1 ;;
+  *)      echo "ERROR:Unsupported OS: $OS"; exit 1 ;;
 esac
 
 case "$ARCH" in
   x86_64)  GOARCH="amd64" ;;
   aarch64) GOARCH="arm64" ;;
   arm64)   GOARCH="arm64" ;;
-  *)       echo "❌ Unsupported architecture: $ARCH"; exit 1 ;;
+  *)       echo "ERROR:Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
-echo "📋 Platform: ${PLATFORM}-${GOARCH}"
+echo "Platform: ${PLATFORM}-${GOARCH}"
 
 # Get latest release tag
-echo "🔍 Finding latest release..."
+echo "Finding latest release..."
 LATEST_TAG=$(curl -sL "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name"' | head -1 | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
 
 if [[ -z "$LATEST_TAG" ]]; then
-  echo "❌ Could not determine latest release. Check network connectivity."
+  echo "ERROR:Could not determine latest release. Check network connectivity."
   exit 1
 fi
 
-echo "📦 Latest release: ${LATEST_TAG}"
+echo "Latest release: ${LATEST_TAG}"
 
-# Construct download URL
-# Release assets follow pattern: mor-launch-<os>-<arch>.zip
-ASSET_NAME="mor-launch-${PLATFORM}-${GOARCH}.zip"
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/${ASSET_NAME}"
+# Fetch release asset list from GitHub API
+echo "Querying release assets..."
+ASSETS_JSON=$(curl -sL "https://api.github.com/repos/${REPO}/releases/tags/${LATEST_TAG}")
 
-echo "⬇️  Downloading ${ASSET_NAME}..."
+# Map platform names used in release assets
+# Older releases: mor-launch-darwin-arm64.zip
+# v5.11.0+: mac-arm64-morpheus-router-<version> (standalone binary)
+if [[ "$PLATFORM" == "darwin" ]]; then
+  PLATFORM_PATTERN="mac"
+else
+  PLATFORM_PATTERN="$PLATFORM"
+fi
 
 TMPDIR_DL=$(mktemp -d)
-ZIPFILE="${TMPDIR_DL}/${ASSET_NAME}"
-
-if ! curl -sL -o "$ZIPFILE" "$DOWNLOAD_URL"; then
-  echo "❌ Download failed. URL: $DOWNLOAD_URL"
-  rm -rf "$TMPDIR_DL"
-  exit 1
-fi
-
-# Check the file is actually a zip
-if ! file "$ZIPFILE" | grep -q -i "zip"; then
-  echo "❌ Downloaded file is not a valid zip archive."
-  echo "   URL might be wrong. Check releases at: https://github.com/${REPO}/releases"
-  rm -rf "$TMPDIR_DL"
-  exit 1
-fi
 
 # Create install directory
 mkdir -p "$INSTALL_DIR"
 
-echo "📂 Extracting to ${INSTALL_DIR}..."
-unzip -o -q "$ZIPFILE" -d "$INSTALL_DIR"
+# --- Strategy 1: Try new naming convention (standalone binaries) ---
+# Pattern: <platform>-<arch>-morpheus-router-<version>
+ROUTER_ASSET=$(echo "$ASSETS_JSON" | grep -o '"name": *"[^"]*"' | sed 's/"name": *"//;s/"//' | grep -i "${PLATFORM_PATTERN}-${GOARCH}-morpheus-router" | head -1)
+CLI_ASSET=$(echo "$ASSETS_JSON" | grep -o '"name": *"[^"]*"' | sed 's/"name": *"//;s/"//' | grep -i "${PLATFORM_PATTERN}-${GOARCH}-morpheus-cli" | head -1)
+
+if [[ -n "$ROUTER_ASSET" ]]; then
+  echo "Found standalone binary: ${ROUTER_ASSET}"
+
+  ROUTER_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/${ROUTER_ASSET}"
+  echo "Downloading ${ROUTER_ASSET}..."
+  if ! curl -sL -o "$INSTALL_DIR/proxy-router" "$ROUTER_URL"; then
+    echo "ERROR:Download failed. URL: $ROUTER_URL"
+    rm -rf "$TMPDIR_DL"
+    exit 1
+  fi
+  chmod +x "$INSTALL_DIR/proxy-router"
+
+  if [[ -n "$CLI_ASSET" ]]; then
+    CLI_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/${CLI_ASSET}"
+    echo "Downloading ${CLI_ASSET}..."
+    curl -sL -o "$INSTALL_DIR/mor-cli" "$CLI_URL" && chmod +x "$INSTALL_DIR/mor-cli"
+  fi
+
+else
+  # --- Strategy 2: Try legacy naming convention (zip archive) ---
+  # Pattern: mor-launch-<platform>-<arch>.zip
+  ZIP_ASSET=$(echo "$ASSETS_JSON" | grep -o '"name": *"[^"]*"' | sed 's/"name": *"//;s/"//' | grep -i "mor-launch-${PLATFORM}-${GOARCH}" | head -1)
+
+  if [[ -z "$ZIP_ASSET" ]]; then
+    echo "ERROR:No matching release asset found for ${PLATFORM}-${GOARCH}."
+    echo "   Available assets:"
+    echo "$ASSETS_JSON" | grep -o '"name": *"[^"]*"' | sed 's/"name": *"/  /;s/"//'
+    echo ""
+    echo "   Check releases at: https://github.com/${REPO}/releases"
+    rm -rf "$TMPDIR_DL"
+    exit 1
+  fi
+
+  echo "Found zip archive: ${ZIP_ASSET}"
+  DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/${ZIP_ASSET}"
+  ZIPFILE="${TMPDIR_DL}/${ZIP_ASSET}"
+
+  echo "Downloading ${ZIP_ASSET}..."
+  if ! curl -sL -o "$ZIPFILE" "$DOWNLOAD_URL"; then
+    echo "ERROR:Download failed. URL: $DOWNLOAD_URL"
+    rm -rf "$TMPDIR_DL"
+    exit 1
+  fi
+
+  # Check the file is actually a zip
+  if ! file "$ZIPFILE" | grep -q -i "zip"; then
+    echo "ERROR:Downloaded file is not a valid zip archive."
+    echo "   URL might be wrong. Check releases at: https://github.com/${REPO}/releases"
+    rm -rf "$TMPDIR_DL"
+    exit 1
+  fi
+
+  echo "Extracting to ${INSTALL_DIR}..."
+  unzip -o -q "$ZIPFILE" -d "$INSTALL_DIR"
+fi
 
 # Clean up temp
 rm -rf "$TMPDIR_DL"
 
 # Remove macOS quarantine flags
 if [[ "$PLATFORM" == "darwin" ]]; then
-  echo "🍎 Removing macOS quarantine flags..."
+  echo "Removing macOS quarantine flags..."
   xattr -cr "$INSTALL_DIR" 2>/dev/null || true
 fi
 
@@ -88,12 +137,12 @@ mkdir -p "$INSTALL_DIR/data/logs"
 
 # Create .env if it doesn't exist
 if [[ ! -f "$INSTALL_DIR/.env" ]]; then
-  echo "📝 Creating .env..."
+  echo "Creating .env..."
   cat > "$INSTALL_DIR/.env" << 'ENVEOF'
 # Morpheus Proxy-Router Configuration (Consumer Mode)
 # Base Mainnet
 
-# RPC endpoint — MUST be set or router silently fails
+# RPC endpoint -- MUST be set or router silently fails
 ETH_NODE_ADDRESS=https://base-mainnet.public.blastapi.io
 
 # Chain
@@ -107,7 +156,7 @@ ETH_NODE_MAX_RECONNECTS=30
 DIAMOND_CONTRACT_ADDRESS=0x6aBE1d282f72B474E54527D93b979A4f64d3030a
 MOR_TOKEN_ADDRESS=0x7431aDa8a591C955a994a21710752EF9b882b8e3
 
-# WALLET_PRIVATE_KEY intentionally left blank — inject at runtime via 1Password
+# WALLET_PRIVATE_KEY intentionally left blank -- inject at runtime via 1Password
 WALLET_PRIVATE_KEY=
 
 # Proxy settings
@@ -140,7 +189,7 @@ fi
 
 # Create models-config.json if it doesn't exist
 if [[ ! -f "$INSTALL_DIR/models-config.json" ]]; then
-  echo "📝 Creating models-config.json..."
+  echo "Creating models-config.json..."
   cat > "$INSTALL_DIR/models-config.json" << 'MODEOF'
 {
   "$schema": "./internal/config/models-config-schema.json",
@@ -174,14 +223,14 @@ else
 fi
 
 echo ""
-echo "✅ Everclaw (Morpheus Lumerin Node) installed to ${INSTALL_DIR}"
+echo "Everclaw (Morpheus Lumerin Node) installed to ${INSTALL_DIR}"
 echo ""
-echo "📋 Next steps:"
+echo "Next steps:"
 echo "  1. Edit ~/morpheus/.env if you need a custom RPC endpoint"
 echo "  2. Update models-config.json with correct model IDs from the blockchain"
 echo "  3. Run: bash skills/everclaw/scripts/start.sh"
 echo ""
-echo "⚠️  Before first use:"
+echo "Before first use:"
 echo "  - Ensure you have MOR tokens on Base mainnet"
 echo "  - Ensure you have ETH on Base for gas"
 echo "  - Set up 1Password with your wallet private key"
