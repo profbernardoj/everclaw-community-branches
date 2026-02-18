@@ -93,6 +93,22 @@ hours_to_diem_reset() {
   echo $(( remaining_min / 60 ))
 }
 
+# === v5.12.0: Direct router healthcheck (catches BadgerDB issues early) ===
+check_router_health() {
+  local cookie_auth=""
+  if [[ -f "$HOME/morpheus/.cookie" ]]; then
+    cookie_auth="-u $(cat "$HOME/morpheus/.cookie")"
+  fi
+  local response
+  response=$(curl -sf --max-time 10 $cookie_auth http://127.0.0.1:8082/healthcheck 2>&1)
+  if [ $? -ne 0 ]; then
+    log "WARN: Morpheus router healthcheck failed: $response"
+    return 1
+  fi
+  [[ "$VERBOSE" == "--verbose" ]] && log "Router healthcheck OK"
+  return 0
+}
+
 mkdir -p "$(dirname "$LOG_FILE")"
 
 # Trim log
@@ -412,6 +428,9 @@ fi
 
 # ─── Step 0: Circuit breaker check ──────────────────────────────────────────
 check_circuit_breaker
+
+# ─── Step 0.5: v5.12.0 Router healthcheck (BadgerDB, blockchain sync) ────────
+check_router_health
 
 # ─── Step 1: HTTP probe ─────────────────────────────────────────────────────
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$PROBE_TIMEOUT" "$GATEWAY_URL" 2>/dev/null || echo "000")
