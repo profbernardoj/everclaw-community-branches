@@ -1,5 +1,5 @@
 {
-  "generated": "2026-02-15T09:01:36.394Z",
+  "generated": "2026-02-17T09:00:38.694Z",
   "owner": "David Johnston",
   "lifeGoals": [
     {
@@ -18,7 +18,8 @@
         }
       ],
       "actionsTaken": [
-        "2026-02-11: Saved Balaji education framework for guiding children's skill development"
+        "2026-02-11: Saved Balaji education framework for guiding children's skill development",
+        "2026-02-15: Noted WHOOP fitness integration plans and family AI hub (individual agents per family member)"
       ],
       "actionsSuggested": [],
       "context": [],
@@ -46,7 +47,8 @@
         }
       ],
       "actionsTaken": [
-        "2026-02-11: Saved Balaji education framework for guiding children's skill development"
+        "2026-02-11: Saved Balaji education framework for guiding children's skill development",
+        "2026-02-15: Noted WHOOP fitness integration plans and family AI hub (individual agents per family member)"
       ],
       "actionsSuggested": [],
       "context": [],
@@ -92,7 +94,8 @@
         }
       ],
       "actionsTaken": [
-        "2026-02-11: Saved Balaji education framework for guiding children's skill development"
+        "2026-02-11: Saved Balaji education framework for guiding children's skill development",
+        "2026-02-15: Noted WHOOP fitness integration plans and family AI hub (individual agents per family member)"
       ],
       "actionsSuggested": [],
       "context": [],
@@ -441,11 +444,95 @@
   ],
   "activities": [
     {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Domain Names Owned (AI/Agent Related)",
+      "desc": "Saved list of domains for future website development consideration: FreeAI.xyz SmartAgent.org"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Domain Names Owned (Freedom/Voluntarist Related)",
+      "desc": "FreemansJourney.com Harriet.chat onchainarchieve.org"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Domain Names Owned (Personal/Family Related)",
+      "desc": "DavidAJohnston.me Johnston.cool Johnston.Estate"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Domain Names Owned (Space Related)",
+      "desc": "Hitchhikersguidetomars.com Martians.io Settlers.me"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Domain Names Owned (Decentralized AI Related)",
+      "desc": "DeAI.dev Decentralizedai.org EACCAGI.com"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "config",
+      "title": "Domain Names Owned (Morpheus Related)",
+      "desc": "GetMorpheus.ai Mor.builders mor.org"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "config",
+      "title": "Domain Names Owned (OpenClaw/EverClaw Related)",
+      "desc": "FriendClaw.xyz MyAI.Capital BasedAI.co"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "config",
+      "title": "Domain Names Owned (x402 / MOR20 Staking Related)",
+      "desc": "StaketoPay.com StaketoRent.com Staketoown.com"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Domain Names Owned (Real World Assets / SFUSD Related)",
+      "desc": "sfusd.tech Total: 1 domain Next step: Develop for Smart Farm Cities / SFUSD RWA project."
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Portfolio Summary",
+      "desc": "Pending: Pull up Base-related Web3 ETH names (reminder set for early March). ---"
+    },
+    {
+      "time": "2026-02-16 00:00",
+      "date": "2026-02-16",
+      "type": "system",
+      "title": "Home Mini Setup Notes",
+      "desc": "New Mac Mini for agent work. Instructions from Thomas B. (BasedAI) for SSH security hardening: 1. Generate Ed25519 key pair: `ssh-keygen -t ed25519 -a 100` 2. Copy to server: `ssh-copy-id -i ~/.ssh/id"
+    },
+    {
       "time": "2026-02-15 00:00",
       "date": "2026-02-15",
       "type": "search",
       "title": "GLM-5 vs MiniMax-M2.5 Research & Testing",
       "desc": "David asked to evaluate GLM-5 and MiniMax-M2.5 as Kimi K2.5 replacements. GLM-5 (Zhipu, 744B/40B active MoE): Reasoning king — AIME 92.7%, GPQA 86%, HLE 50.4 (beats Opus 4.5), lowest hallucination rat"
+    },
+    {
+      "time": "2026-02-15 00:00",
+      "date": "2026-02-15",
+      "type": "config",
+      "title": "Everclaw v0.9.8 Release & ClawHub Trust Score (continued, ~12:00 CST)",
+      "desc": "Robert Scoble (@Scobleizer, 560k followers) posted a massive OpenClaw intelligence report — 98 real-world use cases compiled by @blevlabs' AI reading Scoble's X lists via xAI API Tweet went viral: 1,0"
     },
     {
       "time": "2026-02-14 18:45",
@@ -509,145 +596,12 @@
       "type": "system",
       "title": "Conversation Summary",
       "desc": "user: A new session was started via /new or /reset. Greet the user in your configured persona, if one is provided. Be yourself - use your defined voice, mannerisms, and mood. Keep it to 1-3 sentences "
-    },
-    {
-      "time": "2026-02-14 00:00",
-      "date": "2026-02-14",
-      "type": "system",
-      "title": "Conversation Summary",
-      "desc": "user: A new session was started via /new or /reset. Greet the user in your configured persona, if one is provided. Be yourself - use your defined voice, mannerisms, and mood. Keep it to 1-3 sentences "
-    },
-    {
-      "time": "2026-02-13 00:00",
-      "date": "2026-02-13",
-      "type": "system",
-      "title": "Conversation Summary",
-      "desc": "user: A new session was started via /new or /reset. Greet the user in your configured persona, if one is provided. Be yourself - use your defined voice, mannerisms, and mood. Keep it to 1-3 sentences "
-    },
-    {
-      "time": "2026-02-12 23:53",
-      "date": "2026-02-12",
-      "type": "system",
-      "title": "SmartAgent Repo Created",
-      "desc": "URL: https://github.com/SmartAgentProtocol/smartagent Domain: smartagent.org (David owns it, DNS not configured yet) Logo: David provided a futuristic AI face image — needs to be added to assets/"
-    },
-    {
-      "time": "2026-02-12 23:19",
-      "date": "2026-02-12",
-      "type": "config",
-      "title": "Everclaw Published on ClawHub",
-      "desc": "Live at: https://clawhub.ai/DavidAJohnston/everclaw-inference Published by David from his GitHub account Updated all docs to make ClawHub the primary install method"
-    },
-    {
-      "time": "2026-02-12 22:26",
-      "date": "2026-02-12",
-      "type": "system",
-      "title": "ClawHub Name Collision + Safe Installer",
-      "desc": "User Barry installed Everclaw v0.7 via git. His agent Janet ran `clawhub update everclaw` to upgrade to v0.8. ClawHub fetched a COMPLETELY DIFFERENT product — \"Everclaw Vault\" (encrypted cloud memory,"
-    },
-    {
-      "time": "2026-02-12 22:16",
-      "date": "2026-02-12",
-      "type": "config",
-      "title": "Everclaw v0.9.1 Published",
-      "desc": "SKILL.md: Section 13 rewritten with multi-key setup guide, auth.order config, rotation mechanics, DIEM credit cost table, complete failover docs README: Multi-key rotation added to core features table"
-    },
-    {
-      "time": "2026-02-12 22:01",
-      "date": "2026-02-12",
-      "type": "system",
-      "title": "Multi-Key Auth Rotation Setup",
-      "desc": "David revealed he has 6 Venice API keys. Previously only one was configured, which is why the backup key was never used — OpenClaw's auth system was never told about it. OpenClaw supports multiple aut"
-    },
-    {
-      "time": "2026-02-12 21:47",
-      "date": "2026-02-12",
-      "type": "config",
-      "title": "Everclaw v0.9.0 Published",
-      "desc": "David requested v0.9.0 release. Tagged and pushed to GitHub. SKILL.md: v0.8.0 → v0.9.0, Gateway Guardian section rewritten for v2 (inference probes, 4-stage escalation, state files, config table) READ"
-    },
-    {
-      "time": "2026-02-12 21:20",
-      "date": "2026-02-12",
-      "type": "system",
-      "title": "Gateway Guardian v2",
-      "desc": "David reported being offline again — Venice DIEM credits ran out, all providers entered cooldown, and the agent was brain-dead. Had to manually run `sudo curl -fsSL https://clawd.bot/install.sh | bash"
-    },
-    {
-      "time": "2026-02-11 23:33",
-      "date": "2026-02-11",
-      "type": "system",
-      "title": "Tomorrow's Plan: SmartAgentProtocol",
-      "desc": "David wants to develop a full version of OpenClaw under SmartAgentProtocol that: Wraps all Everclaw improvements into an easy-install package Targets users NOT comfortable with Terminal"
-    },
-    {
-      "time": "2026-02-11 23:30",
-      "date": "2026-02-11",
-      "type": "system",
-      "title": "SmartAgentProtocol GitHub Org",
-      "desc": "Accepted invitation to SmartAgentProtocol org as admin/owner Org: https://github.com/orgs/SmartAgentProtocol Description: \"Open Source Chat Interface For Wallets, Dapps, DAOs, & Smart Contracts\""
-    },
-    {
-      "time": "2026-02-11 22:52",
-      "date": "2026-02-11",
-      "type": "system",
-      "title": "Mission Control Dashboard Rebuilt",
-      "desc": "Rebuilt dashboard to load from `dashboard-data.json` instead of hardcoded data Added `generate-data.mjs` script that reads memory files, goals, USER.md, MEMORY.md New Life Goals tab showing all 6 life"
-    },
-    {
-      "time": "2026-02-11 22:08",
-      "date": "2026-02-11",
-      "type": "config",
-      "title": "x402 Payment Client & ERC-8004 Agent Registry",
-      "desc": "Built both modules and tested against live Base mainnet. Automatic HTTP 402 payment flow: detect → parse PAYMENT-REQUIRED → sign EIP-712 → retry with PAYMENT-SIGNATURE Uses EIP-3009 TransferWithAuthor"
-    },
-    {
-      "time": "2026-02-11 21:52",
-      "date": "2026-02-11",
-      "type": "config",
-      "title": "Everclaw v0.6.0 Published",
-      "desc": "David wanted GLM-4.7-Flash via Morpheus as an option for Light tier jobs, then bump to v0.6. Verified GLM Flash works via Morpheus proxy (tested inference) SKILL.md: added Section 16 — Model Router (v"
-    },
-    {
-      "time": "2026-02-11 21:38",
-      "date": "2026-02-11",
-      "type": "config",
-      "title": "Everclaw Model Router Built",
-      "desc": "David wanted to reduce costs by routing different tasks to different models. Evaluated ClawRouter (BlockRunAI/ClawRouter) but decided to build our own because: ClawRouter routes through BlockRun's API"
-    },
-    {
-      "time": "2026-02-11 21:10",
-      "date": "2026-02-11",
-      "type": "config",
-      "title": "Everclaw v0.5.0 Published",
-      "desc": "David asked to roll all the cooldown cascade fixes into the Everclaw skill and bump to v0.5. 1. SKILL.md (v0.4.0 → v0.5.0): - New \"Proxy Resilience (v0.5)\" section documenting the cooldown cascade pro"
-    },
-    {
-      "time": "2026-02-11 20:51",
-      "date": "2026-02-11",
-      "type": "config",
-      "title": "Provider Cooldown Cascade Fix",
-      "desc": "David reported being offline for hours due to Venice + Morpheus both entering cooldown. Diagnosed and fixed the root cause. Venice ran out of API credits → billing error → cooldown Morpheus proxy retu"
-    },
-    {
-      "time": "2026-02-11 11:32",
-      "date": "2026-02-11",
-      "type": "config",
-      "title": "Everclaw v0.8 — Morpheus API Gateway Bootstrap",
-      "desc": "David wants to reduce friction for new OpenClaw users by providing free inference at startup. New users don't have a Claude API key — Everclaw v0.8 provides a free Morpheus API Gateway key to bootstra"
-    },
-    {
-      "time": "2026-02-11 09:16",
-      "date": "2026-02-11",
-      "type": "system",
-      "title": "Balaji Insight Saved",
-      "desc": "Saved @balajis X post about 10 durable skills in the age of AI (vision, verification, prompting, polishing, community, geography, scarcity, cryptography, physicality, resiliency). Cross-referenced to "
     }
   ],
   "keyFacts": [
     {
       "heading": "Everclaw Skill (profbernardoj/everclaw)",
-      "content": "### Current Version: v0.9.4 (smart session archiver)\n- OpenClaw skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz (GitHub Pages from docs/)\n- Repo: profbernardoj/everclaw on GitHub\n### Architecture\n- **Morpheus proxy:** `~/morpheus/proxy/morpheus-proxy.mjs` (port 8083, launchd: com.morpheus.proxy)\n- **Morpheus proxy-router (Go):** `~/morpheus/` (port 8082)\n- **Proxy auth:** Bearer token `morpheus-local`\n- **OpenClaw provider name:** `morpheus` (e.g., `morpheus/kim"
+      "content": "### Current Version: v0.9.8.3 (community contributions)\n- Merged 7 PRs from Scott Berenzweig (betterbrand): dynamic model discovery, install.sh v5.11.0 fix, bash 3.2 compat, agent integration docs, DIY guide link, viem dependency, staking economics fix\n- OpenClaw skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz (GitHub Pages from docs/)\n- Repo: profbernardoj/everclaw on GitHub\n### Architecture\n- **Morpheus proxy:** `~/morpheus/proxy/morpheus-proxy.mjs` (port 8083"
     },
     {
       "heading": "David's Model Preferences",
@@ -670,8 +624,12 @@
       "content": "- **NEVER say \"free inference\"** — David directive: say \"own your inference\" / \"inference you own\"\n- Morpheus = ownership, not rental. MOR staking = inference forever (tokens staked, returned, recycled)\n- Morpheus API Gateway during beta = \"community-powered\" / \"open access\" (not \"free\")\n- **Don't highlight Llama 3.3** — David considers it outdated. Focus on Kimi K2.5 and GLM-4 models"
     },
     {
+      "heading": "OpenClaw Update Security Checks (2026-02-15)",
+      "content": "**Context:** OpenClaw creator Peter was hired by OpenAI (Feb 2026). OpenAI has a track record of pivoting from open-source mission to closed, for-profit model. Foundation promises notwithstanding, we must verify on EVERY update:\n**Fork:** https://github.com/profbernardoj/openclaw — preserved pre-OpenAI version as backup\n### Mandatory Pre-Update Checks\n1. **License verification:** `git log --follow -p -- LICENSE | head -50` — confirm MIT license unchanged\n2. **No OpenAI defaults:** `grep -ri \"ope"
+    },
+    {
       "heading": "Upcoming",
-      "content": "- Add SmartAgent logo to assets/ (David to upload)\n- Test install.sh on clean macOS and Linux machines\n- Configure DNS for smartagent.org if issues persist\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
+      "content": "- ~~Add SmartAgent logo to assets/~~ ✅ Merged\n- **Follow Scott's DIY Guide for new Mac Mini setup** — Reminder set for tomorrow 9 AM\n- Test install.sh on clean macOS and Linux machines\n- ~~Configure DNS for smartagent.org~~ ✅ Working (browser cache issue)\n- ~~Redesign SmartAgent.org website~~ ✅ Done (Lovable, light theme, deployed)\n- Investigate Signal-cli connection drops and thread starvation\n- Consider registering Everclaw as an ERC-8004 agent on Base"
     },
     {
       "heading": "Key Users",
@@ -679,9 +637,9 @@
     }
   ],
   "stats": {
-    "totalActivities": 29,
+    "totalActivities": 22,
     "totalGoals": 8,
     "activeGoals": 5,
-    "memoryFiles": 24
+    "memoryFiles": 35
   }
 }
