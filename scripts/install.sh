@@ -184,6 +184,16 @@ LOG_FOLDER_PATH=./data/logs
 
 # Environment
 ENVIRONMENT=production
+
+# === v5.12.0 Configurable Timeouts ===
+# Consumer Node → Provider Node timeout (seconds)
+# Total wait: 3 retries × 90s = 270s for streaming to start or full response
+CONSUMER_TO_PROVIDER_TIMEOUT=90
+CONSUMER_TO_PROVIDER_RETRIES=3
+
+# Provider Node → downstream LLM timeout (seconds)
+# 360s = 6 min for long-thinking models on complex reasoning tasks
+PROVIDER_TO_LLM_TIMEOUT=360
 ENVEOF
 fi
 
