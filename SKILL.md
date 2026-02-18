@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.9.8.3
-description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, and nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver to prevent dashboard overload, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 0.9.9
+description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -1842,6 +1842,100 @@ venice/claude-opus-4-6      # Primary (premium)
 ```
 
 For new users without Venice or a local proxy, the gateway is the **first and only** provider — making it the critical bootstrap path.
+
+---
+
+## 20. Always-On Setup for 24/7 Operation (v0.9.9)
+
+Your agent needs your Mac to stay awake. macOS defaults to sleep after inactivity, which interrupts cron jobs, heartbeats, and long-running tasks. Everclaw includes an always-on setup script that configures power management for continuous operation.
+
+### Quick Setup
+
+```bash
+# Configure macOS to never sleep (requires sudo)
+sudo bash skills/everclaw/scripts/always-on.sh
+
+# Restore default power settings
+sudo bash skills/everclaw/scripts/always-on.sh --restore
+```
+
+### What It Does
+
+The script configures macOS power management for 24/7 operation:
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| `disablesleep` | 1 | System never sleeps |
+| `standby` | 0 | No hibernation |
+| `autopoweroff` | 0 | No deep sleep |
+| `powernap` | 1 | Network activity while display off |
+| `womp` | 1 | Wake on LAN enabled (remote access) |
+| `autorestart` | 1 | Auto-restart after power failure |
+| `tcpkeepalive` | 1 | Keep network connections alive |
+| `disksleep` | 0 | Never spin down disks |
+
+### LaunchAgent for Caffeinate
+
+The script also installs a LaunchAgent (`com.everclaw.alwayson`) that runs `caffeinate -i -d -s` in the background, providing an additional layer of protection against system sleep:
+
+- `-i` — Prevent system from idling to sleep
+- `-d` — Prevent display from sleeping
+- `-s` — Prevent system from sleeping when on AC power
+
+### Verify It's Working
+
+```bash
+# Check current power settings
+pmset -g
+
+# Should show:
+# SleepDisabled    1
+# standby          0
+# autorestart      1
+```
+
+### Why This Matters for Agents
+
+Without always-on configuration:
+- Cron jobs don't fire while sleeping
+- Heartbeats miss their schedule
+- Long-running tasks (file transfers, backups) fail
+- Your agent appears "offline" to other agents/users
+
+With always-on:
+- Cron jobs fire on schedule
+- Heartbeats run every 30 minutes like clockwork
+- Long tasks complete uninterrupted
+- Your agent is reachable 24/7
+
+### Power Consumption
+
+A Mac Mini M4 at idle with sleep disabled draws ~6-10W. That's roughly:
+- **$0.50-1.00/month** at $0.12/kWh
+- **Negligible** compared to AI inference costs
+
+### Alternatives for Other Platforms
+
+**Linux:**
+```bash
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+```
+
+**Headless Raspberry Pi:**
+No sleep by default. Ensure `systemd` services are enabled for OpenClaw and Morpheus.
+
+### Troubleshooting
+
+**Mac still sleeps:**
+1. Check `pmset -g assertions` for any processes preventing sleep
+2. Verify LaunchAgent is loaded: `launchctl list | grep everclaw`
+3. Check Energy Saver settings in System Settings aren't overriding pmset
+
+**Display still sleeps:**
+This is fine — the system stays awake even with display off thanks to Power Nap. To disable display sleep entirely:
+```bash
+sudo pmset -a displaysleep 0
+```
 
 ---
 

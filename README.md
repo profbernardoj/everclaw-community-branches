@@ -143,6 +143,17 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 
 **Benefit:** v3 had two fatal bugs: billing exhaustion caused infinite useless restarts (restart clears cooldown → first request re-triggers 402 → back to dead), and `set -euo pipefail` + pkill self-kill caused the restart chain to silently do nothing. v4 understands that billing exhaustion can't be fixed by restarting — it backs off, notifies you, and waits for DIEM to reset at midnight UTC. Paired with reduced billing backoff config (`venice: 1h` instead of 5h), maximum downtime from credit exhaustion drops from 12+ hours to ~1 hour.
 
+### ⚡ Always-On Power Config — 24/7 Agent Operation
+| Component | What It Does |
+|-----------|-------------|
+| **Power Management Setup** | Configures macOS to never sleep — disables sleep, standby, hibernation |
+| **Caffeinate LaunchAgent** | Background process prevents system sleep while running |
+| **Power Nap + Wake on LAN** | Network activity works even with display off; remote wake enabled |
+| **Auto-Restart** | System restarts automatically after power failure |
+| **Restore Mode** | One command restores default power settings |
+
+**Benefit:** Your agent needs your Mac to stay awake. Without this, cron jobs miss schedules, heartbeats don't fire, and long tasks fail mid-execution. With always-on configured, your agent is reachable 24/7, tasks complete uninterrupted, and cron jobs fire exactly when scheduled. Power cost is negligible (~$0.50-1/month for a Mac Mini M4 at idle).
+
 ### 🔍 SkillGuard — Skill Security Scanner
 | Component | What It Does |
 |-----------|-------------|
@@ -247,6 +258,9 @@ When a session ends, your MOR comes back. Open a new session with the same token
 | Scan a skill | `node security/skillguard/src/cli.js scan <path>` |
 | Security audit | `bash security/clawdstrike/scripts/collect_verified.sh` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
+| **Always-on setup** | `sudo bash skills/everclaw/scripts/always-on.sh` |
+| Restore power defaults | `sudo bash skills/everclaw/scripts/always-on.sh --restore` |
+| Check power settings | `pmset -g` |
 
 ---
 
