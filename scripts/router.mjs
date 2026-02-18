@@ -49,6 +49,14 @@ const TIER_MODELS = {
   HEAVY:    { primary: "morpheus/glm-5",          fallback: "venice/claude-opus-4-6" },
 };
 
+// v5.12.0: Tier-aware timeout hints (ms) for downstream consumers
+// Aligned with CONSUMER_TO_PROVIDER_TIMEOUT × RETRIES = 270s max
+const TIER_TIMEOUTS = {
+  LIGHT:    60000,   // GLM-4.7 Flash — fast, 60s
+  STANDARD: 180000,  // GLM-5 standard — 3 min
+  HEAVY:    270000,  // GLM-5 complex reasoning — full 4.5 min window
+};
+
 // ─── Scoring Config ─────────────────────────────────────────────────────────
 
 const CONFIG = {
@@ -299,6 +307,7 @@ export function route(prompt, systemPrompt) {
     ...result,
     model: tierConfig.primary,
     fallback: tierConfig.fallback,
+    timeoutMs: TIER_TIMEOUTS[result.tier],
   };
 }
 

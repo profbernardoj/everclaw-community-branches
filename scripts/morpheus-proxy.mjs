@@ -171,7 +171,7 @@ function oaiError(res, status, message, type = "server_error", code = null) {
 }
 
 // --- Forward a single inference attempt ---
-function forwardToRouter(body, sessionId, modelId, isStreaming, timeoutMs = 180000) {
+function forwardToRouter(body, sessionId, modelId, isStreaming, timeoutMs = 300000) {
   return new Promise((resolve, reject) => {
     const upstreamUrl = new URL("/v1/chat/completions", ROUTER_URL);
     const upstreamHeaders = {
@@ -433,6 +433,11 @@ const server = http.createServer((req, res) => {
   res.writeHead(404, { "Content-Type": "application/json" });
   res.end(JSON.stringify({ error: { message: "Not found" } }));
 });
+
+// v5.12.0: Align server timeouts with upstream consumer→provider total (270s)
+server.requestTimeout = 300000;   // 5 min
+server.headersTimeout = 305000;   // slightly above requestTimeout
+server.keepAliveTimeout = 300000;
 
 server.listen(PROXY_PORT, "127.0.0.1", async () => {
   console.log(`[morpheus-proxy] Listening on http://127.0.0.1:${PROXY_PORT}`);
