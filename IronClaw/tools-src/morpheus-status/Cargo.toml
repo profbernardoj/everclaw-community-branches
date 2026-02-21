@@ -1,0 +1,15 @@
+[package]
+name = "morpheus-status"
+version = "0.1.0"
+edition = "2021"
+description = "WASI component: checks EverClaw proxy health for IronClaw agents"
+
+[dependencies]
+wit-bindgen-rt = "0.39"
+
+[lib]
+crate-type = ["cdylib"]
+
+# Build with: cargo component build --release
+# Requires: cargo install cargo-component
+# Target: wasm32-wasip2 (WASI Preview 2 with wasi:http support)
