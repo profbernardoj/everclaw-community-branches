@@ -1,42 +1,51 @@
 # EverClaw Docker Container
-# Build: docker build -t ghcr.io/everclaw/everclaw:latest .
-# Run: docker run -it ghcr.io/everclaw/everclaw:latest
+# Decentralized Morpheus inference proxy for OpenClaw agents
+#
+# Build:  docker build -t ghcr.io/everclaw/everclaw:latest .
+# Run:    docker run -d -p 8083:8083 --name everclaw ghcr.io/everclaw/everclaw:latest
+# Health: curl http://localhost:8083/health
 
-FROM node:20-slim
+FROM node:20-slim AS base
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Create non-root user
+RUN useradd -m -s /bin/bash everclaw
+
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+# Copy package files first for better layer caching
+COPY --chown=everclaw:everclaw package*.json ./
+RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
 
-# Install dependencies
-RUN npm ci --only=production
+# ─── Application ──────────────────────────────────────────────────────────────
+COPY --chown=everclaw:everclaw . .
 
-# Copy source code
-COPY . .
-
-# Build argument for version
-ARG EVERCLAW_VERSION=0.9.8.3
-
-# Set environment variables
+# Build arguments
+ARG EVERCLAW_VERSION=2026.2.21
 ENV EVERCLAW_VERSION=${EVERCLAW_VERSION}
 ENV NODE_ENV=production
 
-# Create non-root user
-RUN useradd -m -s /bin/bash everclaw&& \
-    chown -R everclaw:everclaw /app
+# Proxy configuration (can be overridden at runtime)
+ENV EVERCLAW_PROXY_PORT=8083
+ENV EVERCLAW_PROXY_HOST=0.0.0.0
+ENV EVERCLAW_AUTH_TOKEN=morpheus-local
+
+# Expose the proxy port
+EXPOSE 8083
+
+# Switch to non-root user
 USER everclaw
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "console.log('healthy')" || exit 1
+# Health check — actually probe the proxy
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -sf http://127.0.0.1:${EVERCLAW_PROXY_PORT}/health || exit 1
 
-# Default command
-CMD ["node", "index.js"]
+# Start the Morpheus proxy
+CMD ["node", "scripts/morpheus-proxy.mjs"]

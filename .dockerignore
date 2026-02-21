@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation & community branches (not needed in container)
+docs/
+website/
+IronClaw/
+NanoClaw/
+Nanobot/
+TinyClaw/
+PicoClaw/
+NullClaw/
+ZeroClaw/
+
+# Build artifacts
+node_modules/
+*.log
+
+# macOS-specific (not needed in container)
+templates/*.plist
+
+# Dev files
+.clawhubignore
+CLAWHUB_WARNING.md
+build-and-push.sh
