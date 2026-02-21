@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+# OpenRC service for EverClaw Morpheus Proxy
+# Install: sudo cp this-file /etc/init.d/everclaw-proxy && sudo rc-update add everclaw-proxy default
+
+name="everclaw-proxy"
+description="EverClaw Morpheus Proxy for ZeroClaw"
+
+command="/usr/bin/node"
+command_args="/home/${EVERCLAW_USER:-$(logname)}/.everclaw/scripts/morpheus-proxy.mjs"
+command_user="${EVERCLAW_USER:-$(logname)}"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+
+depend() {
+    need net
+    after firewall
+}
+
+start_pre() {
+    checkpath --directory --owner ${command_user} /run
+}

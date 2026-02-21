@@ -1,0 +1,23 @@
+# Merge into ~/.zeroclaw/config.toml (setup.sh does this automatically)
+# Adds Morpheus as default provider via EverClaw proxy
+
+# === zero-everclaw ===
+default_provider = "custom:http://127.0.0.1:8083/v1"
+default_model = "glm-5"
+api_key = "morpheus-local"
+
+[models.glm5]
+provider = "custom:http://127.0.0.1:8083/v1"
+model = "glm-5"
+
+[models.flash]
+provider = "custom:http://127.0.0.1:8083/v1"
+model = "glm-4.7-flash"
+
+[models.kimi]
+provider = "custom:http://127.0.0.1:8083/v1"
+model = "kimi-k2.5"
+
+[models.qwen]
+provider = "custom:http://127.0.0.1:8083/v1"
+model = "qwen3-235b"
