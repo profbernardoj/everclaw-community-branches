@@ -221,7 +221,4 @@ The original EverClaw `launchd` template is copied and adapted; proxy starts on 
 
 This is 100% compatible with IronClaw’s security model (WASM sandbox, credential protection, prompt guards) and reuses the exact same decentralized inference layer that powers thousands of OpenClaw agents.
 
-Clone the full repo template here (or just copy the files above):  
-https://github.com/yourname/iron-everclaw (I can push it if you want the real link).
-
 Enjoy owning your inference on IronClaw! 🦞🔥
