@@ -1,0 +1,17 @@
+[package]
+name = "morpheus-status"
+version = "0.1.0"
+edition = "2021"
+description = "Native Rust tool: checks EverClaw proxy health for ZeroClaw agents"
+
+# Using ureq instead of reqwest — much smaller binary, no async runtime needed
+[dependencies]
+ureq = "2"
+
+[[bin]]
+name = "morpheus-status"
+path = "src/main.rs"
+
+# Build: cargo build --release
+# Output: ~1.5 MB static binary (with musl: ~2 MB fully static)
+# Cross-compile: cargo build --release --target x86_64-unknown-linux-musl
