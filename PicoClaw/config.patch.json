@@ -1,0 +1,24 @@
+{
+  "_comment": "Merge into ~/.picoclaw/config.json model_list array (setup.sh does this automatically)",
+  "models": [
+    {
+      "model_name": "morpheus-glm5",
+      "model": "openai/glm-5",
+      "api_base": "http://127.0.0.1:8083/v1",
+      "api_key": "morpheus-local"
+    },
+    {
+      "model_name": "morpheus-flash",
+      "model": "openai/glm-4.7-flash",
+      "api_base": "http://127.0.0.1:8083/v1",
+      "api_key": "morpheus-local"
+    },
+    {
+      "model_name": "morpheus-kimi",
+      "model": "openai/kimi-k2.5",
+      "api_base": "http://127.0.0.1:8083/v1",
+      "api_key": "morpheus-local"
+    }
+  ],
+  "default_model": "morpheus-glm5"
+}
