@@ -75,11 +75,4 @@ zeroclaw agent -m "Say hello using Morpheus"
 
 Star the repo, run the setup, and your ZeroClaw on a $10 RISC-V board now has **unlimited GLM-5-class intelligence** with zero recurring cost and full autonomy.
 
-Need any tweak pushed live in <60 seconds?
-- Default to flash model for ultra-low-power boards?
-- Extra models or load-balancer in config?
-- Native Rust WASM status tool?
-- Docker-compose override?
-- Move repo to your account?
-
 Let’s put decentralized inference on every ZeroClaw deployment! 🦞🔥🦀
