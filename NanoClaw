@@ -65,14 +65,6 @@ node scripts/everclaw-wallet.mjs stake
 - Hybrid = best of both worlds: Claude’s incredible agent harness + Morpheus’ free decentralized models
 - Zero config files to edit manually — Claude does it all via `/add-morpheus`
 
-Star the repo, run the setup, and your NanoClaw instantly becomes the most powerful, cost-free, censorship-resistant WhatsApp agent on the planet.
+Star the repo, run the setup, and your NanoClaw instantly becomes the most powerful, cost-free, censorship-resistant WhatsApp agent on the planet.  
 
-Need tweaks?
-- Full claude-* replacement via LiteLLM bridge instead of hybrid?
-- Extra skills (`add-telegram-morpheus`, auto-stake, etc.)?
-- Move repo to your username?
-- macOS launchd + Docker compose version?
-
-Just say the word and I’ll push the update live in seconds.  
-
-Let’s get every NanoClaw agent running on Morpheus! 🦞🔥🚀
+Let’s get every NanoClaw agent running EverClaw and powered by Morpheus AI! 🦞🔥🚀
