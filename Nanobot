@@ -72,11 +72,4 @@ OPENAI_API_KEY=sk-morpheus OPENAI_BASE_URL=http://127.0.0.1:8083/v1 nanobot run 
 
 Star the repo, run the setup, and your Nanobot MCP agents now have **unlimited GLM-5-class intelligence** with zero recurring cost and full MCP power.
 
-Need any tweak pushed live in <60 seconds?
-- Default to flash model for lighter agents?
-- Directory-config version with multiple Morpheus agents?
-- MCP server for morpheus-status / staking?
-- Docker-compose override with proxy sidecar?
-- Move repo to your account?
-
 Let’s put decentralized inference on every Nanobot MCP deployment! 🦞🔥🧠
