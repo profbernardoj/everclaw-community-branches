@@ -1,0 +1,32 @@
+# Multi-agent Nanobot config with Morpheus model routing
+#
+# Different agents use different Morpheus models based on their role.
+# Run with: OPENAI_API_KEY=morpheus-local OPENAI_BASE_URL=http://127.0.0.1:8083/v1 nanobot run multi-agent.yaml
+
+agents:
+  analyst:
+    name: Research Analyst
+    model: glm-5
+    temperature: 0.3
+    system: |
+      You are a thorough research analyst. Provide detailed, well-sourced analysis.
+      Focus on accuracy and depth.
+    mcpServers: []
+
+  writer:
+    name: Content Writer
+    model: kimi-k2.5
+    temperature: 0.7
+    system: |
+      You are a skilled content writer. Create engaging, clear prose.
+      Adapt your tone to the audience.
+    mcpServers: []
+
+  assistant:
+    name: Quick Assistant
+    model: glm-4.7-flash
+    temperature: 0.5
+    system: |
+      You are a fast, concise assistant. Answer quickly and directly.
+      Keep responses brief unless asked for detail.
+    mcpServers: []

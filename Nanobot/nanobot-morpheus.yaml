@@ -1,0 +1,25 @@
+# Nanobot + EverClaw Morpheus — Single-file config
+#
+# Run with:
+#   OPENAI_API_KEY=morpheus-local OPENAI_BASE_URL=http://127.0.0.1:8083/v1 nanobot run nanobot-morpheus.yaml
+#
+# Or use the alias created by setup.sh:
+#   nanobot-morpheus
+
+agents:
+  main:
+    name: Morpheus Agent
+    model: glm-5
+    temperature: 0.7
+    system: |
+      You are a helpful assistant powered by decentralized inference via the Morpheus network.
+      You have access to MCP tools for file operations, web browsing, and more.
+    mcpServers: []
+    # Add your MCP servers here, e.g.:
+    # mcpServers:
+    #   - name: filesystem
+    #     command: npx
+    #     args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    #   - name: morpheus-status
+    #     command: node
+    #     args: ["~/.everclaw/nanobot/mcp-server/index.mjs"]
