@@ -1,0 +1,39 @@
+# EverClaw Docker Compose
+#
+# Quick start:
+#   docker compose up -d
+#   curl http://localhost:8083/health
+#
+# With OpenClaw (host-installed):
+#   Add to openclaw.json providers: { "morpheus": { "apiBase": "http://localhost:8083/v1" } }
+#
+# With OpenClaw (also in Docker):
+#   Use http://everclaw:8083/v1 as the provider URL (same Docker network)
+
+services:
+  everclaw:
+    image: ghcr.io/everclaw/everclaw:latest
+    container_name: everclaw
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      # Proxy settings
+      - EVERCLAW_PROXY_PORT=8083
+      - EVERCLAW_PROXY_HOST=0.0.0.0
+      - EVERCLAW_AUTH_TOKEN=morpheus-local
+      # Morpheus network settings (set these for P2P staking mode)
+      # - MORPHEUS_ROUTER_URL=http://host.docker.internal:8082
+      # - ETH_NODE_ADDRESS=https://base-mainnet.public.blastapi.io
+    volumes:
+      # Persist session data across restarts
+      - everclaw-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8083/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+
+volumes:
+  everclaw-data:
