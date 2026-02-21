@@ -80,11 +80,4 @@ picoclaw agent -m "Say hello using Morpheus"
 
 Star the repo, run the setup, and your PicoClaw on a $10 board now has **unlimited GLM-5-class intelligence** with zero recurring cost.
 
-Need any tweak pushed live in <60 seconds?
-- Default to flash model for ultra-low-power boards?
-- Full multi-model load-balancer in config?
-- Native Go WASM status tool instead of skill?
-- Docker-compose override?
-- Move repo to your account?
-
 Let’s put decentralized inference on every $10 edge device! 🦞🔥📡
