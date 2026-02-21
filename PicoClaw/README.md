@@ -92,6 +92,18 @@ PRs welcome for:
 - RISC-V testing and benchmarks
 - ARM32 compatibility patches
 
+## Included with EverClaw v2026.2.21
+
+When you install the EverClaw proxy via `setup.sh`, you get these features automatically:
+
+- **Three-Shift Task Planning** — Morning/Afternoon/Night shift system proposes prioritized task plans with approval workflow. Nothing executes without your say-so.
+- **Gateway Guardian v5** — Self-healing watchdog with direct curl inference probes, billing-aware escalation, DIEM credit monitoring, and 4-stage restart escalation. No more Signal spam from failed health checks.
+- **Smart Session Archiver** — Automatically archives old sessions when size exceeds threshold, preventing browser slowdowns.
+- **Model Router** — Open-source first: routes all tiers to Morpheus by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
+- **Multi-Key Auth Rotation** — Configure multiple API keys; auto-rotates when credits drain.
+
+See the main [EverClaw README](../README.md) for full documentation.
+
 ## License
 
 MIT
