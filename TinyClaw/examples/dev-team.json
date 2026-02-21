@@ -1,0 +1,27 @@
+{
+  "_comment": "Example: Dev team with Morpheus model routing",
+  "agents": {
+    "lead": {
+      "provider": "openai",
+      "model": "glm-5",
+      "system": "You are the tech lead. Review code, make architecture decisions, coordinate the team."
+    },
+    "backend": {
+      "provider": "openai",
+      "model": "glm-5",
+      "system": "You are a backend developer. Write server code, APIs, and database logic."
+    },
+    "frontend": {
+      "provider": "openai",
+      "model": "kimi-k2.5",
+      "system": "You are a frontend developer. Write UI code, components, and styles."
+    },
+    "tester": {
+      "provider": "openai",
+      "model": "glm-4.7-flash",
+      "system": "You are a QA engineer. Write tests, find bugs, verify implementations."
+    }
+  },
+  "default_provider": "openai",
+  "default_model": "glm-5"
+}

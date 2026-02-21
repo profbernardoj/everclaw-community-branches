@@ -1,0 +1,10 @@
+{
+  "_comment": "Merge this into ~/.tinyclaw/settings.json (setup.sh does this automatically)",
+  "agents": {
+    "coder": { "provider": "openai", "model": "glm-5" },
+    "writer": { "provider": "openai", "model": "kimi-k2.5" },
+    "reviewer": { "provider": "openai", "model": "glm-4.7-flash" }
+  },
+  "default_provider": "openai",
+  "default_model": "glm-5"
+}
