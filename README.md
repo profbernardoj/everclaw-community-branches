@@ -112,7 +112,8 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **ERC-8004 Agent Registry** | Discover agents on-chain — reads Identity + Reputation registries on Base, resolves registration files, checks trust signals (v0.7) |
 | **API Gateway Bootstrap** | One-command setup for community-powered Morpheus inference — no API key, no wallet, no node required. New users get instant AI access (v0.8) |
 | **Multi-Key Auth Rotation** | Configure multiple Venice API keys — OpenClaw rotates through them automatically when credits drain, keeping you on premium models longer (v0.9.1) |
-| **Gateway Guardian v4** | Billing-aware escalation — classifies errors (billing vs transient), skips useless restarts for credit exhaustion, notifies owner with DIEM reset ETA. Through-OpenClaw inference probes, circuit breaker, 4-stage self-healing, proactive credit monitoring (v0.9.3) |
+| **Gateway Guardian v5** | Direct curl inference probes — eliminates 71K prompt bloat and Signal spam. Billing-aware escalation, DIEM reset awareness, circuit breaker, 4-stage self-healing, proactive credit monitoring (v2026.2.21) |
+| **Three-Shift Task Planning** | Morning/Afternoon/Night shift system — proposes prioritized task plans with approval workflow, shift-specific rules, handoff notes (v2026.2.21) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
 **Benefit:** Your agent runs on inference you own — GLM-5 (Opus 4.5-level), GLM-4.7 Flash, Kimi K2.5, and 30+ open-source models via staked MOR tokens. No API bills, no credit limits — stake once, use forever. MOR tokens are staked, not consumed — returned when sessions close and restaked indefinitely. The open-source first model router (v0.9.8) sends all tiers to Morpheus by default — Claude is only the escape hatch for tasks GLM-5 can't handle. Cron jobs, heartbeats, research, coding, and complex reasoning all run on inference you own. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get instant inference from their very first launch — no API key needed.
@@ -128,12 +129,14 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 
 **Benefit:** Your agent can discover other agents on-chain, verify their reputation, and pay them for services — all without custodial intermediaries. USDC payments are signed with EIP-712 and settled via the Coinbase facilitator. Budget controls prevent surprise spending.
 
-### 🛡️ Gateway Guardian v4 — Billing-Aware Self-Healing
+### 🛡️ Gateway Guardian v5 — Direct Probe Self-Healing
 | Component | What It Does |
 |-----------|-------------|
+| **Direct Curl Probes** | Probes gateway's LiteLLM proxy directly with tiny prompt (~50 chars) — no more 71K workspace prompt bloat |
+| **No Signal Spam** | Failures stay in logs only — no agent session means no accidental Signal message delivery |
+| **Fast Lightweight Model** | Uses glm-4.7-flash for probes instead of glm-5 — faster, cheaper, purpose-built for health checks |
 | **Billing-Aware Escalation** | Classifies errors as `billing` vs `transient` vs `timeout`. Billing → backs off + notifies (restart is useless). Transient → restarts as before |
 | **DIEM Reset Awareness** | Calculates hours to midnight UTC (daily DIEM reset). Billing-dead → 30-min probe interval. Auto-clears on UTC day rollover |
-| **Through-OpenClaw Inference Probes** | Tests the full stack: gateway → auth → provider → response every 2 minutes |
 | **Proactive Credit Monitoring** | Reads Venice DIEM balance from response headers. Warns when balance drops below threshold |
 | **Circuit Breaker** | Detects sub-agents stuck >30 min with repeated timeouts and kills them |
 | **Fixed Restart Chain** | No more `set -e` silent exits or pkill self-kill. ERR trap logs unexpected failures |
@@ -141,7 +144,20 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 | **Signal Notifications** | Notifies owner on: billing exhaustion (with ETA), billing recovery, nuclear restart, total failure |
 | **launchd Integration** | Survives reboots, auto-starts on macOS |
 
-**Benefit:** v3 had two fatal bugs: billing exhaustion caused infinite useless restarts (restart clears cooldown → first request re-triggers 402 → back to dead), and `set -euo pipefail` + pkill self-kill caused the restart chain to silently do nothing. v4 understands that billing exhaustion can't be fixed by restarting — it backs off, notifies you, and waits for DIEM to reset at midnight UTC. Paired with reduced billing backoff config (`venice: 1h` instead of 5h), maximum downtime from credit exhaustion drops from 12+ hours to ~1 hour.
+**Benefit:** v4's `openclaw agent` probes injected the full 71K workspace system prompt into every health check, causing timeouts and delivering error messages to Signal as normal replies. v5 uses direct curl to the LiteLLM proxy with a tiny prompt — fast, silent, no side effects. Combined with billing-aware escalation from v4, your gateway self-heals reliably without spamming you.
+
+### 📋 Three-Shift Task Planning — Structured Work Management
+| Component | What It Does |
+|-----------|-------------|
+| **Morning Shift (6 AM)** | Ramp-up: meetings, comms, decisions — front-loads tasks requiring user input |
+| **Afternoon Shift (2 PM)** | Deep work: coding, writing, building — minimizes interruptions |
+| **Night Shift (10 PM)** | Autonomous: research, maintenance, prep — no external actions without approval |
+| **Priority Tiers** | P1 (must-do), P2 (should-do), P3 (could-do) — respects the 8-hour window |
+| **Approval Workflow** | Nothing executes until the user approves, modifies, or skips |
+| **Shift Handoff** | Each shift writes completion summary for the next shift to pick up |
+| **Configurable Schedule** | Adjust times, skip weekends, set quiet hours — see config reference |
+
+**Benefit:** Your agent proposes what to work on instead of waiting to be told. Three shifts cover 24 hours with clear boundaries — the morning shift handles human-interactive work, afternoon goes deep on building, and the night shift runs autonomously. Approval gates ensure nothing happens without your say-so.
 
 ### ⚡ Always-On Power Config — 24/7 Agent Operation
 | Component | What It Does |

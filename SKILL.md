@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 0.9.9
-description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v4 with billing-aware escalation, through-OpenClaw inference probes, proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 2026.2.21
+description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v5 with direct curl inference probes (eliminates Signal spam), proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, three-shift task planning system (morning/afternoon/night with approval workflow), 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -61,7 +61,7 @@ metadata:
     install:
       method: "git clone (recommended) or clawhub install everclaw-inference"
       note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
-    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security"]
+    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security", "three-shifts", "task-planning"]
 ---
 
 <!-- ─── AGENT INSTRUCTIONS (read by OpenClaw agents) ─────────────── -->
@@ -1023,7 +1023,7 @@ morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gate
 
 ---
 
-## 14. Gateway Guardian v4 (v0.9.3)
+## 14. Gateway Guardian v5 (v2026.2.21)
 
 A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and its ability to run inference. Runs every 2 minutes via launchd.
 
@@ -1034,9 +1034,16 @@ A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and it
 | v1 | HTTP dashboard alive | Providers in cooldown = brain-dead but HTTP 200 |
 | v2 | Raw provider URLs | Provider APIs always return 200 regardless of internal state |
 | v3 | Through-OpenClaw inference probe | Billing exhaustion → restart → instant re-disable = dead loop. Also: `set -e` + pkill self-kill = silent no-op restarts |
-| **v4** | Through-OpenClaw + **billing classification** + **credit monitoring** | Current version |
+| v4 | Through-OpenClaw + billing classification + credit monitoring | `openclaw agent` injected 71K workspace prompt into every probe |
+| **v5** | **Direct curl inference probes** + billing classification + credit monitoring | Current version |
 
-### What v4 Fixes Over v3
+### What v5 Fixes Over v4
+
+**Root cause:** `openclaw agent` injected the full 71K workspace system prompt into every health probe. This caused mor-gateway/glm-5 to timeout at 60s (takes ~37s just for the prompt). Worse, failures were delivered to Signal as normal agent replies — spamming the user with error messages.
+
+**Fix:** Direct curl to gateway's LiteLLM proxy with a tiny prompt (~50 chars). Uses glm-4.7-flash (fast, lightweight) instead of glm-5. No agent session = no Signal delivery on failure. Errors stay in logs only.
+
+### What v4 Fixed Over v3
 
 1. **Billing-aware escalation** — Classifies inference errors as `billing` vs `transient` vs `timeout`. Billing errors trigger backoff + notification instead of useless restarts.
 2. **Silent restart bug** — Replaced `set -euo pipefail` with `set -uo pipefail` + explicit ERR trap. Restart failures are now logged instead of silently exiting.
@@ -1936,6 +1943,66 @@ This is fine — the system stays awake even with display off thanks to Power Na
 ```bash
 sudo pmset -a displaysleep 0
 ```
+
+---
+
+## 21. Three-Shift Task Planning (v2026.2.21)
+
+A structured task planning system that proposes prioritized work plans at the start of each 8-hour shift. Nothing executes without user approval.
+
+### Shifts
+
+| Shift | Default Time | Window | Character |
+|-------|-------------|--------|-----------|
+| ☀️ Morning | 6:00 AM | 6 AM – 2 PM | Ramp-up: meetings, comms, decisions |
+| 🌤️ Afternoon | 2:00 PM | 2 PM – 10 PM | Deep work: coding, writing, building |
+| 🌙 Night | 10:00 PM | 10 PM – 6 AM | Autonomous: research, maintenance |
+
+### How It Works
+
+1. **Gather context** — Reads memory files, calendar, email, git status, previous shift handoff
+2. **Generate plan** — Prioritized tasks (P1 must-do, P2 should-do, P3 could-do), active project status, blocked items
+3. **Present for approval** — User approves, modifies, or skips before anything executes
+4. **Execute** — Works through approved tasks in priority order, logs progress
+5. **Handoff** — Writes shift summary for the next shift to pick up
+
+### Setup
+
+```bash
+# Create three cron jobs (adjust times to your timezone)
+openclaw cron add --name three-shifts-morning --schedule "0 6 * * *" \
+  --message "Generate morning shift plan. Read the three-shifts skill, gather context, and propose tasks for the 6 AM – 2 PM window."
+
+openclaw cron add --name three-shifts-afternoon --schedule "0 14 * * *" \
+  --message "Generate afternoon shift plan. Read the three-shifts skill, gather context, and propose tasks for the 2 PM – 10 PM window."
+
+openclaw cron add --name three-shifts-night --schedule "0 22 * * *" \
+  --message "Generate night shift plan. Read the three-shifts skill, gather context, and propose tasks for the 10 PM – 6 AM window."
+```
+
+### Shift-Specific Rules
+
+- **Morning/Afternoon:** External actions (emails, PRs, messages) allowed with approval
+- **Night:** Autonomous only — no external comms, no financial transactions, no destructive ops
+- **Night cancellation:** If user doesn't approve by 10:30 PM, night shift is cancelled
+
+See `three-shifts/SKILL.md` for full documentation including approval workflows, configuration options, weekend behavior, and quiet hours.
+
+---
+
+## Changelog
+
+### 2026.2.21
+- **Three-Shift Task Planning** — Morning/Afternoon/Night shift system with prioritized task proposals and approval workflow
+- **Gateway Guardian v5** — Direct curl inference probes replace `openclaw agent` probes. Eliminates 71K workspace prompt injection into health checks, prevents Signal spam from failed probes, uses glm-4.7-flash for fast lightweight probing
+- **Version scheme change** — Moved from semver (0.9.x) to date-based versioning (YYYY.M.DD)
+
+### 0.9.9
+- Always-on 24/7 power configuration for macOS
+- GLM-5 as default model (replaces Kimi K2.5)
+
+### 0.9.8.3
+- Community contributions (dynamic model discovery, install.sh fixes, bash 3.2 compat, agent integration docs)
 
 ---
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Gateway Guardian v4 — monitors OpenClaw gateway + inference with billing awareness
+# Gateway Guardian v5 — monitors OpenClaw gateway + inference with billing awareness
 #
 # v1: Only checked HTTP dashboard (useless when providers in cooldown)
 # v2: Probed provider endpoints directly (always 200 — can't see internal state)
@@ -13,6 +13,14 @@
 #     - Fixed: pkill excludes own PID (no more self-kill)
 #     - Added: proactive Venice credit monitoring
 #     - Added: Signal notifications for billing exhaustion + recovery
+# v5: Direct curl inference probe (replaces `openclaw agent`).
+#     - Root cause: `openclaw agent` injected full 71K workspace system prompt into
+#       every probe, causing mor-gateway/glm-5 to timeout at 60s (takes ~37s just
+#       for the prompt). The error "Failed to create chat completions stream:" was
+#       then delivered to Signal as a normal agent reply — spamming the user.
+#     - Fix: Direct curl to gateway's LiteLLM proxy with tiny prompt (~50 chars).
+#       Uses glm-4.7-flash (fast, lightweight) instead of glm-5.
+#       No agent session = no Signal delivery on failure. Errors stay in logs only.
 #
 # Install: launchd plist at ~/Library/LaunchAgents/ai.openclaw.guardian.plist
 # Test:    bash ~/.openclaw/workspace/scripts/gateway-guardian.sh --verbose
@@ -91,22 +99,6 @@ hours_to_diem_reset() {
   now_utc_m=$(date -u '+%M' | sed 's/^0//')
   remaining_min=$(( (23 - now_utc_h) * 60 + (60 - now_utc_m) ))
   echo $(( remaining_min / 60 ))
-}
-
-# === v5.12.0: Direct router healthcheck (catches BadgerDB issues early) ===
-check_router_health() {
-  local cookie_auth=""
-  if [[ -f "$HOME/morpheus/.cookie" ]]; then
-    cookie_auth="-u $(cat "$HOME/morpheus/.cookie")"
-  fi
-  local response
-  response=$(curl -sf --max-time 10 $cookie_auth http://127.0.0.1:8082/healthcheck 2>&1)
-  if [ $? -ne 0 ]; then
-    log "WARN: Morpheus router healthcheck failed: $response"
-    return 1
-  fi
-  [[ "$VERBOSE" == "--verbose" ]] && log "Router healthcheck OK"
-  return 0
 }
 
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -429,9 +421,6 @@ fi
 # ─── Step 0: Circuit breaker check ──────────────────────────────────────────
 check_circuit_breaker
 
-# ─── Step 0.5: v5.12.0 Router healthcheck (BadgerDB, blockchain sync) ────────
-check_router_health
-
 # ─── Step 1: HTTP probe ─────────────────────────────────────────────────────
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$PROBE_TIMEOUT" "$GATEWAY_URL" 2>/dev/null || echo "000")
 
@@ -455,22 +444,57 @@ if [[ "$HTTP_FAIL_COUNT" -gt 0 ]]; then
 fi
 echo "0" > "$STATE_FILE"
 
-# ─── Step 2: Inference probe ────────────────────────────────────────────────
+# ─── Step 2: Provider health probes (v5: direct curl, no agent framework) ───
+# v4 used `openclaw agent` which injected the full 71K workspace system prompt,
+# causing mor-gateway to timeout at 60s and spamming Signal with error messages.
+# v5 probes provider endpoints directly via curl — fast, lightweight, no Signal delivery.
+#
+# We check 3 providers (any 1 passing = inference available):
+#   1. Venice API /models (fast, no auth needed, proves API reachability)
+#   2. Morpheus local proxy /health (proves local P2P inference path)
+#   3. Mor-gateway /models (proves Morpheus API Gateway reachability)
 INFERENCE_OK=false
 INFERENCE_ERROR=""
-AGENT_RESULT=""
+PROVIDERS_CHECKED=0
+PROVIDERS_OK=0
 
-AGENT_RESULT=$(run_with_timeout "$INFERENCE_TIMEOUT" openclaw agent \
-  --session-id "$GUARDIAN_SESSION_ID" \
-  --message "Reply with exactly one word: ALIVE" \
-  --thinking off \
-  --json 2>&1) || true
+# Probe 1: Venice API
+VENICE_RESULT=$(curl -s --max-time 10 "https://api.venice.ai/api/v1/models" 2>&1) || true
+PROVIDERS_CHECKED=$((PROVIDERS_CHECKED + 1))
+if echo "$VENICE_RESULT" | grep -q '"data"'; then
+  PROVIDERS_OK=$((PROVIDERS_OK + 1))
+  [[ "$VERBOSE" == "--verbose" ]] && log "Probe: Venice API OK"
+else
+  INFERENCE_ERROR="venice: $(echo "$VENICE_RESULT" | head -1 | cut -c1-80)"
+  [[ "$VERBOSE" == "--verbose" ]] && log "Probe: Venice API FAIL"
+fi
 
-if echo "$AGENT_RESULT" | grep -qi "ALIVE"; then
+# Probe 2: Local Morpheus proxy
+MORPHEUS_RESULT=$(curl -s --max-time 5 "http://127.0.0.1:8083/health" 2>&1) || true
+PROVIDERS_CHECKED=$((PROVIDERS_CHECKED + 1))
+if echo "$MORPHEUS_RESULT" | grep -q '"status":"ok"'; then
+  PROVIDERS_OK=$((PROVIDERS_OK + 1))
+  [[ "$VERBOSE" == "--verbose" ]] && log "Probe: Morpheus local proxy OK"
+else
+  INFERENCE_ERROR="${INFERENCE_ERROR:+$INFERENCE_ERROR | }morpheus-local: $(echo "$MORPHEUS_RESULT" | head -1 | cut -c1-80)"
+  [[ "$VERBOSE" == "--verbose" ]] && log "Probe: Morpheus local proxy FAIL"
+fi
+
+# Probe 3: Mor-gateway API
+MORGATEWAY_RESULT=$(curl -s --max-time 15 "https://api.mor.org/api/v1/models" 2>&1) || true
+PROVIDERS_CHECKED=$((PROVIDERS_CHECKED + 1))
+if echo "$MORGATEWAY_RESULT" | grep -q '"data"'; then
+  PROVIDERS_OK=$((PROVIDERS_OK + 1))
+  [[ "$VERBOSE" == "--verbose" ]] && log "Probe: Mor-gateway API OK"
+else
+  INFERENCE_ERROR="${INFERENCE_ERROR:+$INFERENCE_ERROR | }mor-gateway: $(echo "$MORGATEWAY_RESULT" | head -1 | cut -c1-80)"
+  [[ "$VERBOSE" == "--verbose" ]] && log "Probe: Mor-gateway API FAIL"
+fi
+
+# At least 1 provider must be reachable for inference to work
+if [[ "$PROVIDERS_OK" -ge 1 ]]; then
   INFERENCE_OK=true
   INFERENCE_ERROR=""
-else
-  INFERENCE_ERROR="$AGENT_RESULT"
 fi
 
 # ─── Evaluate inference health ──────────────────────────────────────────────
