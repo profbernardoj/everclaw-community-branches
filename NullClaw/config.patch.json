@@ -1,0 +1,19 @@
+{
+  "_comment": "Merge into ~/.nullclaw/config.json (setup.sh does this automatically)",
+  "default_provider": "morpheus",
+  "models": {
+    "providers": {
+      "morpheus": {
+        "api_base": "http://127.0.0.1:8083/v1",
+        "api_key": "morpheus-local"
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "glm-5"
+      }
+    }
+  }
+}
