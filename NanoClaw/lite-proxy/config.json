@@ -1,0 +1,12 @@
+{
+  "listen": "127.0.0.1:8084",
+  "upstream": "http://127.0.0.1:8083/v1",
+  "modelMap": {
+    "claude-3.5-sonnet": "glm-5",
+    "claude-3-haiku": "glm-4.7-flash",
+    "claude-3-opus": "glm-5",
+    "claude-sonnet-4": "glm-5",
+    "claude-haiku-4": "glm-4.7-flash"
+  },
+  "dockerHost": "host.docker.internal"
+}
