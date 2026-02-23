@@ -1,17 +1,11 @@
 {
-  "name": "workspace",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "name": "everclaw",
+  "version": "2026.2.21",
+  "private": true,
+  "description": "Morpheus inference skill for OpenClaw agents",
+  "type": "module",
+  "morpheusNodeVersion": "v5.12.0",
   "dependencies": {
-    "@safe-global/protocol-kit": "^6.1.2",
-    "@safe-global/types-kit": "^3.0.0"
+    "viem": "^2.0.0"
   }
 }
