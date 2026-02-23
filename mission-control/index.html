@@ -3,118 +3,454 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mission Control — OpenClaw Dashboard</title>
+<title>🦞 Mission Control — OpenClaw</title>
 <style>
-  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --text-dim: #8b949e; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --red: #f85149; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 1200px; margin: 0 auto; }
-  .header { text-align: center; margin-bottom: 30px; }
-  .title { font-size: 2em; font-weight: 700; }
-  .subtitle { color: var(--text-dim); font-size: 0.9em; margin-top: 4px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-  .card h2 { font-size: 1.1em; margin-bottom: 12px; color: var(--accent); }
-  .card.full { grid-column: 1 / -1; }
-  .goal { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-  .goal:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .goal-name { font-weight: 600; font-size: 1em; }
-  .goal-status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 8px; }
-  .status-active { background: rgba(63, 185, 80, 0.2); color: var(--green); }
-  .status-tracking { background: rgba(210, 153, 34, 0.2); color: var(--yellow); }
-  .status-planned { background: rgba(139, 148, 158, 0.2); color: var(--text-dim); }
-  .sub-goals { margin-top: 6px; padding-left: 16px; }
-  .sub-goal { color: var(--text-dim); font-size: 0.85em; margin: 2px 0; }
-  .activity { margin-bottom: 8px; font-size: 0.85em; }
-  .activity-date { color: var(--accent); font-size: 0.8em; }
-  .activity-title { font-weight: 600; }
-  .fact { margin-bottom: 10px; }
-  .fact-heading { font-weight: 600; color: var(--accent); font-size: 0.9em; }
-  .fact-content { color: var(--text-dim); font-size: 0.8em; white-space: pre-wrap; margin-top: 2px; }
-  .stats { display: flex; gap: 20px; justify-content: center; margin: 16px 0; }
-  .stat { text-align: center; }
-  .stat-value { font-size: 1.8em; font-weight: 700; color: var(--accent); }
-  .stat-label { font-size: 0.75em; color: var(--text-dim); }
-  .empty { color: var(--text-dim); font-style: italic; font-size: 0.85em; }
-  .generated { text-align: center; color: var(--text-dim); font-size: 0.75em; margin-top: 20px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+.header { background: #161b22; border-bottom: 1px solid #30363d; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+.header h1 { font-size: 22px; font-weight: 600; }
+.header h1 span { font-size: 26px; }
+.header .meta { margin-left: auto; text-align: right; }
+.header .subtitle { color: #8b949e; font-size: 13px; }
+.header .updated { color: #484f58; font-size: 11px; margin-top: 2px; }
+.tabs { display: flex; background: #161b22; border-bottom: 1px solid #30363d; padding: 0 24px; gap: 0; overflow-x: auto; }
+.tab { padding: 12px 20px; cursor: pointer; color: #8b949e; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+.tab:hover { color: #e6edf3; }
+.tab.active { color: #e6edf3; border-bottom-color: #f78166; }
+.tab .icon { margin-right: 6px; }
+.content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Stats bar */
+.stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; flex: 1; min-width: 140px; }
+.stat-card .label { color: #8b949e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.stat-card .value { font-size: 24px; font-weight: 700; }
+.stat-card .value.green { color: #3fb950; }
+.stat-card .value.blue { color: #58a6ff; }
+.stat-card .value.orange { color: #d29922; }
+.stat-card .value.purple { color: #bc8cff; }
+
+/* Activity Feed */
+.feed-item { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 12px; transition: border-color 0.2s; }
+.feed-item:hover { border-color: #58a6ff; }
+.feed-item .time { color: #8b949e; font-size: 12px; margin-bottom: 6px; }
+.feed-item .type { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-left: 8px; text-transform: uppercase; }
+.type-config { background: #1f3a5f; color: #58a6ff; }
+.type-message { background: #1a3a2a; color: #3fb950; }
+.type-search { background: #3d2e00; color: #d29922; }
+.type-email { background: #3d1e36; color: #db61a2; }
+.type-cron { background: #2d1f3d; color: #bc8cff; }
+.type-security { background: #3d1e1e; color: #f85149; }
+.type-system { background: #1c2128; color: #8b949e; }
+.feed-item .title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.feed-item .desc { color: #8b949e; font-size: 13px; line-height: 1.5; }
+
+/* Goals */
+.goal-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; margin-bottom: 20px; transition: border-color 0.2s; }
+.goal-card:hover { border-color: #58a6ff; }
+.goal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer; }
+.goal-emoji { font-size: 32px; }
+.goal-name { font-size: 20px; font-weight: 700; }
+.goal-status { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; margin-left: auto; }
+.status-active { background: #1a3a2a; color: #3fb950; }
+.status-tracking { background: #1c2128; color: #8b949e; }
+.status-planned { background: #3d2e00; color: #d29922; }
+.status-complete { background: #1f3a5f; color: #58a6ff; }
+.goal-desc { color: #8b949e; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+.subgoals { border-top: 1px solid #21262d; padding-top: 16px; }
+.subgoals h4 { font-size: 13px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.subgoal { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #21262d; }
+.subgoal:last-child { border-bottom: none; }
+.subgoal-icon { font-size: 14px; margin-top: 2px; flex-shrink: 0; }
+.subgoal-title { font-size: 14px; font-weight: 500; }
+.subgoal-detail { color: #8b949e; font-size: 12px; margin-top: 2px; }
+.subgoal-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.dot-active { background: #3fb950; }
+.dot-planned { background: #d29922; }
+.dot-complete { background: #58a6ff; }
+.dot-in-progress { background: #3fb950; }
+.goal-actions { margin-top: 16px; padding-top: 12px; border-top: 1px solid #21262d; }
+.goal-actions h4 { font-size: 13px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.action-item { font-size: 13px; color: #e6edf3; padding: 4px 0; }
+.action-item::before { content: "✅ "; }
+.goal-collapsible { display: none; }
+.goal-collapsible.expanded { display: block; }
+
+/* Calendar */
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-header h2 { font-size: 18px; }
+.cal-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.cal-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+.cal-legend span { font-size: 12px; color: #8b949e; }
+.cal-grid { display: grid; grid-template-columns: 80px repeat(7, 1fr); border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+.cal-cell { border: 1px solid #21262d; padding: 6px 8px; min-height: 60px; font-size: 12px; }
+.cal-day-header { background: #161b22; font-weight: 600; text-align: center; padding: 10px 8px; font-size: 13px; color: #e6edf3; }
+.cal-time { background: #0d1117; color: #8b949e; font-size: 11px; display: flex; align-items: flex-start; justify-content: center; padding-top: 8px; font-weight: 500; }
+.cal-event { border-radius: 4px; padding: 3px 6px; margin-bottom: 3px; font-size: 11px; font-weight: 500; line-height: 1.3; }
+.cal-blue { background: #1f3a5f; color: #58a6ff; border-left: 3px solid #58a6ff; }
+.cal-green { background: #1a3a2a; color: #3fb950; border-left: 3px solid #3fb950; }
+.cal-red { background: #3d1e1e; color: #f85149; border-left: 3px solid #f85149; }
+.cal-gray { background: #1c2128; color: #8b949e; border-left: 3px solid #8b949e; }
+.cal-purple { background: #2d1f3d; color: #bc8cff; border-left: 3px solid #bc8cff; }
+.cal-today { background: #111922 !important; }
+
+/* Search */
+.search-box { position: relative; margin-bottom: 20px; }
+.search-box input { width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px 16px 14px 44px; color: #e6edf3; font-size: 15px; outline: none; transition: border-color 0.2s; }
+.search-box input:focus { border-color: #58a6ff; }
+.search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #8b949e; }
+.search-result { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+.search-result .source { color: #8b949e; font-size: 12px; margin-bottom: 4px; }
+.search-result .match { font-size: 14px; line-height: 1.6; }
+.search-result mark { background: #3d2e00; color: #d29922; padding: 1px 3px; border-radius: 3px; }
+.no-results { text-align: center; padding: 60px 20px; color: #8b949e; }
+.no-results .big { font-size: 48px; margin-bottom: 12px; }
+.search-stats { color: #8b949e; font-size: 13px; margin-bottom: 16px; }
+
+/* Loading */
+.loading { text-align: center; padding: 60px; color: #8b949e; }
+.loading .spinner { font-size: 32px; animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
+<script id="embedded-data">window.__DASHBOARD_DATA__ = {"generated":"2026-02-22T09:00:20.034Z","owner":"[REDACTED]","lifeGoals":[{"id":"family-first","emoji":"👨‍👩‍👧‍👦","name":"Family First","section":"1. Family First","file":"great-commission-family.md","description":"Protect and provide for the physical, emotional, spiritual, and digital needs and desires of Cayla and the children.","subGoals":[{"title":"Protect and provide for the physical, emotional, spiritual, and digital needs and desires of Cayla a","detail":"","status":"active","source":"description"}],"actionsTaken":["2026-02-11: Saved Balaji education framework for guiding children's skill development","2026-02-15: Noted WHOOP fitness integration plans and family AI hub (individual agents per family member)"],"actionsSuggested":[],"context":[],"status":"active"},{"id":"christ-centered","emoji":"✝️","name":"Christ-Centered Family","section":"2. Christ-Centered Family","file":"great-commission-family.md","description":"Bring glory to God by maintaining a strong marriage and raising children in the bible-believing protestant church with good examples of a moral and purpose-filled life. **Beliefs:** Non-denominational","subGoals":[{"title":"Beliefs:","detail":"Non-denominational bible-believing Christian protestants. Literal belief that the Bible records the inspired word of God spoken to humans by the entit","status":"active","source":"user-md"},{"title":"Church:","detail":"Crossroads Church Austin (Austin, TX) — regular Sunday attendance when not traveling.","status":"active","source":"user-md"}],"actionsTaken":["2026-02-11: Saved Balaji education framework for guiding children's skill development","2026-02-15: Noted WHOOP fitness integration plans and family AI hub (individual agents per family member)"],"actionsSuggested":[],"context":[],"status":"active"},{"id":"great-commission","emoji":"⛪","name":"Great Commission","section":"3. Great Commission","file":"great-commission-family.md","description":"Give every person on earth an opportunity to hear the gospel of Jesus Christ — through supporting missionaries, Bible translation into underserved languages, church planting, and discipling friends in","subGoals":[{"title":"Sponsors missionary Jim Baker (US Midwest)","detail":"","status":"active","source":"involvement"},{"title":"Sponsors missionary Stephen Hanlon (Malaysia — work not public)","detail":"","status":"active","source":"involvement"},{"title":"Interest in supporting Joshua Project (Bible translation)","detail":"","status":"active","source":"involvement"},{"title":"Future goal: AI-powered Bible translation as the technology matures","detail":"","status":"active","source":"involvement"},{"title":"Current involvement:","detail":"","status":"active","source":"user-md"}],"actionsTaken":["2026-02-11: Saved Balaji education framework for guiding children's skill development","2026-02-15: Noted WHOOP fitness integration plans and family AI hub (individual agents per family member)"],"actionsSuggested":[],"context":[],"status":"active"},{"id":"space-settlement","emoji":"🚀","name":"Space Settlement","section":"4. Space Settlement","file":"space-settlement.md","description":"Personally lead the permanent settlement of outer space (Moon, Mars, Asteroid Belt, outer planets) with family members who volunteer to come along. **Current involvement:** Early investor in Space Fun","subGoals":[{"title":"Early investor in Space Fund (space tech venture fund)","detail":"","status":"active","source":"involvement"},{"title":"Helped fund Firefly Aerospace (Cedar Park, TX)","detail":"","status":"active","source":"involvement"},{"title":"SpaceX VIP — attended Future Astronauts Forum, in communication with Phillip at SpaceX re: Starship ","detail":"","status":"active","source":"involvement"},{"title":"Supporter of New Worlds & Space Cowboy Ball (Austin, TX)","detail":"","status":"active","source":"involvement"},{"title":"Knows Tim Dodd (\"Everyday Astronaut\"), attends Astro Awards","detail":"","status":"active","source":"involvement"},{"title":"Every square meter mapped from orbit with unique identifiers","detail":"","status":"planned","source":"user-md"},{"title":"Ownership attributed via Lockean homesteading — first to mix labor with nature (build solar panel, r","detail":"","status":"planned","source":"user-md"},{"title":"Marketplace where bidders lock capital in smart contracts; unlocked to first validated claimant","detail":"","status":"planned","source":"user-md"},{"title":"Verification via onchain robot/human identifiers + independent satellite mapping","detail":"","status":"planned","source":"user-md"},{"title":"Legal basis: U.S. Commercial Space Launch Act of 2015 (SPACE Act) — recognizes private property righ","detail":"","status":"planned","source":"user-md"},{"title":"Focus on private enterprise approach, not state sovereignty","detail":"","status":"planned","source":"user-md"},{"title":"Current involvement:","detail":"","status":"active","source":"user-md"},{"title":"Active project idea:","detail":"Celestial property ownership system on Base (Ethereum L2):","status":"active","source":"user-md"},{"title":"Celestial property ownership system on Base (Ethereum L2) — lunar land registry ","detail":"","status":"planned","source":"active-project"},{"title":"Lockean homesteading model: first to mix labor with nature claims ownership","detail":"","status":"planned","source":"active-project"}],"actionsTaken":[],"actionsSuggested":[],"context":["SpaceX VIP, in contact with Phillip re: Starship seats/payloads","Early investor in Space Fund (space tech venture fund)","Helped fund Firefly Aerospace (Cedar Park, TX)","Knows Tim Dodd (\"Everyday Astronaut\"), attends Astro Awards","Supporter of New Worlds & Space Cowboy Ball (Austin, TX)"],"status":"tracking"},{"id":"abolition-state","emoji":"🏴","name":"Abolition of the State","section":"5. Abolition of the State","file":"abolition-of-state.md","description":"Achieve a pure free market anarcho-capitalist, voluntarist society by developing voluntary free market alternatives to all monopoly government services. **Track record:** Early contributor to the Dece","subGoals":[{"title":"Early contributor to the Decentralized Applications (dApps) framework adopted by Ethereum","detail":"","status":"planned","source":"user-md"},{"title":"Developer of the Smart Agents framework","detail":"","status":"planned","source":"user-md"},{"title":"Created Omni Protocol (originally Mastercoin Protocol) — led to launch of USDT stablecoin by Tether","detail":"","status":"planned","source":"user-md"},{"title":"Coined \"Johnston's Law\" (2014, Coin Summit SF): *\"Everything That Can Be Decentralized Will Be Decen","detail":"","status":"planned","source":"user-md"},{"title":"100+ conference talks on crypto/AI since 2012","detail":"","status":"planned","source":"user-md"},{"title":"100+ articles on crypto/AI","detail":"","status":"planned","source":"user-md"},{"title":"Track record:","detail":"","status":"active","source":"user-md"},{"title":"Pure free market anarcho-capitalist, voluntarist society","detail":"","status":"planned","source":"vision"},{"title":"Develop voluntary free market alternatives to ALL monopoly government services","detail":"","status":"planned","source":"vision"},{"title":"Methods: honest, ethical, high integrity — no shortcuts","detail":"","status":"planned","source":"vision"},{"title":"Decentralized AI inference (Morpheus/Based AI) — replaces centralized AI gatekee","detail":"","status":"in-progress","source":"vector"},{"title":"Onchain property rights (celestial land registry) — replaces state-issued titles","detail":"","status":"in-progress","source":"vector"},{"title":"Smart contracts replacing legal system functions","detail":"","status":"in-progress","source":"vector"}],"actionsTaken":["2026-02-11: Saved Balaji Srinivasan insight on Network State + human value in AI age"],"actionsSuggested":[],"context":["Early contributor to Decentralized Applications (dApps) framework adopted by Ethereum","Developer of the Smart Agents framework","Created Omni Protocol (originally Mastercoin Protocol) — led to USDT stablecoin","Coined \"Johnston's Law\" (2014): \"Everything That Can Be Decentralized Will Be Decentralized\"","100+ conference talks, 100+ articles"],"status":"active"},{"id":"wealth-creation","emoji":"💰","name":"Wealth Creation for Others","section":"6. Wealth Creation for Others","file":"wealth-creation.md","description":"Create more wealth than anyone else in history — not for self-enrichment, but by building projects and protocols that benefit users, shareholders, token holders, employees, and open source contributor","subGoals":[{"title":"Open source contributor and GitHub maintainer","detail":"","status":"planned","source":"user-md"},{"title":"Bitcoin-like structure: anonymous founders (Morpheus, Trinity, Neo), no formal entity, no pre-mine","detail":"","status":"planned","source":"user-md"},{"title":"Decentralized via smart contracts on Ethereum/Base + P2P inference network","detail":"","status":"planned","source":"user-md"},{"title":"Owns MOR tokens earned through contributions; no practical control over project","detail":"","status":"planned","source":"user-md"},{"title":"*Thesis:* Power apps & agents with open-source inference; be the heart of the AI-based economy","detail":"","status":"planned","source":"user-md"},{"title":"Commercial layer for distributed inference — removes complexity for enterprises wanting open source","detail":"","status":"planned","source":"user-md"},{"title":"Serves projects like Mistral AI, Akash, Venice AI, Morpheus that need enterprise-ready integration","detail":"","status":"planned","source":"user-md"},{"title":"David's role: Strategy","detail":"","status":"planned","source":"user-md"},{"title":"Team: Teana Baker-Taylor (Venice AI cofounder, ex-Circle/Binance/Crypto.com), Thomas Borrel (ex-CPO ","detail":"","status":"planned","source":"user-md"},{"title":"Current focus:","detail":"","status":"active","source":"user-md"},{"title":"Morpheus AI (mor.org):","detail":"","status":"active","source":"user-md"},{"title":"Based AI:","detail":"","status":"active","source":"user-md"},{"title":"Everclaw:","detail":"OpenClaw skill for self-sovereign decentralized inference via Morpheus","status":"in-progress","source":"active-project"},{"title":"Johnston's Law:","detail":"\"Everything That Can Be Decentralized Will Be Decentralized\"","status":"in-progress","source":"active-project"}],"actionsTaken":["2026-02-10: Drafted user persona v1 (pre-meeting), sent to David","2026-02-10: Prepared meeting notes with x402/ERC-8004 context"],"actionsSuggested":[],"context":["~9,000 MOR in Safe multisig, ~88 MOR in agent wallet","Safe: [WALLET_REDACTED]","Omni Protocol (Mastercoin) creator — led to USDT/Tether","100+ conference talks, 100+ articles on crypto/AI"],"status":"active"}],"additionalGoals":[{"id":"website-migration","emoji":"🌐","name":"Website Migration","subGoals":[],"actionsTaken":[],"actionsSuggested":[],"context":[],"status":"planned","raw":"---\ntags: [goal, website-migration]\nstatus: active\n---\n# 🌐 Website Migration — Strikingly → GitHub Pages\n\n## Status: TODO (noted Feb 10, 2026)\n\n## Objective\nMove all personal websites from Strikingly to GitHub Pages (or similar static hosting). Same approach as everclaw.xyz — static sites, GitHub repos, custom domains.\n\n## Websites to Migrate\n1. www.basedai.co\n2. www.austinagentweek.com\n3. www.promptrank.org\n4. www.myai.foundation\n5. www.settlers.space\n6. www.davidajohnston.me\n7. www.smartcontractrank.org\n8. www.smartagent.org\n9. www.freeaiday.org\n10. www.agentrank.org\n11. www.mor.builders\n12. www.savannahstuff.me\n13. www.decentralizeai.org\n14. www.freemansjourney.com\n15. www.ethagent.org\n16. www.polygonagent.org\n17. www.smartagency.ai\n18. www.johnstonslaw.org\n19. www.voluntarist.co\n20. www.journeytofreedom.me\n21. NetworkNation.org\n\n## Design Tool\n- Consider Loveable (lovable.dev) — AI-powered website builder\n- Could generate React/static sites that deploy to GitHub Pages\n- Need to evaluate vs hand-coded static sites vs other tools\n\n## Approach\n- Scrape existing Strikingly sites for content/structure\n- Rebuild as static sites (HTML/CSS or React via Loveable)\n- Host on GitHub Pages with custom domains\n- Migrate DNS records one at a time\n\n## Priority\n- Not urgent — future project after Everclaw stabilizes\n- basedai.co and davidajohnston.me likely highest priority\n"},{"id":"weekend-fun","emoji":"🎉","name":"Weekend Fun","subGoals":[],"actionsTaken":[],"actionsSuggested":[],"context":[],"status":"tracking","raw":"---\ntags: [goal, weekend-fun]\nstatus: active\n---\n# 🎉 Weekend Fun — Context\n\n## Family\n- David & Cayla, Austin TX area\n- Savannah (10), Sydney (8), Sofia (6) — school-age kids who enjoy activities\n- Daniel (1) — toddler, needs family-friendly venues\n- Leia (25) — adult, may join occasionally\n\n## Preferences Known\n- Church on Sundays (Crossroads Church Austin)\n- Budget-conscious but willing to invest in experiences\n- Values quality family time\n\n## Past Activities\n- (tracking starts Feb 2026)\n\n## Venues/Events Suggested (avoid repeating)\n- **2026-02-14/15**: Austin Lunar New Year Festival (Webb Middle School), Lady Bird Lake/Zilker Park, Thinkery Children's Museum, Texas Farmers' Market at Mueller\n"}],"activities":[],"keyFacts":[{"heading":"⚡ Active Context (what we're working on RIGHT NOW)","content":"- **Memory system overhaul** — COMPLETE. Local embeddings, hybrid search, session transcripts, tagging all working.\n- **Morpheus API Gateway beta expires March 1** — need transition plan (7 days remaining)\n- **EverClaw v2026.2.22** — memory-upgrade skill shipped, pushed to all 30 repos, PR #12 merged"},{"heading":"📋 Release Process — CRITICAL","content":"When pushing a new named version to `profbernardoj/everclaw`:\n1. Push to `profbernardoj/everclaw` (main)\n2. Push to all 28+ flavor repos (batch script)\n3. Open PR from `profbernardoj` → `EverClaw/everclaw` org repo\n4. David merges the org PR"},{"heading":"🗂️ Memory Map","content":"| Area | Location | What's there |\n|------|----------|-------------|\n| **Daily notes** | `memory/daily/YYYY-MM-DD*.md` | Raw session logs |\n| **Everclaw project** | `memory/projects/everclaw/` | Architecture, strategy, flavors, ClawHub |\n| **SmartAgent project** | `memory/projects/smartagent/` | Org, website, installer |\n| **ClawBox project** | `memory/projects/clawbox/` | IronHill deal, BOM, support bot |\n| **Morpheus infra** | `memory/projects/morpheus/` | Proxy router, sessions, MOR economics"},{"heading":"🏗️ Active Projects","content":"### Everclaw (profbernardoj/everclaw)\n- Version: v2026.2.21 (date-based versioning)\n- Skill for decentralized AI inference via Morpheus network\n- Website: everclaw.xyz | Repo: profbernardoj/everclaw\n- **Details →** `memory/projects/everclaw/architecture.md`\n- **Flavors strategy →** `memory/projects/everclaw/everclaw-flavors-strategy.md`\n### 28 Flavors Sales Funnel\n- Mission: Own your Smart Agent — hardware, data, and inference\n- 5 stages: Sales → VM → Inference → Hardware → DIY\n- All 28 repos cr"},{"heading":"🔧 Key Infrastructure","content":"- **Fallback chain:** claude-opus-4-6 → claude-opus-45 → kimi-k2-5 → morpheus/kimi-k2.5\n- **6 Venice API keys** rotating (246 total DIEM)\n- **Model router:** 3 tiers (LIGHT/STANDARD/HEAVY), open-source first\n- **GLM-5** is default (replaces Kimi K2.5 as of Feb 15)\n- **Details →** `memory/projects/everclaw/architecture.md`"},{"heading":"🗣️ Language Rules","content":"- NEVER say \"free inference\" → say \"own your inference\"\n- Morpheus = ownership, not rental\n- Don't highlight Llama 3.3\n- **Details →** `memory/reference/language-messaging.md`"},{"heading":"🔐 Security","content":"- OpenClaw creator Peter hired by OpenAI — verify every update\n- Fork preserved: profbernardoj/openclaw\n- **Protocol →** `memory/reference/security-update-protocol.md`"},{"heading":"📚 Reference Pointers","content":"- **Model preferences →** `memory/reference/model-preferences.md`\n- **Lessons learned →** `memory/reference/lessons-learned.md`\n- **Key people →** `memory/reference/key-people.md`\n- **School calendar →** `memory/reference/school-calendar-rrisd-2025-2026.md`\n- **Family reminders →** `memory/reference/family-reminders.md`"},{"heading":"✅ Recently Completed","content":"- Memory system overhaul — local embeddings, hybrid search, 968 chunks indexed (Feb 22)\n- memory-upgrade skill built and released (Feb 22)\n- v2026.2.22 pushed to all 30 repos, PR #12 merged (Feb 22)\n- 28 Stage 1 + 26 Stage 2 marketing plans (Feb 19)\n- Viral narratives — 10 meta + 28 per-flavor hooks (Feb 19)\n- InstallOpenClaw.xyz launch campaign (Feb 19)\n- EverClaw Docker container PR (Feb 19)\n- Three-shift skill replacing night-shift (Feb 21)\n- SmartAgent.org redesign + DNS (Feb 12)"},{"heading":"🔲 Open Items","content":"- Morpheus API Gateway beta expires March 1 — transition plan needed\n- Websites for each flavor\n- Referral tracking infrastructure\n- ERC-8004 agent registration on Base\n- Signal-cli connection drops investigation\n- Test install.sh on clean macOS and Linux"}],"stats":{"totalActivities":0,"totalGoals":8,"activeGoals":5,"memoryFiles":0}};</script>
 </head>
 <body>
+
 <div class="header">
-  <div class="title">🎯 Mission Control</div>
-  <div class="subtitle" id="subtitle">OpenClaw Dashboard</div>
-</div>
-
-<div class="stats" id="stats"></div>
-
-<div class="grid">
-  <div class="card full" id="goals-card">
-    <h2>🎯 Goals</h2>
-    <div id="goals"><span class="empty">No goals found. Add .md files to memory/goals/ and run generate-data.mjs</span></div>
-  </div>
-  <div class="card" id="activity-card">
-    <h2>📋 Recent Activity</h2>
-    <div id="activities"><span class="empty">No activity yet.</span></div>
-  </div>
-  <div class="card" id="facts-card">
-    <h2>🧠 Key Facts</h2>
-    <div id="facts"><span class="empty">No key facts. Populate MEMORY.md.</span></div>
+  <h1><span>🦞</span> Mission Control</h1>
+  <div class="meta">
+    <div class="subtitle">OpenClaw Dashboard — [REDACTED]</div>
+    <div class="updated" id="last-updated">Loading...</div>
   </div>
 </div>
 
-<div class="generated" id="generated"></div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('feed')"><span class="icon">📋</span>Activity</div>
+  <div class="tab" onclick="switchTab('goals')"><span class="icon">🎯</span>Life Goals</div>
+  <div class="tab" onclick="switchTab('calendar')"><span class="icon">📅</span>Calendar</div>
+  <div class="tab" onclick="switchTab('search')"><span class="icon">🔍</span>Search</div>
+</div>
+
+<div class="content">
+  <!-- STATS BAR -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-card"><div class="label">Activities</div><div class="value blue" id="stat-activities">—</div></div>
+    <div class="stat-card"><div class="label">Life Goals</div><div class="value orange" id="stat-goals">—</div></div>
+    <div class="stat-card"><div class="label">Active Goals</div><div class="value green" id="stat-active">—</div></div>
+    <div class="stat-card"><div class="label">Memory Files</div><div class="value purple" id="stat-memory">—</div></div>
+  </div>
+
+  <!-- ACTIVITY FEED -->
+  <div id="feed" class="panel active">
+    <div id="feed-items"><div class="loading"><span class="spinner">⏳</span><p>Loading activity feed...</p></div></div>
+  </div>
+
+  <!-- LIFE GOALS -->
+  <div id="goals" class="panel">
+    <div id="goals-items"><div class="loading"><span class="spinner">⏳</span><p>Loading goals...</p></div></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="calendar" class="panel">
+    <div class="cal-header">
+      <h2>📅 Scheduled Tasks — This Week</h2>
+      <div class="cal-legend">
+        <span><span class="dot" style="background:#58a6ff"></span> Briefings</span>
+        <span><span class="dot" style="background:#3fb950"></span> Reports</span>
+        <span><span class="dot" style="background:#bc8cff"></span> Goal Advisors</span>
+        <span><span class="dot" style="background:#f85149"></span> Birthdays</span>
+        <span><span class="dot" style="background:#8b949e"></span> Maintenance</span>
+      </div>
+    </div>
+    <div id="cal-grid" class="cal-grid"></div>
+  </div>
+
+  <!-- GLOBAL SEARCH -->
+  <div id="search" class="panel">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search memories, goals, activity, and key facts..." oninput="doSearch(this.value)">
+    </div>
+    <div id="search-stats" class="search-stats"></div>
+    <div id="search-results"></div>
+    <div id="search-empty" class="no-results">
+      <div class="big">🔍</div>
+      <div>Search across all of OpenClaw's memories, goals, and documents</div>
+    </div>
+  </div>
+</div>
 
 <script>
-const data = window.__DASHBOARD_DATA__ || null;
-if (data) {
-  document.getElementById('subtitle').textContent = `OpenClaw Dashboard — ${data.owner}`;
-  
-  // Stats
-  const statsEl = document.getElementById('stats');
-  const stats = [
-    { value: data.stats.totalGoals, label: 'Goals' },
-    { value: data.stats.activeGoals, label: 'Active' },
-    { value: data.stats.totalActivities, label: 'Activities' },
-  ];
-  statsEl.innerHTML = stats.map(s => `<div class="stat"><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>`).join('');
+let DATA = null;
 
-  // Goals
-  const goals = [...(data.goals || []), ...(data.lifeGoals || []), ...(data.additionalGoals || [])];
-  if (goals.length > 0) {
-    document.getElementById('goals').innerHTML = goals.map(g => `
-      <div class="goal">
-        <span class="goal-name">${g.emoji || '🎯'} ${g.name}</span>
-        <span class="goal-status status-${g.status}">${g.status}</span>
-        ${g.subGoals && g.subGoals.length > 0 ? `<div class="sub-goals">${g.subGoals.slice(0, 5).map(s => `<div class="sub-goal">• ${s.title}</div>`).join('')}</div>` : ''}
-      </div>
-    `).join('');
+// ─── Load Data ──────────────────────────────────────────────────────────────
+
+async function loadData() {
+  // Try embedded data first (works from file:// protocol)
+  if (window.__DASHBOARD_DATA__) {
+    DATA = window.__DASHBOARD_DATA__;
+    renderAll();
+    return;
   }
+  // Fall back to fetch (works from http:// server)
+  try {
+    const res = await fetch('dashboard-data.json?t=' + Date.now());
+    DATA = await res.json();
+    renderAll();
+  } catch (e) {
+    console.error('Failed to load dashboard data:', e);
+    document.getElementById('feed-items').innerHTML = '<div class="no-results"><div class="big">⚠️</div><div>Could not load dashboard data. Run: <code>node mission-control/generate-data.mjs</code></div></div>';
+  }
+}
+
+// ─── Render All ─────────────────────────────────────────────────────────────
+
+function renderAll() {
+  if (!DATA) return;
+
+  // Update header
+  const gen = new Date(DATA.generated);
+  document.getElementById('last-updated').textContent = 'Last updated: ' + gen.toLocaleString();
+
+  // Stats
+  document.getElementById('stat-activities').textContent = DATA.stats.totalActivities;
+  document.getElementById('stat-goals').textContent = DATA.stats.totalGoals;
+  document.getElementById('stat-active').textContent = DATA.stats.activeGoals;
+  document.getElementById('stat-memory').textContent = DATA.stats.memoryFiles;
+
+  renderFeed();
+  renderGoals();
+  renderCalendar();
+}
+
+// ─── Tab Switching ──────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  const tabNames = { feed: 'Activity', goals: 'Life Goals', calendar: 'Calendar', search: 'Search' };
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.textContent.includes(tabNames[tab])) t.classList.add('active');
+  });
+}
+
+// ─── Activity Feed ──────────────────────────────────────────────────────────
+
+function renderFeed() {
+  const items = DATA.activities || [];
+  const container = document.getElementById('feed-items');
+  if (items.length === 0) {
+    container.innerHTML = '<div class="no-results"><div class="big">📋</div><div>No activity recorded yet</div></div>';
+    return;
+  }
+  container.innerHTML = items.map(a => `
+    <div class="feed-item">
+      <div class="time">${a.time} <span class="type type-${a.type}">${a.type}</span></div>
+      <div class="title">${escHtml(a.title)}</div>
+      <div class="desc">${escHtml(a.desc)}</div>
+    </div>
+  `).join('');
+}
+
+// ─── Life Goals ─────────────────────────────────────────────────────────────
+
+function renderGoals() {
+  const goals = [...(DATA.lifeGoals || []), ...(DATA.additionalGoals || [])];
+  const container = document.getElementById('goals-items');
+  if (goals.length === 0) {
+    container.innerHTML = '<div class="no-results"><div class="big">🎯</div><div>No goals loaded</div></div>';
+    return;
+  }
+
+  container.innerHTML = goals.map((g, i) => {
+    const statusClass = 'status-' + (g.status || 'tracking');
+    const statusLabel = (g.status || 'tracking').replace('-', ' ');
+
+    const subGoalsHtml = (g.subGoals || []).map(sg => {
+      const dotClass = 'dot-' + (sg.status || 'planned');
+      return `
+        <div class="subgoal">
+          <div class="subgoal-status-dot ${dotClass}"></div>
+          <div>
+            <div class="subgoal-title">${escHtml(sg.title)}</div>
+            ${sg.detail ? `<div class="subgoal-detail">${escHtml(sg.detail)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const actionsHtml = (g.actionsTaken || []).length > 0
+      ? `<div class="goal-actions"><h4>Actions Taken</h4>${g.actionsTaken.map(a => `<div class="action-item">${escHtml(a)}</div>`).join('')}</div>`
+      : '';
+
+    return `
+      <div class="goal-card">
+        <div class="goal-header" onclick="toggleGoal(${i})">
+          <div class="goal-emoji">${g.emoji || '🎯'}</div>
+          <div class="goal-name">${escHtml(g.name)}</div>
+          <span class="goal-status ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="goal-desc">${escHtml(g.description || '')}</div>
+        <div class="goal-collapsible" id="goal-body-${i}">
+          ${subGoalsHtml ? `<div class="subgoals"><h4>Sub-Goals & Milestones (${g.subGoals?.length || 0})</h4>${subGoalsHtml}</div>` : ''}
+          ${actionsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleGoal(idx) {
+  const el = document.getElementById('goal-body-' + idx);
+  el.classList.toggle('expanded');
+}
+
+// ─── Calendar ───────────────────────────────────────────────────────────────
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const timeSlots = ['3:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '2:00 PM'];
+
+  // Header row
+  let html = '<div class="cal-cell cal-day-header"></div>';
+  days.forEach((d, i) => {
+    const isToday = d.toDateString() === now.toDateString();
+    const label = dayNames[i] + ' ' + (d.getMonth() + 1) + '/' + d.getDate();
+    html += `<div class="cal-cell cal-day-header ${isToday ? 'cal-today' : ''}">${label}${isToday ? ' ●' : ''}</div>`;
+  });
+
+  // Events
+  const events = {};
+  function addEvent(dayIdx, hour, label, cls) {
+    const key = dayIdx + '-' + hour;
+    if (!events[key]) events[key] = [];
+    events[key].push({ label, cls });
+  }
+
+  // 3 AM — Dashboard refresh (all days)
+  for (let i = 0; i < 7; i++) addEvent(i, 3, '🔄 Dashboard Refresh', 'cal-gray');
+
+  // Morning briefings
+  for (let i = 0; i < 5; i++) addEvent(i, 7, '☀️ Morning Briefing', 'cal-blue');
+  for (let i = 5; i < 7; i++) addEvent(i, 8, '☀️ Weekend Briefing', 'cal-blue');
+
+  // 2 PM — Daily capabilities
+  for (let i = 0; i < 7; i++) addEvent(i, 14, '🛠️ Capabilities Report', 'cal-green');
+
+  // Goal advisors (weekdays)
+  const goalLabels = ['🚀 Space Advisor', '💰 Wealth Advisor', '⛪ Commission Advisor', '🏴 Abolition Advisor', '🔗 Synthesis Report'];
+  for (let i = 0; i < 5; i++) addEvent(i, 9, goalLabels[i], 'cal-purple');
+
+  // Weekend
+  addEvent(5, 9, '🎉 Weekend Fun', 'cal-purple');
+  addEvent(6, 9, '📋 Week Preview', 'cal-purple');
+
+  // Time rows
+  timeSlots.forEach(slot => {
+    const match = slot.match(/(\d+):.*\s(AM|PM)/);
+    const hour = parseInt(match[1]);
+    const isPM = match[2] === 'PM' && hour !== 12;
+    const h24 = isPM ? hour + 12 : hour;
+
+    html += `<div class="cal-cell cal-time">${slot}</div>`;
+    days.forEach((d, i) => {
+      const isToday = d.toDateString() === now.toDateString();
+      const key = i + '-' + h24;
+      const evts = events[key] || [];
+      html += `<div class="cal-cell ${isToday ? 'cal-today' : ''}">`;
+      evts.forEach(e => html += `<div class="cal-event ${e.cls}">${e.label}</div>`);
+      html += '</div>';
+    });
+  });
+
+  grid.innerHTML = html;
+}
+
+// ─── Search ─────────────────────────────────────────────────────────────────
+
+function doSearch(query) {
+  const results = document.getElementById('search-results');
+  const stats = document.getElementById('search-stats');
+  const empty = document.getElementById('search-empty');
+
+  if (!query.trim() || !DATA) {
+    results.innerHTML = '';
+    stats.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  const q = query.toLowerCase();
+
+  // Build searchable content from live data
+  const searchable = [];
 
   // Activities
-  if (data.activities && data.activities.length > 0) {
-    document.getElementById('activities').innerHTML = data.activities.slice(0, 20).map(a => `
-      <div class="activity">
-        <span class="activity-date">${a.date}</span>
-        <span class="activity-title">${a.title}</span>
-        <div style="color:var(--text-dim);font-size:0.8em">${a.desc}</div>
-      </div>
-    `).join('');
-  }
+  (DATA.activities || []).forEach(a => searchable.push({
+    source: `Activity: ${a.time}`,
+    text: `${a.title}. ${a.desc}`,
+    type: a.type,
+  }));
 
-  // Key Facts
-  if (data.keyFacts && data.keyFacts.length > 0) {
-    document.getElementById('facts').innerHTML = data.keyFacts.slice(0, 10).map(f => `
-      <div class="fact">
-        <div class="fact-heading">${f.heading}</div>
-        <div class="fact-content">${f.content.slice(0, 300)}${f.content.length > 300 ? '...' : ''}</div>
-      </div>
-    `).join('');
-  }
+  // Goals
+  [...(DATA.lifeGoals || []), ...(DATA.additionalGoals || [])].forEach(g => {
+    searchable.push({
+      source: `Goal: ${g.emoji} ${g.name}`,
+      text: `${g.description}. ${(g.subGoals || []).map(s => s.title).join('. ')}`,
+      type: 'system',
+    });
+  });
 
-  document.getElementById('generated').textContent = `Last updated: ${new Date(data.generated).toLocaleString()}`;
-} else {
-  document.getElementById('generated').textContent = 'No data. Run: node mission-control/generate-data.mjs';
+  // Key facts
+  (DATA.keyFacts || []).forEach(f => searchable.push({
+    source: `Memory: ${f.heading}`,
+    text: f.content,
+    type: 'system',
+  }));
+
+  const matches = searchable.filter(item =>
+    item.text.toLowerCase().includes(q) || item.source.toLowerCase().includes(q)
+  );
+
+  stats.innerHTML = `Found ${matches.length} result${matches.length !== 1 ? 's' : ''} for "${escHtml(query)}"`;
+
+  results.innerHTML = matches.map(m => {
+    const highlighted = m.text.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>');
+    return `
+      <div class="search-result">
+        <div class="source">📄 ${escHtml(m.source)} <span class="type type-${m.type}" style="font-size:10px">${m.type}</span></div>
+        <div class="match">${highlighted}</div>
+      </div>
+    `;
+  }).join('');
 }
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+
+loadData();
 </script>
 </body>
 </html>
