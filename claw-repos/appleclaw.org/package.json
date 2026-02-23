@@ -1,0 +1,10 @@
+{
+  "name": "everclaw",
+  "version": "0.9.8.3",
+  "private": true,
+  "description": "Morpheus inference skill for OpenClaw agents",
+  "type": "module",
+  "dependencies": {
+    "viem": "^2.0.0"
+  }
+}

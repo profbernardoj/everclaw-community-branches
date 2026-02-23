@@ -1,0 +1,104 @@
+{
+  "$schema": "Template config for Everclaw on macOS. Copy relevant sections into your openclaw.json.",
+  "_instructions": [
+    "This template configures Morpheus inference for your OpenClaw agent on macOS.",
+    "IMPORTANT: 'everclaw' is a SKILL (tooling), NOT a provider.",
+    "Valid model prefixes: 'morpheus/' (local P2P) or 'mor-gateway/' (API Gateway).",
+    "NEVER use 'everclaw/' as a model prefix — it will route to Venice and cause billing errors."
+  ],
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "mor-gateway": {
+        "baseUrl": "https://api.mor.org/api/v1",
+        "apiKey": "YOUR_MOR_GATEWAY_API_KEY",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "glm-5",
+            "name": "GLM-5 (via Morpheus Gateway)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "kimi-k2.5",
+            "name": "Kimi K2.5 (via Morpheus Gateway)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "glm-4.7-flash",
+            "name": "GLM 4.7 Flash (via Morpheus Gateway)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "morpheus": {
+        "baseUrl": "http://127.0.0.1:8083/v1",
+        "apiKey": "morpheus-local",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "glm-5",
+            "name": "GLM-5 (via Morpheus P2P)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "kimi-k2.5",
+            "name": "Kimi K2.5 (via Morpheus P2P)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "glm-4.7-flash",
+            "name": "GLM 4.7 Flash (via Morpheus P2P)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "kimi-k2-thinking",
+            "name": "Kimi K2 Thinking (via Morpheus P2P)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "_comment": "Set your primary to a Morpheus model. Add your paid provider as fallback.",
+        "primary": "mor-gateway/glm-5",
+        "fallbacks": [
+          "mor-gateway/kimi-k2.5",
+          "morpheus/glm-5",
+          "morpheus/kimi-k2.5"
+        ]
+      }
+    }
+  }
+}

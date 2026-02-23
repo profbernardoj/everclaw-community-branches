@@ -1,0 +1,61 @@
+{
+  "$schema": "Simplest Everclaw config — Morpheus API Gateway only (no local proxy needed).",
+  "_instructions": [
+    "This is the EASIEST way to get started with Everclaw.",
+    "Uses the Morpheus API Gateway (api.mor.org) — no local proxy-router needed.",
+    "Just get a free API key from https://app.mor.org and paste it below.",
+    "Works on any OS (macOS, Linux, Windows WSL2, Raspberry Pi).",
+    "IMPORTANT: 'everclaw' is a SKILL, NOT a provider.",
+    "NEVER use 'everclaw/' as a model prefix."
+  ],
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "mor-gateway": {
+        "baseUrl": "https://api.mor.org/api/v1",
+        "apiKey": "YOUR_MOR_GATEWAY_API_KEY",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "glm-5",
+            "name": "GLM-5 (via Morpheus Gateway)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "kimi-k2.5",
+            "name": "Kimi K2.5 (via Morpheus Gateway)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "glm-4.7-flash",
+            "name": "GLM 4.7 Flash (via Morpheus Gateway)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "_comment": "GLM-5 via Morpheus Gateway as primary. Add your paid provider (venice, openai, etc.) as fallback if desired.",
+        "primary": "mor-gateway/glm-5",
+        "fallbacks": [
+          "mor-gateway/kimi-k2.5"
+        ]
+      }
+    }
+  }
+}
