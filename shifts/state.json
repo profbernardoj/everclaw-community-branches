@@ -1,0 +1,18 @@
+{
+  "shift": null,
+  "date": null,
+  "status": "idle",
+  "startedAt": null,
+  "approvedAt": null,
+  "approvedBy": null,
+  "planModel": "venice/claude-opus-4-6",
+  "execModel": "mor-gateway/glm-5",
+  "totalSteps": 0,
+  "completed": 0,
+  "blocked": 0,
+  "skipped": 0,
+  "cyclesRun": 0,
+  "lastCycleAt": null,
+  "nightAutoApproved": false,
+  "carryoverFromShift": null
+}

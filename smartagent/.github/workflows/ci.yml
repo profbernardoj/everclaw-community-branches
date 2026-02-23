@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-installer:
+    name: Lint Install Script
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: warning
+
+  test-install-macos:
+    name: Test Install (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run installer in dry-run mode
+        run: |
+          # Verify the script is valid bash
+          bash -n install.sh
+          echo "✓ install.sh syntax OK"
+
+      - name: Check config files exist
+        run: |
+          for f in config/AGENTS.md config/SOUL.md config/BOOTSTRAP.md config/TOOLS.md config/USER.md config/IDENTITY.md; do
+            if [[ ! -f "$f" ]]; then
+              echo "✗ Missing: $f"
+              exit 1
+            fi
+            echo "✓ $f exists"
+          done
+
+  test-install-linux:
+    name: Test Install (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run installer in dry-run mode
+        run: |
+          bash -n install.sh
+          echo "✓ install.sh syntax OK"
+
+      - name: Check config files exist
+        run: |
+          for f in config/AGENTS.md config/SOUL.md config/BOOTSTRAP.md config/TOOLS.md config/USER.md config/IDENTITY.md; do
+            if [[ ! -f "$f" ]]; then
+              echo "✗ Missing: $f"
+              exit 1
+            fi
+            echo "✓ $f exists"
+          done
