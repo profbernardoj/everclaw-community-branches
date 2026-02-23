@@ -381,7 +381,10 @@ run_once() {
   ensure_dirs
   log "Running one-shot scan (window: ${SCAN_WINDOW}s)"
 
-  # Method 1: Check auth-profiles for suspect failures
+  # ONLY method: Check auth-profiles for suspect failures (rapid errors without billing-disable)
+  # Log scanning was removed — gateway logs accumulate old 402 errors that cause false positives.
+  # The auth-profiles method is reliable: it detects keys with recent rapid failures that
+  # OpenClaw classified as "unknown" instead of "billing" (the exact bug we're fixing).
   local suspects
   suspects=$(check_recent_failures)
 
@@ -391,12 +394,6 @@ run_once() {
       log "  $line"
     done
     handle_billing_error "failure_check"
-    return $?
-  fi
-
-  # Method 2: Scan log files
-  if scan_logs; then
-    handle_billing_error "log_scan"
     return $?
   fi
 
