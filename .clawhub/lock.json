@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "skills": {
+    "skillguard": {
+      "version": "1.0.1",
+      "installedAt": 1770146680271
+    },
+    "prompt-guard": {
+      "version": "2.5.3",
+      "installedAt": 1770146682183
+    },
+    "bagman": {
+      "version": "2.1.0",
+      "installedAt": 1770613184312
+    },
+    "everclaw": {
+      "version": "0.3.3",
+      "installedAt": 1770870533736
+    }
+  }
+}

@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 2026.2.21
-description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth profile rotation for Venice API keys, Gateway Guardian v5 with direct curl inference probes (eliminates Signal spam), proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, three-shift task planning system (morning/afternoon/night with approval workflow), 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
+version: 2026.2.23
+description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth rotation v2 with proactive DIEM balance monitoring and reactive 402 watchdog, Gateway Guardian v5 with direct curl inference probes (eliminates Signal spam), proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, three-shift cyclic execution engine (v2 with 15-minute execution loops), 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -1021,6 +1021,62 @@ morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gate
 
 **v0.5 improvement:** The Morpheus proxy returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the Morpheus provider into extended cooldown due to transient infrastructure issues. If a Morpheus session expires mid-request, the proxy automatically opens a fresh session and retries once.
 
+### Venice Key Health Monitor (v2.0)
+
+OpenClaw's billing error detection has a pattern gap: Venice returns `"Insufficient USD or Diem balance to complete request"` but OpenClaw checks for `"insufficient balance"` (adjacent words). Since "USD or Diem" separates "insufficient" from "balance", the pattern fails. The error gets classified as `"unknown"` instead of `"billing"`, the key gets a 60-second cooldown instead of a billing disable, and the same empty key gets retried in a loop.
+
+**Two scripts fix this at the skill level:**
+
+#### 1. Proactive Key Health Monitor (`venice-key-monitor.sh`)
+
+Periodically probes every Venice API key's DIEM/USD balance via a cheap GLM-4.7-Flash inference call (costs ~0.0001 DIEM). Reads the `x-venice-balance-diem` or `x-venice-balance-usd` response header and disables depleted keys by writing `disabledUntil` + `disabledReason: "billing"` directly to `auth-profiles.json`.
+
+```bash
+# Check all keys and disable depleted ones
+bash skills/everclaw/scripts/venice-key-monitor.sh
+
+# Report balances without making changes
+bash skills/everclaw/scripts/venice-key-monitor.sh --status
+
+# Custom depletion threshold (default: 1 DIEM)
+bash skills/everclaw/scripts/venice-key-monitor.sh --threshold 5
+```
+
+**Cron:** Runs every 2 hours. Pre-empts the problem before the agent ever tries an empty key.
+
+#### 2. Reactive 402 Watchdog (`venice-402-watchdog.sh`)
+
+Monitors `auth-profiles.json` for Venice keys with rapid failures that aren't properly billing-disabled (the telltale sign of OpenClaw's pattern gap). When detected, immediately disables the offending key and identifies the next healthy key.
+
+```bash
+# One-shot scan (check recent failures)
+bash skills/everclaw/scripts/venice-402-watchdog.sh
+
+# Run as daemon (continuous monitoring every 30s)
+bash skills/everclaw/scripts/venice-402-watchdog.sh --daemon
+```
+
+**Cron:** Runs every 5 minutes. Catches billing errors in near-real-time that the proactive monitor might miss between its 2-hour checks.
+
+#### Detection Patterns (what OpenClaw misses)
+
+| Venice Error | OpenClaw Pattern | Match? |
+|-------------|-----------------|--------|
+| `Insufficient USD or Diem balance to complete request` | `"insufficient balance"` | ❌ No — words not adjacent |
+| `402 Payment Required` | `/status.*402/` | ✅ Only if status code preserved |
+| `Insufficient credits` | `"insufficient credits"` | ✅ |
+
+The watchdog catches the first pattern (the most common Venice error) that OpenClaw's text matching misses.
+
+#### State Files
+
+| File | Purpose |
+|------|---------|
+| `~/.openclaw/logs/venice-key-balances.json` | Last balance check results per key |
+| `~/.openclaw/logs/venice-402-state.json` | Last watchdog action and rotation state |
+| `~/.openclaw/logs/venice-key-monitor.log` | Monitor activity log |
+| `~/.openclaw/logs/venice-402-watchdog.log` | Watchdog activity log |
+
 ---
 
 ## 14. Gateway Guardian v5 (v2026.2.21)
@@ -1445,7 +1501,7 @@ if (agent.x402Support && apiEndpoint) {
 
 ---
 
-## Quick Reference (v0.9.4)
+## Quick Reference (v2026.2.23)
 
 | Action | Command |
 |--------|---------|
@@ -1466,6 +1522,9 @@ if (agent.x402Support && apiEndpoint) {
 | Proxy health | `curl http://127.0.0.1:8083/health` |
 | Guardian test | `bash scripts/gateway-guardian.sh --verbose` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
+| **Venice key health** | `bash skills/everclaw/scripts/venice-key-monitor.sh --status` |
+| **Venice key balances** | `bash skills/everclaw/scripts/venice-key-monitor.sh --verbose` |
+| **Venice 402 watchdog** | `bash skills/everclaw/scripts/venice-402-watchdog.sh --verbose` |
 | Archive sessions | `bash skills/everclaw/scripts/session-archive.sh` |
 | Check session size | `bash skills/everclaw/scripts/session-archive.sh --check` |
 | Force archive | `bash skills/everclaw/scripts/session-archive.sh --force` |

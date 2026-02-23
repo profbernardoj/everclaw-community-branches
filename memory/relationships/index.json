@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-20",
+  "categories": {
+    "family": 6,
+    "close_friends": 0,
+    "church_friends": 0,
+    "colleagues": 0,
+    "broader_community": 0,
+    "strangers": 0,
+    "bad_actors": 0,
+    "unknown": 0
+  },
+  "contacts": [
+    {
+      "name": "Cayla Johnston",
+      "category": "family",
+      "relationship": "Wife",
+      "file": "family/cayla-johnston.md"
+    },
+    {
+      "name": "Leia Johnston",
+      "category": "family",
+      "relationship": "Adoptive daughter",
+      "file": "family/leia-johnston.md"
+    },
+    {
+      "name": "Savannah Johnston",
+      "category": "family",
+      "relationship": "Daughter",
+      "file": "family/savannah-johnston.md"
+    },
+    {
+      "name": "Sydney Johnston",
+      "category": "family",
+      "relationship": "Daughter",
+      "file": "family/sydney-johnston.md"
+    },
+    {
+      "name": "Sofia Johnston",
+      "category": "family",
+      "relationship": "Daughter",
+      "file": "family/sofia-johnston.md"
+    },
+    {
+      "name": "Daniel Johnston",
+      "category": "family",
+      "relationship": "Son",
+      "file": "family/daniel-johnston.md"
+    }
+  ]
+}
