@@ -1023,7 +1023,12 @@ morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gate
 
 ### Venice Key Health Monitor (v2.0)
 
-OpenClaw's billing error detection has a pattern gap: Venice returns `"Insufficient USD or Diem balance to complete request"` but OpenClaw checks for `"insufficient balance"` (adjacent words). Since "USD or Diem" separates "insufficient" from "balance", the pattern fails. The error gets classified as `"unknown"` instead of `"billing"`, the key gets a 60-second cooldown instead of a billing disable, and the same empty key gets retried in a loop.
+OpenClaw's billing error detection has pattern gaps with Venice-specific error messages. Two known gaps:
+
+1. **Balance depletion:** Venice returns `"Insufficient USD or Diem balance to complete request"` but OpenClaw checks for `"insufficient balance"` (adjacent words). Since "USD or Diem" separates "insufficient" from "balance", the pattern fails.
+2. **Per-key spend limit:** Venice returns `"API key DIEM spend limit exceeded. Your account may still have DIEM balance, but this API key has reached its configured DIEM spending limit."` — OpenClaw has no pattern for "spend limit" at all.
+
+Both get classified as `"unknown"` instead of `"billing"`, the key gets a 60-second cooldown instead of a billing disable, and the same exhausted key gets retried in a loop.
 
 **Two scripts fix this at the skill level:**
 
@@ -1063,10 +1068,11 @@ bash skills/everclaw/scripts/venice-402-watchdog.sh --daemon
 | Venice Error | OpenClaw Pattern | Match? |
 |-------------|-----------------|--------|
 | `Insufficient USD or Diem balance to complete request` | `"insufficient balance"` | ❌ No — words not adjacent |
+| `API key DIEM spend limit exceeded` | *(none)* | ❌ No pattern exists |
 | `402 Payment Required` | `/status.*402/` | ✅ Only if status code preserved |
 | `Insufficient credits` | `"insufficient credits"` | ✅ |
 
-The watchdog catches the first pattern (the most common Venice error) that OpenClaw's text matching misses.
+The watchdog catches the first two patterns (the most common Venice billing errors) that OpenClaw's text matching misses.
 
 #### State Files
 
