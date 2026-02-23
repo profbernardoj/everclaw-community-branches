@@ -1,0 +1,48 @@
+[
+  {
+    "name": "Morning Family Briefing ☀️",
+    "schedule": { "kind": "cron", "expr": "30 6 * * 1-5", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 120,
+      "message": "It's a weekday morning. Generate the family morning briefing and send via YOUR_CHANNEL to YOUR_PHONE.\n\nCheck memory files for any date-specific reminders for today (field trips, special items, events).\n\nStanding daily reminders (edit these):\n- REMINDER_1\n- REMINDER_2\n\nChildren reference (edit these):\n- CHILD_1 (age) - born DATE\n- CHILD_2 (age) - born DATE\n\nFormat: Short, scannable, emoji-friendly."
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "name": "Afternoon Pickup Briefing 🚗",
+    "schedule": { "kind": "cron", "expr": "40 14 * * 1-5", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 120,
+      "message": "Generate the school pickup briefing for today and send via YOUR_CHANNEL to YOUR_PHONE.\n\nPickup schedule (edit for your family):\n\nMONDAY: [who at what time]\nTUESDAY: [who at what time]\nWEDNESDAY: [who at what time]\nTHURSDAY: [who at what time]\nFRIDAY: [who at what time]\n\nCheck today's day of the week and report ONLY today's schedule. Format: Short, scannable, emoji-friendly. Make it crystal clear WHO gets picked up WHEN."
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "_comment": "Create one of these per family member. Change the name, date, and budget.",
+    "name": "Birthday Reminder: PERSON_NAME 🎂",
+    "schedule": { "kind": "cron", "expr": "0 9 DD MM *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "main",
+    "payload": {
+      "kind": "systemEvent",
+      "text": "🎂 REMINDER: PERSON_NAME's birthday is in 4 weeks (MONTH DAY). Time to find a gift — budget under $AMOUNT."
+    }
+  },
+  {
+    "name": "Weekend Fun Planner 🎉",
+    "schedule": { "kind": "cron", "expr": "0 7 * * 6", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 300,
+      "message": "Find exciting, fresh things for the family to do THIS WEEKEND in YOUR_CITY.\n\nFamily: DESCRIBE_YOUR_FAMILY\n\nSteps:\n1. Search for weekend events: 'YOUR_CITY family events this weekend'\n2. Check local weather\n3. Suggest 3-4 options mixing: one EVENT, one OUTDOOR activity, one CREATIVE/LEARNING, one FOOD adventure\n4. For each: name, location, time, why the kids would love it\n\nSend the plan via YOUR_CHANNEL to YOUR_PHONE using the message tool.\nAfter sending, respond with NO_REPLY."
+    },
+    "delivery": { "mode": "none" }
+  }
+]
