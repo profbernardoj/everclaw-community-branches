@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Dashboard Refresh 📊",
+    "schedule": { "kind": "cron", "expr": "0 3 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_LIGHT_MODEL",
+      "timeoutSeconds": 120,
+      "message": "Run the Mission Control dashboard data generator to refresh the dashboard. Execute: cd ~/.openclaw/workspace && node mission-control/generate-data.mjs — Report the results. If it fails, report the error."
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "name": "Disk Usage Monitor 💾",
+    "schedule": { "kind": "cron", "expr": "0 9 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_LIGHT_MODEL",
+      "thinking": "off",
+      "timeoutSeconds": 30,
+      "message": "Check disk usage on the root volume. Run:\n\ndf -h / | tail -1\n\nParse the Use% column. If it is 50% or higher, send a warning via YOUR_CHANNEL to YOUR_PHONE using the message tool:\n\n'💾 Disk usage alert: [X]% used ([used] of [total]). [free] remaining.'\n\nIf under 50%, respond with NO_REPLY."
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "name": "Smart Session Archiver 🗄️",
+    "schedule": { "kind": "cron", "expr": "0 */6 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_LIGHT_MODEL",
+      "timeoutSeconds": 60,
+      "message": "Run the smart session archiver to prevent dashboard overload. Execute: bash ~/.openclaw/workspace/skills/everclaw/scripts/session-archive.sh --verbose — Report the results. If sessions were archived, mention the before/after size."
+    },
+    "delivery": { "mode": "none" }
+  }
+]

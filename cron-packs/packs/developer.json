@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Daily GitHub PR Check 🔍",
+    "schedule": { "kind": "cron", "expr": "30 7 * * 1-5", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_LIGHT_MODEL",
+      "timeoutSeconds": 120,
+      "message": "Check for open pull requests on GitHub repositories and report them.\n\nRepos to check (edit this list):\n- YOUR_GITHUB_REPO_1\n- YOUR_GITHUB_REPO_2\n\nFor each repo with open PRs:\n1. List PR number, title, author, branch\n2. Brief summary of what it changes\n3. Any obvious issues or merge-readiness\n\nFormat as a concise daily briefing. If no PRs, just say 'No open PRs across all repos.'\n\nSend the report via YOUR_CHANNEL to YOUR_PHONE using the message tool.\nAfter sending: NO_REPLY"
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "name": "Monthly Security Check 🔐",
+    "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 300,
+      "message": "Run a monthly security check on the OpenClaw installation.\n\nSteps:\n1. Check OpenClaw version: openclaw status\n2. Check for available updates\n3. Scan installed skills for any new warnings\n4. Review file permissions on sensitive directories\n5. Check for any leaked credentials in workspace files\n\nReport findings via YOUR_CHANNEL to YOUR_PHONE. Flag any issues that need attention."
+    },
+    "delivery": { "mode": "announce" }
+  }
+]

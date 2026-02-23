@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Three Shifts: Morning ☀️",
+    "schedule": { "kind": "cron", "expr": "0 6 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_HEAVY_MODEL",
+      "thinking": "off",
+      "timeoutSeconds": 300,
+      "message": "Read the three-shifts skill at skills/everclaw/three-shifts/SKILL.md. Execute Phase 1 (Planning) for the MORNING shift (6 AM – 2 PM). Read shifts/handoff.md, shifts/context.md, shifts/state.json, and recent memory files. Generate the shift plan and present for user approval. After approval, decompose all tasks into atomic steps and write to shifts/tasks.md."
+    },
+    "delivery": { "mode": "announce", "channel": "YOUR_CHANNEL", "to": "YOUR_PHONE", "bestEffort": true }
+  },
+  {
+    "name": "Three Shifts: Afternoon 🌤️",
+    "schedule": { "kind": "cron", "expr": "0 14 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_HEAVY_MODEL",
+      "thinking": "off",
+      "timeoutSeconds": 300,
+      "message": "Read the three-shifts skill at skills/everclaw/three-shifts/SKILL.md. Execute Phase 1 (Planning) for the AFTERNOON shift (2 PM – 10 PM). Read shifts/handoff.md, shifts/context.md, shifts/state.json, and recent memory files. Generate the shift plan and present for user approval. After approval, decompose all tasks into atomic steps and write to shifts/tasks.md."
+    },
+    "delivery": { "mode": "announce", "channel": "YOUR_CHANNEL", "to": "YOUR_PHONE", "bestEffort": true }
+  },
+  {
+    "name": "Three Shifts: Night 🌙",
+    "schedule": { "kind": "cron", "expr": "0 22 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_HEAVY_MODEL",
+      "thinking": "off",
+      "timeoutSeconds": 300,
+      "message": "Read the three-shifts skill at skills/everclaw/three-shifts/SKILL.md. Execute Phase 1 (Planning) for the NIGHT shift (10 PM – 6 AM). IMPORTANT: If shifts/tasks.md has carryover items already approved today, auto-approve them and set state.json nightAutoApproved=true. Do NOT ping the user for already-approved carryover. Only present new tasks for approval. After approval (or auto-approve), decompose into atomic steps and write to shifts/tasks.md."
+    },
+    "delivery": { "mode": "announce", "channel": "YOUR_CHANNEL", "to": "YOUR_PHONE", "bestEffort": true }
+  },
+  {
+    "name": "Three Shifts: Cycle Executor ⚙️",
+    "schedule": { "kind": "cron", "expr": "*/15 * * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "thinking": "off",
+      "timeoutSeconds": 600,
+      "message": "You are a CYCLE EXECUTOR for the Three-Shifts system. You execute ONE step per cycle.\n\nALGORITHM — follow EXACTLY:\n\n1. READ shifts/state.json\n   - If status is NOT \"executing\": respond with exactly HEARTBEAT_OK (do nothing)\n   - If status IS \"executing\": continue\n\n2. READ shifts/tasks.md\n   - Find the FIRST step marked [ ] (not started)\n   - If no [ ] steps, check [!] (blocked) steps — retry if the blocker may have cleared\n   - If ALL steps are [x], [-], or [!] with 5+ retries: this shift is DONE → go to step 8\n\n3. READ shifts/context.md for rules, constraints, and known pitfalls\n\n4. CLAIM the step: Edit tasks.md, change [ ] to [~] for that step\n\n5. EXECUTE the step:\n   - Do EXACTLY what the step description says\n   - Stay within scope — do NOT drift to other tasks\n   - Max 3 tool calls for this step\n\n6. WRITE RESULTS back to tasks.md:\n   - Success: change [~] to [x] and append — DONE (cycle N): brief result\n   - Blocked: change [~] to [!] and append — BLOCKED (cycle N): reason\n\n7. UPDATE shifts/state.json: Increment cyclesRun, update counts, set lastCycleAt\n   UPDATE shifts/context.md if you learned something useful\n   DONE — respond with a one-line summary.\n\n8. SHIFT COMPLETE: Copy tasks.md to shifts/history/, write handoff.md, set status to completed.\n\nRULES:\n- NEVER take more than 2 steps per cycle\n- NEVER ask the user anything — if blocked, mark [!] and move on\n- Night shift: NO external comms, NO financial txns, NO destructive ops"
+    },
+    "delivery": { "mode": "none" }
+  }
+]
