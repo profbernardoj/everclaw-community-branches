@@ -52,7 +52,7 @@ Night:     8 PM – 4 AM   (cron: 0 20 * * *)
 
 ## Model Selection
 
-Shift planning should use the default model (currently GLM-5 via Morpheus). The planning task is STANDARD tier — no need for Claude unless the user has complex multi-project prioritization.
+Shift planning should use the default model (e.g. GLM-5, GPT-4o-mini). The planning task is STANDARD tier — no need for Claude unless the user has complex multi-project prioritization.
 
 ## Weekend Behavior
 

@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Morning Briefing (Weekdays) 📰",
+    "schedule": { "kind": "cron", "expr": "45 7 * * 1-5", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 300,
+      "message": "Compile a morning briefing. Use web_search for each topic. IMPORTANT: Space searches by 2+ seconds (free tier rate limit).\n\nTopics (customize these to your interests):\n1. YOUR_TOPIC_1 — e.g., AI technology\n2. YOUR_TOPIC_2 — e.g., Crypto/blockchain\n3. YOUR_TOPIC_3 — e.g., Space tech\n4. YOUR_TOPIC_4 — e.g., Economics/markets\n5. YOUR_TOPIC_5 — e.g., Your industry\n\nFor each topic, search for recent news (past 24h). Compile into a concise briefing.\n\nSend the briefing via YOUR_CHANNEL to YOUR_PHONE using the message tool.\nAfter sending, respond with NO_REPLY."
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "name": "Morning Briefing (Weekends) 📰",
+    "schedule": { "kind": "cron", "expr": "45 8 * * 0,6", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 300,
+      "message": "Compile a weekend morning briefing. Same format as weekday but slightly relaxed. Use web_search for each topic. Space searches by 2+ seconds.\n\nTopics (same as weekday — customize):\n1. YOUR_TOPIC_1\n2. YOUR_TOPIC_2\n3. YOUR_TOPIC_3\n\nSend via YOUR_CHANNEL to YOUR_PHONE using the message tool.\nAfter sending, respond with NO_REPLY."
+    },
+    "delivery": { "mode": "none" }
+  },
+  {
+    "name": "Daily Capabilities & Tools Report 🔧",
+    "schedule": { "kind": "cron", "expr": "0 14 * * *", "tz": "YOUR_TIMEZONE" },
+    "sessionTarget": "isolated",
+    "payload": {
+      "kind": "agentTurn",
+      "model": "YOUR_STANDARD_MODEL",
+      "timeoutSeconds": 300,
+      "message": "Compile a daily capabilities and tools report. IMPORTANT: Space web_search calls by 2+ seconds.\n\nSections:\n1. New OpenClaw Skills — Search for 'OpenClaw new skills ClawHub 2026'\n2. Agentic Tools & Protocols — Search for 'AI agent tools MCP A2A protocol updates'\n3. Capability Improvements — Suggest 1-2 concrete improvements for your setup\n\nSend via YOUR_CHANNEL to YOUR_PHONE using the message tool.\nAfter sending, respond with NO_REPLY."
+    },
+    "delivery": { "mode": "none" }
+  }
+]
