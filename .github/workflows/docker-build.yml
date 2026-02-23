@@ -33,6 +33,9 @@ jobs:
         id: version
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
+      - name: Set up QEMU (for multi-arch)
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -50,10 +53,13 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
+            # On push to main: tag as "latest" and version from package.json
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=${{ steps.version.outputs.VERSION }},enable=${{ github.ref == 'refs/heads/main' }}
+            # On tag push: use the git tag (e.g., v2026.2.23)
+            type=semver,pattern={{raw}}
+            # PR builds: tag with PR number (not pushed)
             type=ref,event=pr
-            type=raw,value=${{ steps.version.outputs.VERSION }},enable={{is_default_branch}}
-            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -71,7 +77,7 @@ jobs:
       - name: Output image info
         if: github.event_name != 'pull_request'
         run: |
-          echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "## Docker Image Published 🐳" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
