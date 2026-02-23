@@ -1,29 +1,4 @@
-# Dependencies
-node_modules/
-
-# Cloned repos (managed separately)
-claw-repos/
-
-# Stale forks/templates (remove when no longer needed)
-everclaw-fork/
-everclaw-template/
-
-# OS files
 .DS_Store
-*.swp
-*.swo
-*~
-
-# Secrets (never commit)
-*.key
-*.pem
-.env
-.env.*
-
-# Build artifacts
-dist/
-build/
-
-# Python venvs
-.venv*/
-__pycache__/
+node_modules/
+*.log
+CLAUDE.md
