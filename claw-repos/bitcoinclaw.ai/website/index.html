@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everclaw — AI Inference You Own</title>
+  <meta name="description" content="AI inference you own, forever powering your OpenClaw agents via the Morpheus decentralized network.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♾️</text></svg>">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --text: #e0e0e8;
+      --text-muted: #8888a0;
+      --accent: #6c5ce7;
+      --accent-glow: rgba(108, 92, 231, 0.15);
+      --green: #00d68f;
+      --green-glow: rgba(0, 214, 143, 0.1);
+      --orange: #f0a030;
+      --code-bg: #1a1a28;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Beta Banner */
+    .beta-banner {
+      background: linear-gradient(90deg, rgba(240, 160, 48, 0.1), rgba(240, 160, 48, 0.05));
+      border-bottom: 1px solid rgba(240, 160, 48, 0.2);
+      padding: 10px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--orange);
+    }
+
+    /* Header */
+    header {
+      padding: 80px 0 40px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 32px;
+    }
+
+    /* Path Selector */
+    .paths {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 48px 0;
+    }
+
+    @media (max-width: 640px) {
+      .paths { grid-template-columns: 1fr; }
+      h1 { font-size: 32px; }
+      .subtitle { font-size: 17px; }
+    }
+
+    .path-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .path-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .path-card.active {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .path-card .icon { font-size: 32px; margin-bottom: 12px; }
+    .path-card h3 { font-size: 18px; margin-bottom: 8px; }
+    .path-card p { font-size: 14px; color: var(--text-muted); }
+
+    /* Sections */
+    .section {
+      display: none;
+      margin: 0 0 48px;
+    }
+
+    .section.visible { display: block; }
+
+    .section h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .step-number {
+      background: var(--accent);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-header h3 { font-size: 16px; }
+    .step p { color: var(--text-muted); font-size: 14px; margin-bottom: 12px; }
+
+    /* Code Blocks */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .code-block code {
+      color: var(--green);
+      white-space: pre;
+    }
+
+    .code-block .comment { color: var(--text-muted); }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--border);
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover { background: var(--accent); color: white; }
+    .copy-btn.copied { background: var(--green); color: white; }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    @media (max-width: 900px) {
+      .features { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .features { grid-template-columns: 1fr; }
+      .whats-new-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .feature .icon { font-size: 24px; margin-bottom: 8px; }
+    .feature h4 { font-size: 15px; margin-bottom: 6px; }
+    .feature p { font-size: 13px; color: var(--text-muted); }
+
+    /* Models */
+    .models-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .models-table th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .models-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .models-table tr:last-child td { border-bottom: none; }
+
+    /* How It Works */
+    .how-it-works {
+      text-align: center;
+      margin: 48px 0;
+      padding: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+
+    .flow-step {
+      background: var(--code-bg);
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .flow-arrow { color: var(--accent); font-size: 18px; }
+
+    /* Footer */
+    footer {
+      padding: 48px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+
+    /* MOR Economics */
+    .economics {
+      background: var(--green-glow);
+      border: 1px solid rgba(0, 214, 143, 0.2);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin: 24px 0;
+    }
+
+    .economics h4 { color: var(--green); margin-bottom: 8px; }
+    .economics p { font-size: 14px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- Beta Banner -->
+  <div class="beta-banner">
+    ⚠️ Everclaw is experimental beta open source software for testers only. Use at your own risk.
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="logo">♾️</div>
+      <h1><span>Everclaw</span></h1>
+      <p style="font-size: 13px; color: var(--accent); margin-bottom: 12px; letter-spacing: 1px;">v0.9.8.2</p>
+      <p class="subtitle">Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. AI inference you own, via the Morpheus decentralized network.</p>
+    </div>
+  </header>
+
+  <!-- Path Selector (CTA) -->
+  <div class="container">
+    <h2 style="text-align: center; margin-bottom: 8px;">Get Started</h2>
+    <p style="text-align: center; color: var(--text-muted); font-size: 15px; margin-bottom: 24px;">Choose your starting point:</p>
+
+    <div class="paths">
+      <div class="path-card" onclick="showPath('new')" id="path-new">
+        <div class="icon">🆕</div>
+        <h3>New to OpenClaw</h3>
+        <p>Install OpenClaw first, then add Everclaw</p>
+      </div>
+      <div class="path-card" onclick="showPath('existing')" id="path-existing">
+        <div class="icon">⚡</div>
+        <h3>Already have OpenClaw</h3>
+        <p>Add Everclaw to your existing setup</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Path: New Users -->
+  <div class="container">
+    <div class="section" id="section-new">
+      <h2>Install OpenClaw + Everclaw</h2>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">1</div>
+          <h3>Install OpenClaw</h3>
+        </div>
+        <p>OpenClaw is the AI agent framework that Everclaw extends. Install it with npm:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>npm install -g openclaw</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <h3>Run the OpenClaw Setup Wizard</h3>
+        </div>
+        <p>This configures your agent, sets up your model provider, and creates your workspace:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>openclaw onboard</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">3</div>
+          <h3>Install Everclaw</h3>
+        </div>
+        <p>Install from ClawHub (easiest) or the command-line installer:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>clawhub install everclaw-inference</code>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Or: <code style="font-size: 12px;">curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code></p>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">4</div>
+          <h3>Install the Morpheus Router</h3>
+        </div>
+        <p>Downloads the Morpheus proxy-router for your platform:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/install.sh</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">5</div>
+          <h3>Set Up the Proxy &amp; Guardian</h3>
+        </div>
+        <p>Installs the OpenAI-compatible proxy and the gateway health monitor:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/install-proxy.sh</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">6</div>
+          <h3>Create Your Wallet</h3>
+        </div>
+        <p>Generates an Ethereum wallet and stores the private key in your macOS Keychain. No external accounts needed.</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs setup</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">7</div>
+          <h3>Fund Your Wallet</h3>
+        </div>
+        <p>Send ETH to your wallet address (shown after setup). You need a small amount of ETH on Base for gas and to swap for MOR tokens. Then swap:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code><span class="comment"># Swap 0.05 ETH for MOR tokens</span>
+node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs swap eth 0.05
+
+<span class="comment"># Approve MOR for staking</span>
+node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">8</div>
+          <h3>Start Inference</h3>
+        </div>
+        <p>Launch the Morpheus router. Your agent now has access to decentralized AI inference.</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/start.sh</code>
+        </div>
+      </div>
+
+      <div class="economics">
+        <h4>💡 MOR is staked, not spent</h4>
+        <p>When you open an inference session, your MOR tokens are locked as a deposit. When the session ends, they come back. Stake them again for a new session. This is what makes the access yours forever — you're not buying consumable API credits.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Path: Existing OpenClaw Users -->
+  <div class="container">
+    <div class="section" id="section-existing">
+      <h2>Add Everclaw to OpenClaw</h2>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">1</div>
+          <h3>Install Everclaw</h3>
+        </div>
+        <p>Install from <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference" style="color: var(--accent);">ClawHub</a> or the command-line installer:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>clawhub install everclaw-inference</code>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Or: <code style="font-size: 12px;">curl -fsSL https://raw.githubusercontent.com/profbernardoj/everclaw/main/scripts/install-everclaw.sh | bash</code></p>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <h3>Configure Your Agent (setup.mjs)</h3>
+        </div>
+        <p>One command configures Morpheus providers in your OpenClaw config. Get a free API key at <a href="https://app.mor.org" style="color: var(--accent);">app.mor.org</a>, then:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key YOUR_KEY --apply --test --restart</code>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Gateway-only (no local proxy): add <code style="font-size: 12px;">--template gateway-only</code>. Dry-run first (omit <code style="font-size: 12px;">--apply</code>) to preview changes.</p>
+      </div>
+
+      <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin: 24px 0 16px; border-top: 1px solid var(--border); padding-top: 24px;">
+        <strong>Optional:</strong> For local P2P inference (stake MOR tokens), continue with steps 3–6:
+      </p>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">3</div>
+          <h3>Install Router, Proxy &amp; Guardian</h3>
+        </div>
+        <p>Two commands set up the Morpheus router, OpenAI-compatible proxy, and gateway health monitor:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/install.sh
+bash ~/.openclaw/workspace/skills/everclaw/scripts/install-proxy.sh</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">4</div>
+          <h3>Create Your Wallet</h3>
+        </div>
+        <p>Generates a wallet and stores the key in macOS Keychain. No 1Password, no external accounts.</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs setup</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">5</div>
+          <h3>Fund &amp; Swap</h3>
+        </div>
+        <p>Send ETH (on Base) to your wallet address, then swap for MOR:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code><span class="comment"># Swap ETH for MOR</span>
+node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs swap eth 0.05
+
+<span class="comment"># Approve MOR for staking</span>
+node ~/.openclaw/workspace/skills/everclaw/scripts/everclaw-wallet.mjs approve</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <div class="step-number">6</div>
+          <h3>Start Inference</h3>
+        </div>
+        <p>Launch the Morpheus router:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <code>bash ~/.openclaw/workspace/skills/everclaw/scripts/start.sh</code>
+        </div>
+      </div>
+
+      <div class="economics">
+        <h4>💡 MOR is staked, not spent</h4>
+        <p>When you open an inference session, your MOR tokens are locked as a deposit. When the session ends, they come back. Stake them again for a new session. This is what makes the access yours forever — you're not buying consumable API credits.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="container">
+    <div class="how-it-works">
+      <h3>How It Works</h3>
+      <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Stake MOR tokens for inference sessions. When the session ends, your MOR comes back. Stake again. Forever.</p>
+      <div class="flow">
+        <div class="flow-step">Your Agent</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Everclaw Proxy</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Morpheus P2P</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">AI Model</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What's New -->
+  <div class="container" style="margin-top: 32px;">
+    <div style="background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: var(--radius); padding: 24px;">
+      <h3 style="font-size: 18px; margin-bottom: 12px;">🆕 What's New in v0.9.8.2 — One-Command Setup</h3>
+      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
+        <div>
+          <strong style="color: var(--green);">⚡ One-Command Setup (setup.mjs)</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">New <code>setup.mjs</code> auto-detects your OS, picks the right config template, merges Morpheus providers into your OpenClaw config, updates auth profiles, tests the gateway, and restarts — all in one command. Config templates for macOS, Linux, and gateway-only setups included.</p>
+        </div>
+        <div>
+          <strong style="color: var(--green);">⭐ GLM-5 as Default Model</strong>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Zhipu's GLM-5 (744B MoE, 40B active) replaces Kimi K2.5 as the default for all tiers. Matches Claude Opus 4.5 on benchmarks: 92.7% AIME 2026, 86% GPQA-Diamond, industry-leading hallucination resistance. All through Morpheus inference you own.</p>
+        </div>
+      </div>
+      <div class="whats-new-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; gap: 16px; font-size: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(108, 92, 231, 0.15);">
+        <div>
+          <strong style="color: var(--text-muted);">v0.9.7 — Diagnostics</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">18-check diagnostic tool + provider guard</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.9.4 — Session Archiver</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Size-triggered archiving + Guardian v4</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.8 — Gateway Bootstrap</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Zero-config instant inference startup</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.7 — Agent Economy</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">x402 payments + ERC-8004 registry</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.6 — Model Router</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">3-tier classifier, 13 dimensions, &lt;1ms</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.5 — Proxy Resilience</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Cooldown-safe errors, session auto-retry</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.4 — Zero-Dep Wallet</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">macOS Keychain, no external accounts</p>
+        </div>
+        <div>
+          <strong style="color: var(--text-muted);">v0.3 — Security Suite</strong>
+          <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">SkillGuard, ClawdStrike, PromptGuard, Bagman</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="container">
+    <h2 style="text-align: center; margin-bottom: 24px;">What's Included</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">🚀</div>
+        <h4>Zero-Config Bootstrap</h4>
+        <p>One command gives new users instant AI inference via the Morpheus API Gateway. No API key, no wallet, no node — just run and go.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔑</div>
+        <h4>Multi-Key Rotation</h4>
+        <p>Add multiple Venice API keys. When one runs out of DIEM credits, auto-rotates to the next. Stay on Claude instead of falling to cheaper models.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">♾️</div>
+        <h4>Decentralized Inference</h4>
+        <p>Access GLM-5 (Opus 4.5-level), GLM-4.7 Flash, Kimi K2.5, and 30+ models through the Morpheus P2P network.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔌</div>
+        <h4>OpenAI-Compatible Proxy</h4>
+        <p>Standard API format. Auto-opens 7-day sessions, renews before expiry, auto-retries on session errors, and returns cooldown-safe error codes.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🧭</div>
+        <h4>Open-Source First Router</h4>
+        <p>13-dimension classifier, &lt;1ms. Routes trivial tasks to GLM Flash, everything else to GLM-5 — all on Morpheus. Claude is fallback only.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">💸</div>
+        <h4>x402 Payments</h4>
+        <p>Pay any x402-enabled agent with USDC on Base. Automatic 402 detection, EIP-712 signing, budget controls, and dry-run mode.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📋</div>
+        <h4>ERC-8004 Registry</h4>
+        <p>Discover agents on-chain. Read identity, services, endpoints, and reputation from the Base mainnet registries.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🛡️</div>
+        <h4>Gateway Guardian v4</h4>
+        <p>Billing-aware escalation — classifies errors, skips useless restarts for credit exhaustion. Through-OpenClaw probes, credit monitoring, circuit breaker, fixed restart chain. Signal notifications with DIEM reset ETA.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔐</div>
+        <h4>Zero-Dependency Wallet</h4>
+        <p>Private keys stored in macOS Keychain. No 1Password, no external accounts. Generate, swap, and stake in one script.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📦</div>
+        <h4>Smart Session Archiver</h4>
+        <p>Size-triggered archiving prevents dashboard overload. Monitors session size, archives old sessions above 10MB. Runs as cron — no-op when healthy.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔍</div>
+        <h4>SkillGuard Scanner</h4>
+        <p>Scan skills for malicious patterns before installing. Protects against supply chain attacks.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🧱</div>
+        <h4>Prompt Injection Defense</h4>
+        <p>Multi-language detection, severity scoring, and HiveFence threat intelligence network.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Models -->
+  <div class="container" style="margin-top: 48px;">
+    <h2 style="text-align: center; margin-bottom: 24px;">Available Models</h2>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+      <table class="models-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Type</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>GLM-5 ⭐</strong></td><td>General</td><td>Default — Opus 4.5-level, STANDARD + HEAVY tier</td></tr>
+          <tr><td><strong>GLM 4.7 Flash</strong></td><td>Fast</td><td>LIGHT tier — cron, heartbeats, simple lookups</td></tr>
+          <tr><td>Kimi K2.5</td><td>General</td><td>Solid general model</td></tr>
+          <tr><td>Kimi K2 Thinking</td><td>Reasoning</td><td>Extended thinking for complex tasks</td></tr>
+          <tr><td>GLM-5:web</td><td>General + Web</td><td>GLM-5 with web search</td></tr>
+          <tr><td>GLM 4.7</td><td>General</td><td>Full GLM model</td></tr>
+          <tr><td>Qwen3 235B</td><td>General</td><td>Large parameter count</td></tr>
+          <tr><td>GPT-OSS 120B</td><td>General</td><td>OpenAI's open-source model</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://clawhub.ai/DavidAJohnston/everclaw-inference">ClawHub</a>
+        <a href="https://github.com/profbernardoj/everclaw">GitHub</a>
+        <a href="https://github.com/profbernardoj/everclaw/blob/main/SKILL.md">Full Docs</a>
+        <a href="https://github.com/profbernardoj/everclaw/releases/tag/v0.9.8.2">v0.9.8.2 Release</a>
+        <a href="https://mor.org">Morpheus AI</a>
+        <a href="https://openclaw.ai">OpenClaw</a>
+        <a href="https://x402.org">x402 Protocol</a>
+        <a href="https://www.8004scan.io">8004scan</a>
+        <a href="https://app.uniswap.org/explore/tokens/base/0x7431ada8a591c955a994a21710752ef9b882b8e3">Get MOR</a>
+      </div>
+      <p>Everclaw is experimental beta open source software for testers only.<br>Use at your own risk. MIT License.</p>
+      <p style="margin-top: 12px;">Powered by <a href="https://mor.org">Morpheus</a> · Built for <a href="https://openclaw.ai">OpenClaw</a></p>
+    </div>
+  </footer>
+
+  <script>
+    function showPath(path) {
+      document.getElementById('section-new').classList.remove('visible');
+      document.getElementById('section-existing').classList.remove('visible');
+      document.getElementById('path-new').classList.remove('active');
+      document.getElementById('path-existing').classList.remove('active');
+
+      document.getElementById(`section-${path}`).classList.add('visible');
+      document.getElementById(`path-${path}`).classList.add('active');
+
+      document.getElementById(`section-${path}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function copyCode(btn) {
+      const code = btn.parentElement.querySelector('code').textContent;
+      // Strip comment lines for clean copy
+      const clean = code.split('\n').filter(l => !l.trim().startsWith('#')).join('\n').trim();
+      navigator.clipboard.writeText(clean).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
