@@ -19,6 +19,7 @@ import path from "node:path";
 
 // --- Configuration ---
 const PROXY_PORT = parseInt(process.env.MORPHEUS_PROXY_PORT || "8083", 10);
+const PROXY_HOST = process.env.EVERCLAW_PROXY_HOST || "127.0.0.1";
 const ROUTER_URL = process.env.MORPHEUS_ROUTER_URL || "http://localhost:8082";
 const COOKIE_PATH = process.env.MORPHEUS_COOKIE_PATH || path.join(process.env.HOME, "morpheus/.cookie");
 const SESSION_DURATION = parseInt(process.env.MORPHEUS_SESSION_DURATION || "604800", 10); // 7 days default
@@ -439,8 +440,8 @@ server.requestTimeout = 300000;   // 5 min
 server.headersTimeout = 305000;   // slightly above requestTimeout
 server.keepAliveTimeout = 300000;
 
-server.listen(PROXY_PORT, "127.0.0.1", async () => {
-  console.log(`[morpheus-proxy] Listening on http://127.0.0.1:${PROXY_PORT}`);
+server.listen(PROXY_PORT, PROXY_HOST, async () => {
+  console.log(`[morpheus-proxy] Listening on http://${PROXY_HOST}:${PROXY_PORT}`);
   console.log(`[morpheus-proxy] Router: ${ROUTER_URL}`);
   console.log(`[morpheus-proxy] Session duration: ${SESSION_DURATION}s, renew before: ${RENEW_BEFORE_SEC}s`);
 
