@@ -1,39 +1,48 @@
-# EverClaw Docker Compose
+# EverClaw Full Stack — Docker Compose
 #
 # Quick start:
 #   docker compose up -d
-#   curl http://localhost:8083/health
+#   open http://localhost:18789
 #
-# With OpenClaw (host-installed):
-#   Add to openclaw.json providers: { "morpheus": { "apiBase": "http://localhost:8083/v1" } }
+# Ports:
+#   18789 — OpenClaw Gateway (web UI + API)
+#   8083  — Morpheus inference proxy (OpenAI-compatible)
 #
-# With OpenClaw (also in Docker):
-#   Use http://everclaw:8083/v1 as the provider URL (same Docker network)
+# First run creates a default config with Morpheus as the primary provider.
+# Override by mounting your own config at ~/.openclaw/openclaw.json
 
 services:
   everclaw:
     image: ghcr.io/everclaw/everclaw:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EVERCLAW_VERSION: "2026.2.23"
     container_name: everclaw
     restart: unless-stopped
     ports:
-      - "8083:8083"
+      - "18789:18789"  # OpenClaw Gateway (web UI)
+      - "8083:8083"    # Morpheus inference proxy
     environment:
-      # Proxy settings
+      # OpenClaw settings
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN:-}
+      # Morpheus proxy settings
       - EVERCLAW_PROXY_PORT=8083
       - EVERCLAW_PROXY_HOST=0.0.0.0
-      - EVERCLAW_AUTH_TOKEN=morpheus-local
-      # Morpheus network settings (set these for P2P staking mode)
+      - EVERCLAW_AUTH_TOKEN=${EVERCLAW_AUTH_TOKEN:-morpheus-local}
+      # Morpheus API Gateway (for cloud inference — get a key at app.mor.org)
+      - MOR_GATEWAY_API_KEY=${MOR_GATEWAY_API_KEY:-}
+      # For P2P staking mode (optional)
       # - MORPHEUS_ROUTER_URL=http://host.docker.internal:8082
       # - ETH_NODE_ADDRESS=https://base-mainnet.public.blastapi.io
+      # - WALLET_PRIVATE_KEY=  # Use Docker secrets in production!
     volumes:
-      # Persist session data across restarts
-      - everclaw-data:/app/data
+      # Persist config and workspace across restarts
+      - ${OPENCLAW_HOME:-~/.openclaw}:/home/node/.openclaw
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8083/health"]
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:18789/health"]
       interval: 30s
       timeout: 10s
-      start_period: 15s
+      start_period: 30s
       retries: 3
-
-volumes:
-  everclaw-data:
