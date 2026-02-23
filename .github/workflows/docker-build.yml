@@ -70,6 +70,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             EVERCLAW_VERSION=${{ steps.version.outputs.VERSION }}
+            OPENCLAW_VERSION=v2026.2.22
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64

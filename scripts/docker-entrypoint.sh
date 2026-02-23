@@ -14,8 +14,10 @@ DEFAULT_CONFIG="${OPENCLAW_HOME}/openclaw-default.json"
 
 # ─── First Run: Scaffold workspace ──────────────────────────────────────────
 
+OPENCLAW_VER=$(node -e "try{console.log(require('/app/package.json').version)}catch{console.log('unknown')}" 2>/dev/null)
 echo "🔧 EverClaw v${EVERCLAW_VERSION:-unknown} — Full Stack Container"
-echo "   OpenClaw Gateway: http://0.0.0.0:18789"
+echo "   OpenClaw:         v${OPENCLAW_VER} (pinned)"
+echo "   Gateway UI:       http://0.0.0.0:18789"
 echo "   Morpheus Proxy:   http://0.0.0.0:${EVERCLAW_PROXY_PORT:-8083}"
 echo ""
 
