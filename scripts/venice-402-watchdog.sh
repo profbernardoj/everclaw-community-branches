@@ -43,6 +43,10 @@ VENICE_402_PATTERNS=(
   "402.*Payment Required"
   "Insufficient.*Diem.*balance"
   "Insufficient.*USD.*balance"
+  "DIEM spend limit exceeded"
+  "diem spend limit exceeded"
+  "API key DIEM spend limit"
+  "reached its configured DIEM spending limit"
 )
 
 # Parse args

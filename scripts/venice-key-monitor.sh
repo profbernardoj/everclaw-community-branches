@@ -77,8 +77,10 @@ except Exception as e:
 probe_balance() {
   local key="$1"
   # Make a minimal inference call and capture response headers
+  local body_file
+  body_file=$(mktemp)
   local headers
-  headers=$(curl -s -o /dev/null -D - \
+  headers=$(curl -s -o "$body_file" -D - \
     --max-time "$PROBE_TIMEOUT" \
     "$VENICE_API" \
     -H "Authorization: Bearer $key" \
@@ -88,10 +90,18 @@ probe_balance() {
 
   local status
   status=$(echo "$headers" | head -1 | grep -oE '[0-9]{3}' | head -1)
+  local body
+  body=$(cat "$body_file" 2>/dev/null)
+  rm -f "$body_file"
 
-  # Check for 402 specifically
+  # Check for 402 specifically — covers both balance depletion and per-key spend limits
   if [[ "$status" == "402" ]]; then
-    echo "0|402"
+    # Distinguish between balance depletion and per-key spend limit
+    if echo "$body" | grep -qi "spend limit"; then
+      echo "0|402_SPEND_LIMIT"
+    else
+      echo "0|402"
+    fi
     return 0
   fi
 
@@ -268,7 +278,11 @@ main() {
     if [[ "$is_depleted" == "yes" ]]; then
       depleted=$((depleted + 1))
       state_json="${state_json}false}"
-      log "DEPLETED: $profile_id — ${balance_float} DIEM (below threshold ${DIEM_THRESHOLD})"
+      if [[ "$status" == "402_SPEND_LIMIT" ]]; then
+        log "SPEND_LIMIT: $profile_id — per-key DIEM spending limit reached (account may still have balance)"
+      else
+        log "DEPLETED: $profile_id — ${balance_float} DIEM (below threshold ${DIEM_THRESHOLD})"
+      fi
 
       if [[ -z "$STATUS_ONLY" ]]; then
         local disable_result
