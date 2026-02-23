@@ -8,8 +8,11 @@
 #   18789 — OpenClaw Gateway (web UI + API)
 #   8083  — Morpheus inference proxy (OpenAI-compatible)
 #
-# Build:
+# Build (uses pinned OpenClaw version):
 #   docker build -t ghcr.io/everclaw/everclaw:latest .
+#
+# Build with specific OpenClaw version:
+#   docker build --build-arg OPENCLAW_VERSION=v2026.2.22 -t ghcr.io/everclaw/everclaw:latest .
 #
 # Run:
 #   docker run -d \
@@ -28,8 +31,14 @@
 #   WALLET_PRIVATE_KEY      — For local P2P staking (optional, use secrets in production)
 
 # ─── Stage 1: Build OpenClaw ─────────────────────────────────────────────────
+# Pin OpenClaw version for reproducible builds.
+# Update this when upgrading to a new release.
+
+ARG OPENCLAW_VERSION=v2026.2.22
 
 FROM node:22-bookworm AS openclaw-builder
+
+ARG OPENCLAW_VERSION
 
 # Install Bun (required for OpenClaw build scripts)
 RUN curl -fsSL https://bun.sh/install | bash
@@ -39,13 +48,14 @@ RUN corepack enable
 
 WORKDIR /openclaw
 
-# Clone OpenClaw source
-RUN git clone --depth 1 https://github.com/openclaw/openclaw.git . && \
+# Clone pinned OpenClaw release (not latest — intentional)
+RUN git clone --depth 1 --branch ${OPENCLAW_VERSION} https://github.com/openclaw/openclaw.git . && \
     rm -rf .git
 
-# Install dependencies
+# Copy EverClaw skill into build context
 COPY --chown=node:node . /everclaw-skill
 
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Build gateway + UI
