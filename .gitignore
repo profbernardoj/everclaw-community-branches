@@ -2,3 +2,14 @@
 node_modules/
 *.log
 CLAUDE.md
+
+# Personal/private files — NEVER commit
+memory/
+MEMORY.md
+USER.md
+IDENTITY.md
+HEARTBEAT.md
+AGENTS.md
+SOUL.md
+TOOLS.md
+avatars/
