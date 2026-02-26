@@ -65,7 +65,7 @@ This runs automatically on every `git push` across ALL repos on this machine.
 - Can be bypassed with `git push --no-verify` (use with extreme caution)
 
 ### 5. Agent Integration
-The agent (Bernardo) should call `pii_scan` before external actions:
+The agent should call `pii_scan` before external actions:
 
 ```bash
 # Scan a file
