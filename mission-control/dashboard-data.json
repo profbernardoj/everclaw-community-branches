@@ -183,12 +183,12 @@
     {
       "date": "2026-02-25",
       "title": "Conversation Summary",
-      "desc": "assistant: Now fix `192.168.1.100` in PicoClaw: assistant: Now run a full re-scan to verify everything is clean: assistant: All clean. Venice key refs are all placeholders (`YOUR_KEY_HERE`, `YOUR_PRIM"
+      "desc": "assistant: Now fix `[REDACTED_IP]` in PicoClaw: assistant: Now run a full re-scan to verify everything is clean: assistant: All clean. Venice key refs are all placeholders (`YOUR_KEY_HERE`, `YOUR_PRIM"
     },
     {
       "date": "2026-02-25",
       "title": "Conversation Summary",
-      "desc": "assistant: ✅ New session started · model: venice/claude-opus-4-6 user: Switch to this Venice Key #2 VENICE-INFERENCE-KEY-[REDACTED]"
+      "desc": "assistant: ✅ New session started · model: venice/claude-opus-4-6 user: Switch to this Venice Key #2 [KEY_REDACTED]"
     },
     {
       "date": "2026-02-25",
@@ -253,7 +253,7 @@
     {
       "date": "2026-02-25",
       "title": "Venice Key Cleanup",
-      "desc": "David manually verified Venice key balances — only 2 of 6 keys had DIEM Key 1: VENICE-INFERENCE-KEY-[REDACTED] — 98 DIEM staked Key 2: VENICE-INFERENCE-KEY-PnID5u0lyTuJ"
+      "desc": "David manually verified Venice key balances — only 2 of 6 keys had DIEM Key 1: [KEY_REDACTED] — 98 DIEM staked Key 2: VENICE-INFERENCE-KEY-PnID5u0lyTuJ"
     },
     {
       "date": "2026-02-25",
@@ -268,7 +268,7 @@
     {
       "date": "2026-02-25",
       "title": "Venice Key Rotation — Exposed Key Replaced",
-      "desc": "Old key1 (VENICE-INFERENCE-KEY-[REDACTED]) was exposed in EverClaw org repo David provided new key: VENICE-INFERENCE-KEY-[REDACTED] Repl"
+      "desc": "Old key1 ([KEY_REDACTED]) was exposed in EverClaw org repo David provided new key: [KEY_REDACTED] Repl"
     },
     {
       "date": "2026-02-25",
