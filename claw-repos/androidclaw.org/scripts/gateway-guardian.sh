@@ -41,7 +41,9 @@ run_with_timeout() {
 # ─── Configuration ───────────────────────────────────────────────────────────
 GATEWAY_PORT="${OPENCLAW_GATEWAY_PORT:-18789}"
 GATEWAY_URL="http://127.0.0.1:${GATEWAY_PORT}/"
-LAUNCHD_LABEL="ai.openclaw.gateway"
+# Auto-detect the active OpenClaw service label (gateway vs node naming varies by version)
+LAUNCHD_LABEL="${OPENCLAW_LAUNCHD_LABEL:-$(launchctl list 2>/dev/null | grep -o 'ai\.openclaw\.\(gateway\|node\)' | head -1)}"
+LAUNCHD_LABEL="${LAUNCHD_LABEL:-ai.openclaw.gateway}"  # fallback if detection fails
 LOG_FILE="$HOME/.openclaw/logs/guardian.log"
 STATE_FILE="$HOME/.openclaw/logs/guardian.state"
 INFERENCE_STATE_FILE="$HOME/.openclaw/logs/guardian-inference.state"
