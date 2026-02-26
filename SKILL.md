@@ -28,6 +28,34 @@ metadata:
         storage: "openclaw.json providers config"
         required: false
         description: "Free API key from app.mor.org. Community bootstrap key included for initial setup."
+    install:
+      method: "git clone (recommended) or clawhub install everclaw-inference"
+      note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
+    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security", "three-shifts", "task-planning"]
+dependencies:
+  clawhub:
+    - slug: skillguard
+      required: true
+      description: "Security scanner for skill packages — scans before install"
+    - slug: prompt-guard
+      required: true
+      description: "Prompt injection defense with HiveFence network"
+    - slug: bagman
+      required: false
+      description: "Secure key management for agent wallets"
+  github:
+    - repo: profbernardoj/everclaw
+      path: skills/pii-guard
+      required: true
+      description: "PII leak prevention — blocks personal data in outbound actions"
+    - repo: profbernardoj/everclaw
+      path: skills/three-shifts
+      required: false
+      description: "Cyclic shift execution engine — 3x daily task planning and 15-min execution cycles"
+    - repo: profbernardoj/everclaw
+      path: skills/relationships
+      required: false
+      description: "Relationship CRM for tracking people and connections"
     network:
       outbound:
         - host: "api.mor.org"
