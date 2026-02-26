@@ -29,3 +29,14 @@ smartagent/config/AGENTS.md
 smartagent/config/SOUL.md
 smartagent/config/HEARTBEAT.md
 smartagent/config/BOOTSTRAP.md
+.pii-patterns.json
+
+# Temporary files
+answers-msg*.txt
+
+# Temporary files
+report.txt
+
+# Temporary files
+answers-msg*.txt
+scripts/workspace-pii-remediation.sh

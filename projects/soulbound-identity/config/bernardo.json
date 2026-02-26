@@ -1,0 +1,16 @@
+{
+  "name": "Bernardo",
+  "description": "Business & engineering agent for decentralized AI infrastructure. Manages EverClaw, SmartAgent, and Morpheus/Based AI integration. Ships code, handles repos, enforces security.",
+  "image": "",
+  "workspacePath": "~/.openclaw/workspace",
+  "ownerAddress": "",
+  "agentId": null,
+  "chainId": "8453",
+  "soulbound": {
+    "locked": true,
+    "standard": "ERC-5192"
+  },
+  "services": [],
+  "supportedTrust": ["reputation"],
+  "notes": "Current unified agent — will evolve into Agentic AI Agent after separation"
+}

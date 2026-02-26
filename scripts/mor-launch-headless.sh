@@ -22,10 +22,10 @@ fi
 WALLET_KEY=""
 
 # Method 1: 1Password service account
-OP_TOKEN=$(security find-generic-password -a "bernardo-agent" -s "op-service-account-token" -w 2>/dev/null || true)
+OP_TOKEN=$(security find-generic-password -a "AGENT_USER" -s "op-service-account-token" -w 2>/dev/null || true)
 if [[ -n "$OP_TOKEN" ]]; then
   export OP_SERVICE_ACCOUNT_TOKEN="$OP_TOKEN"
-  WALLET_KEY=$(op item get "Base Session Key" --vault "Bernardo Agent Vault" --fields "Private Key" --reveal 2>/dev/null || true)
+  WALLET_KEY=$(op item get "Base Session Key" --vault "AGENT_VAULT" --fields "Private Key" --reveal 2>/dev/null || true)
 fi
 
 # Method 2: macOS Keychain (everclaw-wallet.mjs stores keys here)
