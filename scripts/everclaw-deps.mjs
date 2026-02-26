@@ -121,8 +121,13 @@ function parseFrontmatter(content) {
     for (const part of parts) {
       const item = {};
       for (const line of part.split('\n')) {
-        const kv = line.match(/^\s*(\w+):\s*["']?([^"'\n]+?)["']?\s*$/);
-        if (kv) item[kv[1]] = kv[2];
+        const kv = line.match(/^\s*(\w+):\s*(.+?)\s*$/);
+        if (kv) {
+          let val = kv[2];
+          // Strip surrounding quotes
+          val = val.replace(/^["']|["']$/g, '');
+          item[kv[1]] = val;
+        }
       }
       if (Object.keys(item).length) items.push(item);
     }
@@ -140,8 +145,12 @@ function parseFrontmatter(content) {
     const clawhubBlock = depsBlock.substring(start, end);
     for (const item of parseItems(clawhubBlock)) {
       if (item.slug) {
+        const aliases = item.aliases
+          ? item.aliases.replace(/[\[\]"' ]/g, '').split(',').filter(Boolean)
+          : [];
         result.dependencies.clawhub.push({
           slug: item.slug,
+          aliases,
           version: item.version || null,
           required: item.required === 'false' ? false : true,
           description: item.description || '',
@@ -315,7 +324,9 @@ function main() {
   const present = [];
 
   for (const dep of clawhubDeps) {
-    if (installed[dep.slug] || isSkillInstalled(workspace, dep.slug)) {
+    const slugsToCheck = [dep.slug, ...(dep.aliases || [])];
+    const found = slugsToCheck.some(s => installed[s] || isSkillInstalled(workspace, s));
+    if (found) {
       present.push({ ...dep, source: 'clawhub' });
     } else {
       missing.push({ ...dep, source: 'clawhub' });
