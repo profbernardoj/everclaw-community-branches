@@ -61,7 +61,28 @@ metadata:
     install:
       method: "git clone (recommended) or clawhub install everclaw-inference"
       note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
-    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security"]
+    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security", "android", "termux"]
+dependencies:
+  clawhub:
+    - slug: everclaw-inference
+      aliases: ["everclaw"]
+      required: true
+      description: "Core EverClaw inference skill — Morpheus decentralized AI"
+    - slug: skillguard
+      required: true
+      description: "Security scanner for skill packages"
+    - slug: prompt-guard
+      required: true
+      description: "Prompt injection defense"
+  github:
+    - repo: profbernardoj/everclaw
+      path: skills/pii-guard
+      required: true
+      description: "PII leak prevention"
+    - repo: profbernardoj/everclaw
+      path: skills/three-shifts
+      required: false
+      description: "Cyclic shift execution engine"
 ---
 
 <!-- ─── AGENT INSTRUCTIONS (read by OpenClaw agents) ─────────────── -->
