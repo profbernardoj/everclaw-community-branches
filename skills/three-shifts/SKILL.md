@@ -34,7 +34,7 @@ shifts/
 
 ```markdown
 # Afternoon Shift — 2026-02-22
-Approved by: David | Approved at: 2:15 PM CST
+Approved by: {{USER}} | Approved at: 2:15 PM CST
 Shift window: 2:00 PM – 10:00 PM CST
 Cycles remaining: ~30
 
@@ -73,7 +73,7 @@ Next target: Step 1.2
 - macOS arm64, OpenClaw 2026.2.21-2
 - Git repos: ~/.openclaw/workspace, ~/morpheus
 - 1Password for secrets (never store raw keys)
-- Signal for user comms
+- Messaging for user comms
 
 ## Constraints
 - Never force push or delete branches
@@ -84,7 +84,7 @@ Next target: Step 1.2
 
 ## Known Pitfalls (learned from experience)
 - Morpheus session_id and model_id must be HTTP headers, not JSON body
-- signal-cli drops connections periodically — not actionable, just retry
+- Messaging clients may drop connections periodically — not actionable, just retry
 - Venice billing cooldown: 1 hour per key on 402
 - Always check git status before committing — avoid partial commits
 
@@ -103,7 +103,7 @@ Next target: Step 1.2
   "status": "executing",
   "startedAt": "2026-02-22T20:00:00Z",
   "approvedAt": "2026-02-22T20:15:00Z",
-  "approvedBy": "David",
+  "approvedBy": "{{USER}}",
   "planModel": "venice/claude-opus-4-6",
   "execModel": "mor-gateway/glm-5",
   "totalSteps": 9,
@@ -223,7 +223,7 @@ When the user responds to a shift plan:
 
 **"Approve" / "Approve all":**
 1. Read `shifts/state.json` — confirm status is `awaiting_approval`
-2. Set `status` to `"executing"`, `approvedAt` to current ISO timestamp, `approvedBy` to `"David"`
+2. Set `status` to `"executing"`, `approvedAt` to current ISO timestamp, `approvedBy` to the user's name
 3. Write updated state.json
 4. The next cycle executor cron (every 15 min) will pick it up automatically
 
@@ -302,7 +302,7 @@ Each cycle is an **isolated session** — no memory of previous cycles except wh
 - **Never ask the user mid-cycle.** If you need user input, mark blocked and note what's needed.
 - **Stay in scope.** The step says "commit skill files" — don't also refactor the README.
 - **Update context.md with lessons.** This is how you teach the next cycle.
-- **Respect quiet hours.** Night cycles: no Signal messages, no external comms.
+- **Respect quiet hours.** Night cycles: no messages, no external comms.
 - **Max 2 steps per cycle.** Leave time for the next cycle to start clean.
 
 ### Handling Blocks
@@ -311,7 +311,7 @@ When a step is blocked:
 1. Mark it `[!]` with a clear reason
 2. Check if the block is:
    - **Dependency block** (step 3 needs step 2's output): Skip, will retry when step 2 clears
-   - **User block** (needs David's input): Note in handoff, skip
+   - **User block** (needs user input): Note in handoff, skip
    - **External block** (API down, service unavailable): Retry next cycle automatically
    - **Error block** (command failed): Log error in context.md, retry with different approach next cycle
 3. Move to the next available `[ ]` step
@@ -361,7 +361,7 @@ When all steps are `[x]`, `[-]`, or `[!]`, OR when the shift window expires:
 
 4. **Update daily log:** Append shift summary to `memory/daily/YYYY-MM-DD.md`
 
-5. **Notify user** (morning/afternoon only): Brief summary via Signal
+5. **Notify user** (morning/afternoon only): Brief summary via messaging
    - Night shift: write summary but don't ping until morning planning cron
 
 ---
@@ -372,7 +372,7 @@ When all steps are `[x]`, `[-]`, or `[!]`, OR when the shift window expires:
 
 ```
 Name: three-shifts-plan-morning
-Schedule: cron 0 6 * * * (America/Chicago)
+Schedule: cron 0 6 * * * ({{TIMEZONE}})
 Model: venice/claude-opus-4-6
 Session: isolated
 Message: >
@@ -384,7 +384,7 @@ Message: >
   After approval, decompose all tasks into atomic GLM-5-sized steps and write to shifts/tasks.md.
 
 Name: three-shifts-plan-afternoon
-Schedule: cron 0 14 * * * (America/Chicago)
+Schedule: cron 0 14 * * * ({{TIMEZONE}})
 Model: venice/claude-opus-4-6
 Session: isolated
 Message: >
@@ -395,7 +395,7 @@ Message: >
   After approval, decompose all tasks into atomic GLM-5-sized steps and write to shifts/tasks.md.
 
 Name: three-shifts-plan-night
-Schedule: cron 0 22 * * * (America/Chicago)
+Schedule: cron 0 22 * * * ({{TIMEZONE}})
 Model: venice/claude-opus-4-6
 Session: isolated
 Message: >
@@ -412,7 +412,7 @@ Message: >
 
 ```
 Name: three-shifts-cycle
-Schedule: cron */15 * * * * (America/Chicago)
+Schedule: cron */15 * * * * ({{TIMEZONE}})
 Model: mor-gateway/glm-5
 Session: isolated
 Message: >
