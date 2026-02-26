@@ -1,0 +1,67 @@
+{
+  "_description": "Master roster of all agents to be registered on-chain",
+  "_owner": "EverClaw Contributor",
+  "_soulbound": "All agents — ERC-5192 locked, non-transferable",
+  "_chain": "Base (8453)",
+  "_status": "PRE-REGISTRATION — awaiting agent separation",
+
+  "business": {
+    "host": "Mac Mini #1",
+    "agents": [
+      {
+        "name": "Web3 Agent",
+        "slug": "web3-agent",
+        "previousName": "MorpheusAI Agent",
+        "description": "Morpheus ecosystem specialist. Decentralized inference, MOR token strategy, node operations, and Web3 infrastructure.",
+        "role": "coordinator",
+        "subAgents": ["marketing", "sales", "coding"]
+      },
+      {
+        "name": "Agentic AI Agent",
+        "slug": "agentic-ai-agent",
+        "previousName": "EverClaw Agent (Bernardo)",
+        "description": "Agentic AI development lead. EverClaw skill ecosystem, 28 flavors, ClawHub, OpenClaw configuration, and agent infrastructure.",
+        "role": "coordinator",
+        "subAgents": ["marketing", "sales", "coding"]
+      },
+      {
+        "name": "Corporate Agent",
+        "slug": "corporate-agent",
+        "previousName": "BasedAI Agent",
+        "description": "Corporate and enterprise operations. Based AI commercial layer, enterprise partnerships, and business development.",
+        "role": "coordinator",
+        "subAgents": ["marketing", "sales", "coding"]
+      },
+      {
+        "name": "Advisor Agent",
+        "slug": "advisor-agent",
+        "previousName": null,
+        "description": "External advisory agent. Supports advisory work with external projects, due diligence, strategy consulting, and partnership evaluation.",
+        "role": "standalone"
+      },
+      {
+        "name": "David Agent",
+        "slug": "david-agent",
+        "previousName": null,
+        "description": "Public-facing David clone. Trained on historical emails and public knowledge to represent the user's voice, tone, and perspective in public discussions.",
+        "role": "standalone",
+        "trainingStatus": "NOT_STARTED",
+        "trainingTarget": "March 2026",
+        "trainingData": ["historical emails", "public content", "meeting notes"]
+      }
+    ]
+  },
+
+  "personal": {
+    "host": "Mac Mini #2",
+    "agents": [
+      { "name": "David Personal Agent", "slug": "david-personal", "description": "the user's personal AI assistant. Calendar, family coordination, personal tasks." },
+      { "name": "[REDACTED] Personal Agent", "slug": "cayla-personal", "description": "[REDACTED]'s personal AI assistant." },
+      { "name": "[REDACTED] Personal Agent", "slug": "savannah-personal", "description": "Savannah's personal AI assistant." },
+      { "name": "[REDACTED] Personal Agent", "slug": "sydney-personal", "description": "Sydney's personal AI assistant." },
+      { "name": "[REDACTED] Personal Agent", "slug": "sofia-personal", "description": "Sofia's personal AI assistant." },
+      { "name": "Daniel Personal Agent", "slug": "daniel-personal", "description": "Daniel's personal AI assistant." },
+      { "name": "[REDACTED] Personal Agent", "slug": "leia-personal", "description": "Leia's personal AI assistant." }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "gate": {
+    "autoAllowThreshold": 80,
+    "reviewThreshold": 50,
+    "blockThreshold": 0,
+    "requireApprovalForAll": true
+  },
+  "ledger": {
+    "mdPath": "~/.openclaw/workspace/memory/reference/approved-skills.md",
+    "jsonPath": "~/.openclaw/workspace/.skillguard-ledger.json"
+  },
+  "scan": {
+    "enableFlowAnalysis": true,
+    "enableDiffScan": true,
+    "maxFileSize": 1048576
+  }
+}

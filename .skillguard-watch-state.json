@@ -1,0 +1,59 @@
+{
+  "lastRunAt": "2026-02-25T09:01:43.057Z",
+  "skills": {
+    "bagman": {
+      "hash": "232b12718e70c7c6b4f47c3b5110e3042659c84cd38d2ac4b911fffe84fd2d29",
+      "score": 0,
+      "findingsCount": 78,
+      "lastScannedAt": "2026-02-24T01:37:48.434Z"
+    },
+    "clawdstrike": {
+      "hash": "70cd55966c9885aed224cd8666b281e309495e7bce2d8757fe795036c386a363",
+      "score": 0,
+      "findingsCount": 27,
+      "lastScannedAt": "2026-02-24T01:37:48.445Z"
+    },
+    "everclaw": {
+      "hash": "b5a8568d2100aab05088b4050d6735f2d077c3e0c1c7197f91ace3495cd212f9",
+      "score": 0,
+      "findingsCount": 21788,
+      "lastScannedAt": "2026-02-25T09:01:43.012Z"
+    },
+    "night-shift": {
+      "hash": "f55a7d88215ca8d06cf3fa33be3303d47de538ea6754d6c12d621dbe49fd4348",
+      "score": 95,
+      "findingsCount": 3,
+      "lastScannedAt": "2026-02-24T01:37:51.355Z"
+    },
+    "pii-guard": {
+      "hash": "0bf0ea3d8e53259e2919bf8603a196a519649005d48027c16cd372f8b823dc82",
+      "score": 94,
+      "findingsCount": 9,
+      "lastScannedAt": "2026-02-24T01:37:51.356Z"
+    },
+    "prompt-guard": {
+      "hash": "6b89af2b20c27aa267d2db6e8cd68267fae1a7f0b66f975a42d7b4209e444ec7",
+      "score": 0,
+      "findingsCount": 95,
+      "lastScannedAt": "2026-02-24T01:37:51.371Z"
+    },
+    "relationships": {
+      "hash": "ebcd555b19febc2a0b5bddcd30dac563c617706b1449448ed9ebf2ba3e5a4772",
+      "score": 75,
+      "findingsCount": 7,
+      "lastScannedAt": "2026-02-24T01:37:51.374Z"
+    },
+    "skillguard": {
+      "hash": "fde80d7b9c501ad2bee3eaaee36b94983d0ed68aca1362cdfc69979524ba436e",
+      "score": 0,
+      "findingsCount": 380,
+      "lastScannedAt": "2026-02-25T09:01:43.056Z"
+    },
+    "three-shifts": {
+      "hash": "60cdbe8e0c668d58483176b66f07eb7cbfc7858088ba3e4e861e136752b123f8",
+      "score": 98,
+      "findingsCount": 2,
+      "lastScannedAt": "2026-02-24T01:37:51.406Z"
+    }
+  }
+}

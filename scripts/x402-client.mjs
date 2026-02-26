@@ -86,12 +86,12 @@ function getPrivateKey() {
 
   try {
     const token = execSync(
-      'security find-generic-password -a "bernardo-agent" -s "op-service-account-token" -w',
+      'security find-generic-password -a "AGENT_USER" -s "op-service-account-token" -w',
       { encoding: "utf-8", timeout: 5000 }
     ).trim();
 
     const key = execSync(
-      `OP_SERVICE_ACCOUNT_TOKEN=${token} op item get "Base Session Key" --vault "Bernardo Agent Vault" --fields "Private Key" --reveal`,
+      `OP_SERVICE_ACCOUNT_TOKEN=${token} op item get "Base Session Key" --vault "AGENT_VAULT" --fields "Private Key" --reveal`,
       { encoding: "utf-8", timeout: 10000, env: { ...process.env, OP_SERVICE_ACCOUNT_TOKEN: token } }
     ).trim();
 

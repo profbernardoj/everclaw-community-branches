@@ -1,125 +1,139 @@
-# Night Shift — 2026-02-22 (10 PM – 6 AM CST)
-Auto-approved: All tasks pre-approved from today's session. Research + documentation only.
+# Night Shift — 2026-02-26 (10 PM – 6 AM CST)
 Exec model: GLM-5 | Plan model: Claude Opus 4.6 | ~32 cycles available
 
 ---
 
-## Task 1: Research AppFactory for EverClaw Mobile App [P2] ✅
+## STATUS: AWAITING APPROVAL
 
-### Summary
-Total steps: 5 | Done: 5 | Blocked: 0 | Remaining: 0
-Recommendation: Capacitor for MVP (2-3 weeks), React Native later if needed
-Output: `memory/projects/everclaw/mobile-app-research.md`
-
-### Step 1.1: Fetch AppFactory README and docs [x]
-- `web_fetch` https://raw.githubusercontent.com/0xAxiom/AppFactory/main/README.md (full)
-- `web_fetch` https://raw.githubusercontent.com/0xAxiom/AppFactory/main/QUICKSTART.md
-- `web_fetch` https://api.github.com/repos/0xAxiom/AppFactory/contents/app-factory (list directory)
-- Write raw content to `/tmp/appfactory-docs.md` for reference in next steps
-- **Expected output:** Combined markdown of all docs in /tmp/appfactory-docs.md — DONE (cycle 1): Fetched README, QUICKSTART, directory listing; wrote 5.7KB summary to /tmp/appfactory-docs.md
-
-### Step 1.2: Fetch AppFactory skill files and deeper docs [x]
-- From the directory listing in step 1.1, identify key files (SKILL.md, package.json, config files)
-- `web_fetch` each key file (max 4 fetches)
-- Append content to `/tmp/appfactory-docs.md`
-- **Expected output:** Complete documentation dump — DONE (cycle 2): Fetched app-factory/CLAUDE.md (29KB skill constitution), appended key excerpts to docs
-
-### Step 1.3: Analyze AppFactory capabilities and assess App Store readiness [x]
-- Read `/tmp/appfactory-docs.md`
-- Assess: What does it generate? (Expo project? bare React Native? just UI?)
-- Assess: How close to App Store/Play Store ready? What manual steps remain?
-- Assess: Does it support push notifications, native modules, custom APIs?
-- Assess: Security considerations (SkillGuard scan needed before install)
-- Write analysis to `memory/projects/everclaw/mobile-app-research.md` under "## AppFactory Analysis"
-- **Expected output:** Detailed analysis section written — DONE (cycle 3): Wrote comprehensive analysis (5.4KB) covering output type, store readiness, push support, native modules, API gaps, security, QA system, templates, and limitations for EverClaw
-
-### Step 1.4: Draft EverClaw mobile app spec [x]
-- Read `memory/projects/everclaw/architecture.md` for current EverClaw architecture
-- Read MEMORY.md for context on flavors strategy and mobile app requirements
-- Draft spec with: screens (onboarding, flavor picker, chat, settings), API connections (OpenClaw gateway, Morpheus, Venice), push notifications, cross-platform requirements
-- Requirements from David: onboarding flow, flavor picker, gateway connection, chat interface, settings (Morpheus key, Venice key, MOR staking), push notifications, iOS + Android via Expo
-- Append spec to `memory/projects/everclaw/mobile-app-research.md` under "## EverClaw Mobile App Spec"
-- **Expected output:** Complete app spec section written — DONE (cycle 4): Wrote comprehensive app spec (8KB) covering 4 screens, API integrations, push notifications, security, monetization options, and open questions
-
-### Step 1.5: Write recommendations and next steps [x]
-- Read `memory/projects/everclaw/mobile-app-research.md` (what you wrote so far)
-- Compare AppFactory approach vs Capacitor approach (from Feb 22 research — see memory/daily/2026-02-22.md)
-- Write pros/cons comparison and recommendation
-- Add "## Next Steps" section: what David needs to decide, what SkillGuard checks are needed before install
-- **Expected output:** Completed research doc with recommendation — DONE (cycle 5): Wrote comparison table, pros/cons, recommended Capacitor for MVP with React Native later, outlined next steps and timeline
+**Context:** Tasks carried over from Feb 24-25. Major PII remediation completed Feb 25 but workspace never committed. Multiple cron jobs in error state.
 
 ---
 
-## Task 2: David's 21 Strategic Questions [P3]
+## CARRYOVER TASKS (from Feb 24-25)
 
-All answers go to `memory/daily/2026-02-23-night-answers.md`. Create the file on first step.
-For each question: read MEMORY.md, USER.md, SOUL.md, IDENTITY.md, TOOLS.md, and recent daily files. Give honest, specific, actionable answers referencing real projects, patterns, and decisions. 3-5 sentences each minimum.
+## Task 1: Fix Cron Job Timeouts [P2] [CARRYOVER]
+**Why:** Venice 402 Watchdog (status=running, no timeout, every 5 min) and Disk Usage Monitor (status=error, no timeout) both need explicit timeoutSeconds.
 
-### Step 2.1: Answer Questions 1-3 [x]
-- Read: SOUL.md, USER.md, IDENTITY.md (if exists), TOOLS.md, MEMORY.md
-- Create `memory/daily/2026-02-23-night-answers.md` with header
-- **Q1:** Tools/automations David is missing that would measurably improve operations
-- **Q2:** Assumptions about David that could be wrong and should be vetted
-- **Q3:** What David likely needs next week based on decision patterns
-- Write answers to the file
-- **Expected output:** File created with Q1-Q3 answers — DONE (cycle 6): Created file with 5 specific missing tools (ERC-8004, git sync, Morpheus monitor, ClawBox dashboard, school calendar), 5 assumptions to vet (evening window, delegation boundaries, article relevance, family size, caution level), and 5 next-week priorities (XMTP, Gateway transition, CTA unblocking, $1B tracking, smart contract prep)
+### Step 1.1: Add timeoutSeconds to both cron jobs [ ]
+- Read `~/.openclaw/cron/jobs.json`
+- Find job `63364746-e6bc-45a7-95f0-44bc1f29ba54` (Venice 402 Watchdog) — add `"timeoutSeconds": 180`
+- Find job `88a4609b-87b0-42c0-9c4f-69cb927b7fa3` (Disk Usage Monitor) — add `"timeoutSeconds": 120`
+- Write updated JSON back
+- **Expected output:** Both jobs have explicit timeoutSeconds
 
-### Step 2.2: Answer Questions 4-6 [x]
-- Read relevant context files if needed
-- **Q4:** Skills/capabilities to develop based on where projects are heading
-- **Q5:** Context being lost between sessions that needs fixes
-- **Q6:** Connections between projects/ideas David hasn't made yet
-- Append answers to `memory/daily/2026-02-23-night-answers.md`
-- **Expected output:** Q4-Q6 appended — DONE (cycle 6): Appended 5 skills to develop (XMTP, mobile, smart contracts, x402, ERC-8004), 5 context-loss fixes (project status, cron alerts, meeting notes, config changelog, process lessons), and 5 project connections (TabHR flavors, ERC-8004 reputation for $1B goal, active staking demand, cron-as-a-service, agent stack positioning)
-
-### Step 2.3: Answer Questions 7-9 [x]
-- **Q7:** Recurring friction points that could be eliminated with new workflows
-- **Q8:** Rules to write into identity/skill files based on corrections received
-- **Q9:** Audit of last week's actions — what moved goals forward vs wasted motion
-- Append answers to `memory/daily/2026-02-23-night-answers.md`
-- **Expected output:** Q7-Q9 appended — DONE (cycle 7): Wrote 5 friction points (session startup lag, CTA blockers, cron health visibility, multi-repo sync, git drift), 5 rules to codify (ship-first, reference-before-asking, active protocol use, verify-cached-values, test-on-clean-systems), and week audit (70% forward: memory fix, releases, Docker, x402, three-shifts, mobile research; 30% overhead: Docker iteration, repo recreation, watchdog false positives, shift rewrite, marketing reorg)
-
-### Step 2.4: Answer Questions 10-12
-- **Q10:** Where defaulting to generic output when specific/tailored is possible
-- **Q11:** One compounding system to build that makes every future task faster
-- **Q12:** Repeated errors and guardrails to prevent them
-- Append answers to `memory/daily/2026-02-23-night-answers.md`
-- **Expected output:** Q10-Q12 appended
-
-### Step 2.5: Answer Questions 13-15
-- **Q13:** What to research/prototype based on ecosystem direction
-- **Q14:** Where filling gaps with assumptions instead of flagging them
-- **Q15:** Most valuable underutilized data/pattern in memory files
-- Append answers to `memory/daily/2026-02-23-night-answers.md`
-- **Expected output:** Q13-Q15 appended
-
-### Step 2.6: Answer Questions 16-18
-- **Q16:** Score 1-10 on modeling David's priorities + specific fixes
-- **Q17:** External data sources/feeds that would sharpen decisions
-- **Q18:** What a replacement agent would get wrong — capture knowledge permanently
-- Append answers to `memory/daily/2026-02-23-night-answers.md`
-- **Expected output:** Q16-Q18 appended
-
-### Step 2.7: Answer Questions 19-21
-- **Q19:** Workflows David still does manually that could be automated
-- **Q20:** Parts of current approach that are outdated and need rebuilding
-- **Q21:** Single highest leverage thing in next 24 hours David hasn't asked for
-- Append answers to `memory/daily/2026-02-23-night-answers.md`
-- **Expected output:** Q19-Q21 appended, file complete
+### Step 1.2: Restart gateway and verify [ ]
+- Run: `openclaw gateway restart`
+- Wait 15s, run: `openclaw gateway status` — confirm active
+- Run: `openclaw cron list 2>/dev/null | grep -E "Watchdog|Disk"` — verify jobs present
+- **Expected output:** Gateway restarted, jobs active
 
 ---
 
-## Task 3: Night Maintenance [P3-Autonomous]
+## Task 2: Commit Workspace (PII Remediation Complete) [P2] [CARRYOVER]
+**Why:** 20+ dirty files including PII remediation fixes from Feb 25. Uncommitted work = risk.
+**Night-safe approach:** Stage and commit locally only, push requires morning approval.
 
-### Step 3.1: Memory maintenance — review and update MEMORY.md [~]
-- Read memory/daily/2026-02-23.md and memory/daily/2026-02-22.md
-- Identify items to add/update in MEMORY.md (new projects, completed items, stale entries)
-- Update MEMORY.md: add AppFactory research pointer, add x402 milestone, update active context, move completed items
-- **Expected output:** MEMORY.md updated with current state
+### Step 2.1: Stage workspace changes [ ]
+- Run: `cd ~/.openclaw/workspace && git status --short`
+- Stage all: `git add -A`
+- **Expected output:** All changes staged
+
+### Step 2.2: Create local commit (no push) [ ]
+- Commit: `git commit -m "chore: post-PII-remediation workspace sync
+
+- Updated handoff, tasks, state files
+- mission-control index.html update
+- skillguard CLI updates
+- smartagent gateway scripts
+- submodule commits from flavor repos"`
+- Verify: `git log -1 --oneline`
+- **Expected output:** Commit created locally, NOT pushed
+
+### Step 2.3: Document need for morning push [ ]
+- Append to `memory/daily/2026-02-26.md`: "Git push required — workspace commit ready, needs David approval for push to public repos"
+- **Expected output:** Reminder documented for morning
+
+---
+
+## Task 3: Research MOR Staking vs Credits [P2] [CARRYOVER]
+**Why:** Morpheus beta expires March 1 (3 days). David needs recommendation.
+
+### Step 3.1: Research current pricing and staking info [ ]
+- Run: `web_search "Morpheus MOR token staking API credits 2026"` (wait 3s)
+- Run: `web_fetch https://mor.org` for pricing details
+- Check proxy-router logs for session cost data from Feb (if accessible)
+- Document findings in `memory/projects/morpheus/gateway-transition-plan.md`
+- **Expected output:** Pricing data collected
+
+### Step 3.2: Write recommendation section [ ]
+- Append "## Cost Recommendation" to transition plan
+- Include: cost comparison, staking info, urgency (3 days), recommended approach
+- **Expected output:** Clear recommendation ready for morning review
+
+---
+
+## Task 4: Agent Architecture Prep Checklist [P3] [CARRYOVER]
+**Why:** Architecture work planned for this week. David needs ready checklist.
+
+### Step 4.1: Create setup checklist [ ]
+- Create `memory/projects/agent-architecture-setup.md` if not exists
+- Document: Business Mac Mini #1 (5 agents), Personal Mac Mini #2 (7 agents)
+- List: 12 soulbound NFTs, ERC-8004 registration, ERC-6551 TBAs
+- Note: Code already written (hash-identity.mjs, registration-builder.mjs, chain-client.mjs)
+- Include: Current blockers (Morpheus Gateway key not working, Venice DIEM timing)
+- **Expected output:** Complete checklist ready for David
+
+---
+
+## Task 5: Daily Log & Memory Maintenance [P3]
+
+### Step 5.1: Create today's daily log [ ]
+- Create `memory/daily/2026-02-26.md`
+- Document: Night shift activity, cron timeout fixes, MOR research, agent prep
+- **Expected output:** Daily log started
+
+### Step 5.2: Archive old shift file [ ]
+- Archive `shifts/tasks.md` to `shifts/history/2026-02-25-night.md`
+- **Expected output:** Old shift archived
+
+### Step 5.3: Update MEMORY.md active context [ ]
+- Remove stale items (Morpheus beta now 3 days, not 6)
+- Update completed items (PII remediation done, 41 repos cleaned)
+- Update open items (add cron job errors)
+- **Expected output:** MEMORY.md current
+
+---
+
+## Task 6: Proactive Issue Scan [P3] [STANDING]
+**Why:** Standing night task — leave the workspace slightly better than we found it.
+
+### Step 6.1: Diagnose error-state cron jobs [ ]
+- List all error jobs: Daily GitHub PR Check, Morning X Briefing, Finance Tracker, Disk Usage Monitor, Capabilities Report, Weekly Goals
+- Check one: `openclaw cron logs be4215d6-0c51-4d9f-8ab2-cba2ed2cfcfa` (Morning X Briefing)
+- Identify pattern: Are all using Morpheus Gateway which is failing?
+- Document findings in `memory/daily/2026-02-26.md`
+- **Expected output:** Root cause identified or flagged for morning
 
 ---
 
 ## Summary
-Total steps: 13 | Tasks: 3 (1 P2, 1 P3, 1 P3-auto)
-Estimated cycles: ~10-13 (some steps may complete in same cycle)
-All steps are research, writing, or memory maintenance — fully night-safe.
+| Priority | Task | Steps | Est. Cycles | Source |
+|----------|------|-------|-------------|--------|
+| P2 | Fix cron job timeouts | 2 | 2-3 | Carryover |
+| P2 | Commit workspace (local only) | 3 | 3-4 | Carryover |
+| P2 | Research MOR staking vs credits | 2 | 2-3 | Carryover |
+| P3 | Agent architecture prep | 1 | 1-2 | Carryover |
+| P3 | Daily log & memory maintenance | 3 | 3-4 | Maintenance |
+| P3 | Proactive issue scan (cron errors) | 1 | 1-2 | Standing |
+
+Total steps: 12 | Estimated: 12-16 cycles | Buffer: 16-20 cycles
+
+---
+
+## Night Rules Enforced
+- ✅ NO external communications (Signal, email, social)
+- ✅ NO financial transactions
+- ✅ NO destructive operations (rm -rf, force push)
+- ✅ NO security changes (key rotation, permissions)
+- ✅ Git push held for morning approval
+- ✅ Research and documentation only
