@@ -8,7 +8,7 @@
 | Afternoon | 2:00 PM | 2:15 PM | 2 PM – 10 PM | 30 min |
 | Night | 10:00 PM | 10:15 PM | 10 PM – 6 AM | Auto-approve carryover; 15 min for new tasks |
 
-All times in user's local timezone (America/Chicago).
+All times in user's local timezone ({{TIMEZONE}}).
 
 ## Models
 
