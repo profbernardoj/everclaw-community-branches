@@ -18,7 +18,7 @@ bash setup.sh
 
 ```bash
 # Set the proxy host IP
-export PROXY_HOST=192.168.1.100  # your proxy host's IP
+export PROXY_HOST=YOUR_PROXY_HOST  # your proxy host's IP
 
 # Run setup (skips proxy install, only patches PicoClaw config)
 bash setup.sh
@@ -27,7 +27,7 @@ bash setup.sh
 ### Verify from the edge device
 
 ```bash
-curl http://192.168.1.100:8083/health
+curl http://YOUR_PROXY_HOST:8083/health
 picoclaw agent -m "Hello from Morpheus"
 ```
 
@@ -44,6 +44,6 @@ picoclaw agent -m "Hello from Morpheus"
 pkg install nodejs git curl
 
 # Set proxy host (assuming proxy runs on your home server)
-export PROXY_HOST=192.168.1.100
+export PROXY_HOST=YOUR_PROXY_HOST
 bash setup.sh
 ```

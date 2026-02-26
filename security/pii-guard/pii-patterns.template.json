@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "description": "PII Guard V2 patterns. Edit with YOUR protected data. NEVER commit this file.",
+  "updated": "",
+
+  "names": [
+    "YOUR FULL NAME HERE",
+    "SPOUSE FULL NAME",
+    "CHILD FULL NAME"
+  ],
+
+  "first_names": [
+    "YourFirstName",
+    "SpouseFirstName",
+    "ChildFirstName"
+  ],
+
+  "emails": [
+    "your-personal@email.com",
+    "your-work@email.com"
+  ],
+
+  "phones": [
+    "+1XXXXXXXXXX",
+    "XXX-XXX-XXXX"
+  ],
+
+  "wallets": [
+    "0xYOUR_PERSONAL_WALLET_ADDRESS_HERE"
+  ],
+
+  "organizations": [
+    "Your Church or School",
+    "Your Employer"
+  ],
+
+  "people": [
+    "Business Contact Name",
+    "Associate Name"
+  ],
+
+  "websites": [
+    "your-personal-site.com"
+  ],
+
+  "location_signals": [
+    "Your City Name",
+    "Your School District",
+    "Your Neighborhood"
+  ],
+
+  "keywords": [
+    "any other sensitive string"
+  ],
+
+  "regex": [
+    "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+    "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+  ],
+
+  "blocked_paths": [
+    "memory/daily/",
+    "memory/reference/"
+  ]
+}

@@ -25,7 +25,7 @@ Edit `~/.picoclaw/config.json`:
 
 If the proxy runs on a different device, update `api_base` in all model entries:
 ```json
-{ "api_base": "http://192.168.1.100:8083/v1" }
+{ "api_base": "http://YOUR_PROXY_HOST:8083/v1" }
 ```
 
 ## Troubleshooting

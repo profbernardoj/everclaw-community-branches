@@ -1,0 +1,28 @@
+{
+  "_description": "BookingClaw cron jobs",
+  "_flavor": "bookingclaw",
+  "jobs": [
+    {
+      "name": "Price Watch Check",
+      "description": "Check tracked flights and hotels for price changes",
+      "schedule": { "kind": "cron", "expr": "0 8 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Check all active price watches in memory/travel/price-watches.md. For each watched route or hotel, search current pricing and compare to last recorded price. Alert on any drop >10% or if a price is approaching the budget threshold. Update the watch file with today's prices. If no active watches, just confirm and skip."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Trip Countdown",
+      "description": "Reminders for upcoming trips as they approach",
+      "schedule": { "kind": "cron", "expr": "0 9 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Check memory/travel/ for upcoming trips. For trips within 14 days: summarize what's confirmed and what's still pending. For trips within 72 hours: generate a pre-trip checklist (documents, packing, check-in status, weather at destination, ground transport). For trips within 24 hours: check-in reminder and final details. If no upcoming trips, skip."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

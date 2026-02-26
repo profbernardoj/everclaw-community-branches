@@ -1,0 +1,39 @@
+{
+  "_description": "BitcoinClaw cron jobs",
+  "_flavor": "bitcoinclaw",
+  "jobs": [
+    {
+      "name": "Morning Bitcoin Briefing",
+      "description": "Daily overview of Bitcoin price, network, and developments",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily Bitcoin briefing. Include: 1) Current BTC price in USD and sats/dollar, 24h change. 2) Mempool status — congestion level, recommended fees for low/medium/high priority. 3) Network stats — latest block height, hashrate trend, days until next difficulty adjustment. 4) Any notable Bitcoin news in the last 24h (protocol developments, regulatory, institutional adoption). 5) Halving countdown update. Keep it tight — data first, commentary minimal."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "DCA Reminder",
+      "description": "Reminder to execute DCA buy (if enabled)",
+      "schedule": { "kind": "cron", "expr": "0 9 * * 1", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "DCA reminder. Check TOOLS.md for DCA settings. If DCA is enabled, remind me it's time to stack. Include: current BTC price, how this compares to my DCA average (if tracked in memory/bitcoin/), and cumulative sats stacked so far. If DCA is disabled, skip."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Network Report",
+      "description": "Deep weekly look at Bitcoin network metrics",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Bitcoin network report. 1) Price: weekly high/low/close and percent change. 2) Network: hashrate trend, difficulty adjustment recap or preview, blocks mined. 3) Mempool: average fees this week vs last. 4) Lightning Network: capacity changes if data available. 5) Development: any notable BIPs, Core releases, or protocol discussions. 6) On-chain: any notable large transactions or whale movements in the news."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

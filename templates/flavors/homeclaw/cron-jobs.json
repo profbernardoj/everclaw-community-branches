@@ -1,0 +1,39 @@
+{
+  "_description": "HomeClaw cron jobs",
+  "_flavor": "homeclaw",
+  "jobs": [
+    {
+      "name": "Morning Home Status",
+      "description": "Quick morning overview of home systems",
+      "schedule": { "kind": "cron", "expr": "0 6 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Morning home status check. 1) All devices online? Flag any offline or low-battery. 2) Indoor temperature and overnight energy usage if available. 3) Today's weather — should windows be opened or HVAC adjusted? 4) Any maintenance items due this week (check TOOLS.md schedule). 5) Security status — all doors locked, cameras operational. Keep it brief — only flag things that need attention."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Energy Weekly Report",
+      "description": "Weekly energy usage summary and optimization suggestions",
+      "schedule": { "kind": "cron", "expr": "0 9 * * 0", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate weekly energy report. If energy monitoring data is available: 1) Total usage this week vs last week. 2) Peak usage times. 3) Any anomalies or waste detected (lights left on, HVAC running unnecessarily). 4) Suggestions for optimization. If no energy data available, check device health and maintenance schedule instead."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Maintenance Reminder",
+      "description": "Monthly check on scheduled maintenance items",
+      "schedule": { "kind": "cron", "expr": "0 10 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Monthly maintenance check. Review the maintenance schedule in TOOLS.md. Flag any items that are due or overdue this month (HVAC filters, smoke detector batteries, water filters, etc.). Present as a simple checklist with last-replaced dates and days until due."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

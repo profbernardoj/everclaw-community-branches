@@ -1,0 +1,39 @@
+{
+  "_description": "FamilyClaw cron jobs",
+  "_flavor": "familyclaw",
+  "jobs": [
+    {
+      "name": "Morning Family Briefing",
+      "description": "What's happening today for the family",
+      "schedule": { "kind": "cron", "expr": "0 6 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate the family morning briefing. Include: 1) Today's calendar for all family members — school events, activities, appointments. 2) Any special items needed today (forms, costumes, packed lunch, etc.). 3) Weather summary — do kids need jackets/umbrellas? 4) Today's meal plan if active. 5) Any reminders from memory/family-tasks.md. Keep it warm and practical — this goes to the family group chat."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Sunday Weekly Preview",
+      "description": "Preview of the upcoming week for the family",
+      "schedule": { "kind": "cron", "expr": "0 19 * * 0", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate the weekly family preview. Include: 1) Day-by-day summary of the week ahead — school events, activities, appointments for everyone. 2) Any early dismissals or days off school. 3) Meal plan for the week if active. 4) Chore rotation for the week. 5) Any upcoming birthdays, deadlines, or events to prepare for. 6) Grocery needs if a shopping trip is planned. Keep it organized and easy to scan."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "After-School Reminder",
+      "description": "Afternoon reminder for pickups and activities",
+      "schedule": { "kind": "cron", "expr": "0 14 * * 1-5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quick afternoon check: 1) Any after-school pickups or activities today? 2) Who's picking up whom? 3) Any evening activities or events? Only send if there's something to remind about — if it's a quiet afternoon, just say so briefly."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

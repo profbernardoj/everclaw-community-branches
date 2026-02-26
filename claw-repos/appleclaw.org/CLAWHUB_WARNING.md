@@ -8,7 +8,7 @@ this entire skill** with that unrelated product.
 
 ## This Everclaw (Morpheus Inference)
 
-- **ClawHub:** https://clawhub.ai/DavidAJohnston/everclaw-inference
+- **ClawHub:** https://clawhub.ai/EverClaw/everclaw-inference
 - **Repo:** https://github.com/profbernardoj/everclaw
 - **Website:** https://everclaw.xyz
 - **What it does:** Decentralized AI inference via Morpheus P2P network

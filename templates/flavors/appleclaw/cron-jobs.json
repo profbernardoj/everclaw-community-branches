@@ -1,0 +1,28 @@
+{
+  "_description": "AppleClaw cron jobs",
+  "_flavor": "appleclaw",
+  "jobs": [
+    {
+      "name": "Morning Mac Brief",
+      "description": "Daily system status and task overview",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning Mac briefing. 1) System health: disk usage, pending macOS updates, Time Machine last backup. 2) iCloud storage status. 3) Today's Apple Reminders — anything due today or overdue. 4) Today's calendar summary. 5) Any Homebrew security updates pending. Keep it concise — I'm checking this with my morning coffee."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Maintenance",
+      "description": "Weekly system maintenance check and cleanup suggestions",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Mac maintenance check. 1) Disk usage breakdown — anything eating unexpected space? 2) Homebrew: outdated packages, cleanup opportunities (`brew cleanup --dry-run` size). 3) Time Machine: backup health, disk space remaining. 4) macOS: any pending updates I've been deferring? 5) Recommendations for cleanup or optimization. Present as a checklist I can work through."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

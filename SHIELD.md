@@ -267,7 +267,7 @@ To avoid context overflow:
 - severity: medium
 - confidence: 0.86
 - action: require_approval
-- title: Email sends to addresses not pre-approved by David
+- title: Email sends to addresses not pre-approved by the owner
 - recommendation_agent: APPROVE: outbound request to mail.proton.me
 - expires_at: 2026-12-31T23:59:59Z
 - revoked: false

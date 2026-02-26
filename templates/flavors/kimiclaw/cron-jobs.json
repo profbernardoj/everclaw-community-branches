@@ -1,0 +1,28 @@
+{
+  "_description": "KimiClaw cron jobs",
+  "_flavor": "kimiclaw",
+  "jobs": [
+    {
+      "name": "Kimi Endpoint Check",
+      "description": "Verify Kimi models are available across all providers",
+      "schedule": { "kind": "cron", "expr": "0 */8 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Kimi availability check. Test each provider: 1) Venice — kimi-k2-5 responding? kimi-k2-thinking responding? 2) Morpheus local — kimi-k2.5 available? 3) Morpheus Gateway — kimi-k2.5 available? Note response times for each. Only send a message if a provider is down or significantly slower than usual."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly Usage & Quality Report",
+      "description": "Monthly review of Kimi usage patterns and quality",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Monthly Kimi report. 1) Usage: K2.5 vs K2 Thinking — how many requests each? What types of tasks? 2) Thinking model performance: average thinking time, quality advantage over standard model. 3) Long context usage: any tasks that used >64K tokens? How did they perform? 4) Provider reliability: uptime by provider, any outages. 5) New releases from Moonshot worth evaluating. 6) Routing recommendations for next month."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

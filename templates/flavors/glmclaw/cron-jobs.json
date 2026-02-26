@@ -1,0 +1,28 @@
+{
+  "_description": "GLMClaw cron jobs",
+  "_flavor": "glmclaw",
+  "jobs": [
+    {
+      "name": "GLM Endpoint Health Check",
+      "description": "Verify GLM models are available across providers",
+      "schedule": { "kind": "cron", "expr": "0 */6 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "GLM health check. 1) Local Morpheus proxy — is glm-5 responding? Is glm-4.7-flash responding? Test with a quick prompt. 2) Morpheus Gateway — available? 3) Latency comparison: local vs gateway. Only alert if something is down or quality degraded — skip if everything is healthy."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly GLM Performance Report",
+      "description": "Monthly review of GLM usage, quality, and cost",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Monthly GLM report. 1) Usage: requests by model (GLM-5 vs Flash), total tokens. 2) Routing: what percentage of tasks went to GLM vs fallback? Why did fallbacks happen? 3) Quality: any patterns in tasks where GLM excelled or struggled? 4) Cost: inference cost via Morpheus (MOR staking value) vs equivalent centralized API pricing. 5) New releases: any new GLM models from Zhipu worth evaluating. 6) Recommendations for next month's routing."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

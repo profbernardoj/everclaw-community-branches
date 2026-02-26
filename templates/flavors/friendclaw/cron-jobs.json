@@ -1,0 +1,28 @@
+{
+  "_description": "FriendClaw cron jobs",
+  "_flavor": "friendclaw",
+  "jobs": [
+    {
+      "name": "Weekly Social Check-in",
+      "description": "Review relationships and suggest who to reach out to",
+      "schedule": { "kind": "cron", "expr": "0 9 * * 0", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly friendship check-in. 1) Birthdays coming up this week — who, when, gift ideas if needed. 2) Overdue check-ins — anyone in the inner circle or close friends tier who I haven't contacted past their threshold? Suggest 2-3 people to reach out to with natural conversation starters based on their interests. 3) Upcoming social events this week. 4) Any life events I should acknowledge (new jobs, milestones I've noted). Keep it warm and practical."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Birthday Alert",
+      "description": "Daily birthday check with advance notice",
+      "schedule": { "kind": "cron", "expr": "0 8 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Birthday check. Look at contacts in memory/contacts/ for: 1) Birthdays TODAY — remind me to send a message. 2) Birthdays in the next 3 days — do I need to order a gift or make a reservation? 3) Birthdays in the next 7 days — heads up for planning. If no birthdays coming up, skip — do not send a message."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

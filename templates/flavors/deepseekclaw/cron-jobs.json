@@ -1,0 +1,28 @@
+{
+  "_description": "DeepSeekClaw cron jobs",
+  "_flavor": "deepseekclaw",
+  "jobs": [
+    {
+      "name": "Model Health Check",
+      "description": "Verify local DeepSeek models are running and responsive",
+      "schedule": { "kind": "cron", "expr": "0 */6 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quick model health check. 1) Is the local inference server (Ollama/vLLM) running? 2) Which models are loaded? 3) Run a quick test prompt to verify response quality. 4) Check GPU memory usage if applicable. Only alert if something is wrong — skip if everything is healthy."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly Cost & Quality Report",
+      "description": "Monthly review of inference costs and model performance",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Monthly DeepSeek report. 1) Inference usage: requests by model, total tokens processed. 2) Cost: local inference (electricity/GPU estimate) vs API costs. Comparison to equivalent Claude/GPT pricing. 3) Quality notes: any tasks where DeepSeek struggled and fallback was needed. 4) New releases: any new DeepSeek models released this month worth evaluating. 5) Recommendations for next month's routing strategy."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

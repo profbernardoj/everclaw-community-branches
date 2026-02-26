@@ -1,6 +1,6 @@
 ---
 name: everclaw
-version: 2026.2.25
+version: 2026.2.23
 description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth rotation v2 with proactive DIEM balance monitoring and reactive 402 watchdog, Gateway Guardian v5 with direct curl inference probes (eliminates Signal spam), proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, three-shift cyclic execution engine (v2 with 15-minute execution loops), 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, and ERC-8004 agent registry reader for discovering trustless agents on Base.
 homepage: https://everclaw.com
 metadata:
@@ -28,34 +28,6 @@ metadata:
         storage: "openclaw.json providers config"
         required: false
         description: "Free API key from app.mor.org. Community bootstrap key included for initial setup."
-    install:
-      method: "git clone (recommended) or clawhub install everclaw-inference"
-      note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
-    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security", "three-shifts", "task-planning"]
-dependencies:
-  clawhub:
-    - slug: skillguard
-      required: true
-      description: "Security scanner for skill packages — scans before install"
-    - slug: prompt-guard
-      required: true
-      description: "Prompt injection defense with HiveFence network"
-    - slug: bagman
-      required: false
-      description: "Secure key management for agent wallets"
-  github:
-    - repo: profbernardoj/everclaw
-      path: skills/pii-guard
-      required: true
-      description: "PII leak prevention — blocks personal data in outbound actions"
-    - repo: profbernardoj/everclaw
-      path: skills/three-shifts
-      required: false
-      description: "Cyclic shift execution engine — 3x daily task planning and 15-min execution cycles"
-    - repo: profbernardoj/everclaw
-      path: skills/relationships
-      required: false
-      description: "Relationship CRM for tracking people and connections"
     network:
       outbound:
         - host: "api.mor.org"
@@ -148,7 +120,7 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key <API_KEY> --a
 
 Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. Access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
 
-> 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/DavidAJohnston/everclaw-inference](https://clawhub.ai/DavidAJohnston/everclaw-inference)
+> 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/EverClaw/everclaw-inference](https://clawhub.ai/EverClaw/everclaw-inference)
 >
 > ⚠️ **Name Collision Warning:** A different product ("Everclaw Vault") uses the bare `everclaw` slug on ClawHub. **Always use `everclaw-inference`** — never `clawhub install everclaw` or `clawhub update everclaw`. See `CLAWHUB_WARNING.md` for details.
 
@@ -1217,7 +1189,7 @@ tail -f ~/.openclaw/logs/guardian.log
 | `MAX_STUCK_DURATION_SEC` | `1800` | Circuit breaker: kill sub-agents stuck >30 min |
 | `STUCK_CHECK_INTERVAL` | `300` | Circuit breaker check interval (5 min) |
 | `OWNER_SIGNAL` | `+1XXXXXXXXXX` | Signal number for notifications |
-| `SIGNAL_ACCOUNT` | `+15129488566` | Signal sender account |
+| `SIGNAL_ACCOUNT` | `+1XXXXXXXXXX` | Signal sender account |
 
 ### State Files
 

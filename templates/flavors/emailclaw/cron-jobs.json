@@ -1,0 +1,39 @@
+{
+  "_description": "EmailClaw cron jobs — install via OpenClaw cron system",
+  "_flavor": "emailclaw",
+  "jobs": [
+    {
+      "name": "Morning Email Digest",
+      "description": "Generate a summary of overnight emails and present priorities for the day",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning email digest. Check all unread emails since last digest. Categorize as urgent/followup/fyi/noise. For urgent items, include sender, subject, and a 1-line summary. For followup items, list sender and subject only. Count fyi and noise. Present as a clean briefing."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Afternoon Follow-up Check",
+      "description": "Check for threads that need follow-up and new urgent messages",
+      "schedule": { "kind": "cron", "expr": "0 14 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Check my inbox for: 1) Any new urgent messages since this morning. 2) Any threads from memory/email-followups.md that are overdue. 3) Any meeting-related emails for tomorrow. Give me a brief update — only alert if there's something actionable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Email Stats",
+      "description": "Weekly summary of email volume, response times, and patterns",
+      "schedule": { "kind": "cron", "expr": "0 9 * * 0", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my weekly email stats. How many emails received this week? How many replied to? How many still pending? Who were the top 5 senders? Any threads older than 7 days that still need a response? Present as a brief weekly review."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

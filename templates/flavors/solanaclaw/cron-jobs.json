@@ -1,0 +1,28 @@
+{
+  "_description": "SolanaClaw cron jobs",
+  "_flavor": "solanaclaw",
+  "jobs": [
+    {
+      "name": "Morning Solana Brief",
+      "description": "Daily overview of SOL, DeFi, and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily Solana briefing. 1) SOL price, 24h change, and 7d trend. 2) Staking: validator status, rewards accrued, any performance issues. 3) DeFi positions: current values, yield changes, any health alerts. 4) Network: TPS, congestion status, any incidents. 5) Ecosystem news: notable protocol launches, airdrops, governance votes. 6) Tracked SPL token prices. Data-first, concise."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Solana Report",
+      "description": "Deep weekly review of positions and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Solana report. 1) SOL: weekly price performance. 2) Staking: total rewards this week, APY, validator comparison — should I switch? 3) DeFi: position P&L for the week, yield trends, any new opportunities on reputable protocols. 4) NFTs: tracked collection floor changes if applicable. 5) Airdrop check: any new eligibility criteria for tracked wallets. 6) Protocol health: any exploits, audits, or concerns in protocols I use."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

@@ -104,33 +104,41 @@ WORKDIR /app
 
 RUN cat > /home/node/.openclaw/openclaw-default.json << 'DEFAULTCONFIG'
 {
-  "$schema": "https://raw.githubusercontent.com/openclaw/openclaw/main/schema/openclaw.json",
-  "providers": {
-    "morpheus-local": {
-      "apiBase": "http://127.0.0.1:8083/v1",
-      "apiKey": "morpheus-local",
-      "models": {
-        "glm-5": { "tier": "STANDARD" },
-        "glm-4.7-flash": { "tier": "LIGHT" },
-        "kimi-k2.5": { "tier": "STANDARD" },
-        "kimi-k2-thinking": { "tier": "HEAVY" }
-      }
-    },
-    "mor-gateway": {
-      "apiBase": "https://api.mor.org/v1",
-      "apiKey": "${MOR_GATEWAY_API_KEY:-}",
-      "models": {
-        "glm-5": { "tier": "STANDARD" },
-        "glm-4.7-flash": { "tier": "LIGHT" },
-        "kimi-k2.5": { "tier": "STANDARD" }
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "morpheus-local": {
+        "baseUrl": "http://127.0.0.1:8083/v1",
+        "api": "openai-completions",
+        "models": [
+          { "id": "glm-5", "name": "GLM-5 (Morpheus Local)", "reasoning": false },
+          { "id": "glm-4.7-flash", "name": "GLM 4.7 Flash (Morpheus Local)", "reasoning": false },
+          { "id": "kimi-k2.5", "name": "Kimi K2.5 (Morpheus Local)", "reasoning": false },
+          { "id": "kimi-k2-thinking", "name": "Kimi K2 Thinking (Morpheus Local)", "reasoning": true }
+        ]
+      },
+      "mor-gateway": {
+        "baseUrl": "https://api.mor.org/api/v1",
+        "api": "openai-completions",
+        "models": [
+          { "id": "glm-5", "name": "GLM-5 (Morpheus Gateway)", "reasoning": false },
+          { "id": "glm-4.7-flash", "name": "GLM 4.7 Flash (Morpheus Gateway)", "reasoning": false },
+          { "id": "kimi-k2.5", "name": "Kimi K2.5 (Morpheus Gateway)", "reasoning": false }
+        ]
       }
     }
   },
-  "defaultModel": "morpheus-local/glm-5",
-  "fallbackModels": [
-    "mor-gateway/glm-5",
-    "mor-gateway/kimi-k2.5"
-  ]
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "morpheus-local/glm-5",
+        "fallbacks": [
+          "mor-gateway/glm-5",
+          "mor-gateway/kimi-k2.5"
+        ]
+      }
+    }
+  }
 }
 DEFAULTCONFIG
 

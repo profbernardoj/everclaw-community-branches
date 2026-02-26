@@ -1,0 +1,39 @@
+{
+  "_description": "OfficeClaw cron jobs",
+  "_flavor": "officeclaw",
+  "jobs": [
+    {
+      "name": "Morning Briefing",
+      "description": "Daily overview of calendar, priorities, and inbox highlights",
+      "schedule": { "kind": "cron", "expr": "0 7 * * 1-5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning office briefing. Include: 1) Today's calendar with meeting times, attendees, and topics. 2) Any prep needed for the first meeting. 3) Top 3 urgent emails. 4) Overdue tasks from memory/tasks.md. 5) Any deadlines this week. Keep it scannable — bullet points, not paragraphs."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "End of Day Wrap-up",
+      "description": "Summarize what happened today and prep for tomorrow",
+      "schedule": { "kind": "cron", "expr": "0 17 * * 1-5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my end-of-day wrap-up. Include: 1) Meetings attended today — any action items captured? 2) Tasks completed vs still pending. 3) Tomorrow's first meeting and whether prep is ready. 4) Any emails that still need a response. Brief and actionable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Review",
+      "description": "Friday afternoon review of the week and preview of next week",
+      "schedule": { "kind": "cron", "expr": "0 16 * * 5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my weekly review. 1) Key accomplishments this week. 2) Tasks carried over to next week. 3) Next week's major meetings and deadlines. 4) Any follow-ups that are overdue. 5) Suggested time blocks for deep work next week based on calendar gaps."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

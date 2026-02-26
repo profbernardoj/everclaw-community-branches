@@ -25,12 +25,8 @@ echo ""
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "📝 First run — creating default OpenClaw config..."
   
-  # Substitute env vars into default config
-  if [ -n "$MOR_GATEWAY_API_KEY" ]; then
-    sed "s/\${MOR_GATEWAY_API_KEY:-}/$MOR_GATEWAY_API_KEY/g" "$DEFAULT_CONFIG" > "$CONFIG_FILE"
-  else
-    sed 's/\${MOR_GATEWAY_API_KEY:-}//g' "$DEFAULT_CONFIG" > "$CONFIG_FILE"
-  fi
+  # Copy default config (env var substitution handled by OpenClaw auth setup)
+  cp "$DEFAULT_CONFIG" "$CONFIG_FILE"
   
   echo "   Config: $CONFIG_FILE"
 fi

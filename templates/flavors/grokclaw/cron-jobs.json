@@ -1,0 +1,28 @@
+{
+  "_description": "GrokClaw cron jobs",
+  "_flavor": "grokclaw",
+  "jobs": [
+    {
+      "name": "Morning Content Brief",
+      "description": "Daily overview of trends, mentions, and content opportunities",
+      "schedule": { "kind": "cron", "expr": "0 8 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning X/Twitter briefing. 1) Trending topics relevant to my watchlist — any conversations I should join? 2) Notable posts from key accounts I follow overnight. 3) Any mentions or replies that need attention. 4) Content suggestion — based on what's trending and my interests, suggest 1-2 post ideas with draft text. 5) Any scheduled content I should publish today. Keep it focused — I want signal, not a content calendar."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Evening Engagement Review",
+      "description": "Review today's post performance and engagement",
+      "schedule": { "kind": "cron", "expr": "0 20 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Evening engagement review. 1) How did today's posts perform? Impressions, engagement rate, notable replies. 2) Any post getting unexpected traction that deserves a follow-up? 3) Any replies or conversations I should respond to before end of day. 4) Quick scan of what's trending now — anything worth a late evening take? Brief, only flag what's actionable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

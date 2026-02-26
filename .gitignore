@@ -3,40 +3,17 @@ node_modules/
 *.log
 CLAUDE.md
 
-# Personal/private files — NEVER commit
-memory/
+# Private memory — NEVER push personal data
+memory/campaigns/
+memory/daily/
+memory/events/
+memory/goals/
+memory/insights/
+memory/marketing/
+memory/projects/
+memory/reference/
+memory/relationships/
 MEMORY.md
-USER.md
-IDENTITY.md
-HEARTBEAT.md
-AGENTS.md
-SOUL.md
-TOOLS.md
-ACCOUNTS.md
-WISDOM.md
-BRAIN.md
-FINANCE.md
-PEOPLE.md
-PLAYBOOK.md
-VOICE.md
-avatars/
-drafts/
-shifts/context.md
-smartagent/config/USER.md
-smartagent/config/IDENTITY.md
-smartagent/config/TOOLS.md
-smartagent/config/AGENTS.md
-smartagent/config/SOUL.md
-smartagent/config/HEARTBEAT.md
-smartagent/config/BOOTSTRAP.md
-.pii-patterns.json
-
-# Temporary files
-answers-msg*.txt
-
-# Temporary files
-report.txt
-
-# Temporary files
-answers-msg*.txt
-scripts/workspace-pii-remediation.sh
+shifts/
+mission-control/dashboard-data.json
+morpheus-user-persona-strategy.md

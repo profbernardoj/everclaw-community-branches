@@ -5,9 +5,9 @@ set -uo pipefail
 # Uses flux-dev model, 512x512, saves as PNG
 # Compatible with bash 3.2+ (macOS)
 
-VENICE_KEY="VENICE-INFERENCE-KEY-[REDACTED]"
+VENICE_KEY="VENICE-INFERENCE-KEY-REDACTED"
 API_URL="https://api.venice.ai/api/v1/images/generations"
-OUTPUT_DIR="/Users/[REDACTED]/.openclaw/workspace/branding/flavor-logos"
+OUTPUT_DIR="~/.openclaw/workspace/branding/flavor-logos"
 MODEL="flux-dev"
 
 STYLE="Minimal flat vector logo icon on pure white background, modern tech aesthetic, clean lines, no text, no words, single centered icon, professional brand mark, 2-3 colors maximum"

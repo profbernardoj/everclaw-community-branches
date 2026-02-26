@@ -1,0 +1,28 @@
+{
+  "_description": "BaseClaw cron jobs",
+  "_flavor": "baseclaw",
+  "jobs": [
+    {
+      "name": "Morning Base Brief",
+      "description": "Daily overview of Base portfolio and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily Base briefing. 1) ETH and USDC balances on Base. 2) Tracked token prices and 24h changes. 3) DeFi position health and yields. 4) Pending bridge transfers. 5) Notable Base ecosystem news — new protocols, Coinbase announcements, Farcaster trending topics. 6) Any ERC-8004 agent registry activity for tracked agents. Concise and data-driven."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Base Ecosystem Report",
+      "description": "Deep weekly review of Base ecosystem activity",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Base ecosystem report. 1) Portfolio: weekly P&L across all Base positions. 2) DeFi: yield trends, new protocol launches worth evaluating. 3) Ecosystem metrics: TVL growth, transaction count trends, new contract deployments. 4) Social layer: Farcaster highlights, notable Degen/social token activity. 5) Agent economy: new ERC-8004 registrations, x402 payment volume if trackable. 6) Upcoming: any Coinbase announcements, Base-specific events or campaigns."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

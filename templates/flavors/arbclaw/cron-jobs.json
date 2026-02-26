@@ -1,0 +1,28 @@
+{
+  "_description": "ArbClaw cron jobs",
+  "_flavor": "arbclaw",
+  "jobs": [
+    {
+      "name": "Morning Arbitrum Brief",
+      "description": "Daily overview of ARB, DeFi, and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily Arbitrum briefing. 1) ARB price, 24h change. 2) DeFi positions: GMX, lending, LP health and yields. 3) Pending bridge transfers — any claimable? 4) Network: sequencer status, gas prices. 5) Active governance proposals with deadlines. 6) Ecosystem news: new protocols, incentive programs, notable events. Concise and data-driven."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Arbitrum DeFi Review",
+      "description": "Deep weekly review of positions and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Arbitrum DeFi review. 1) ARB: weekly price performance and trend. 2) Position recap: all DeFi positions with weekly P&L and current yields. 3) Yield landscape: any significant rate changes on major protocols? New opportunities worth evaluating? 4) Governance: votes cast this week, upcoming proposals. 5) Protocol health: any incidents or concerns in protocols I'm using. 6) Bridge activity: completed and pending transfers."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

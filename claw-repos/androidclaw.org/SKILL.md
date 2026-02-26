@@ -61,28 +61,7 @@ metadata:
     install:
       method: "git clone (recommended) or clawhub install everclaw-inference"
       note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/everclaw."
-    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security", "android", "termux"]
-dependencies:
-  clawhub:
-    - slug: everclaw-inference
-      aliases: ["everclaw"]
-      required: true
-      description: "Core EverClaw inference skill — Morpheus decentralized AI"
-    - slug: skillguard
-      required: true
-      description: "Security scanner for skill packages"
-    - slug: prompt-guard
-      required: true
-      description: "Prompt injection defense"
-  github:
-    - repo: profbernardoj/everclaw
-      path: skills/pii-guard
-      required: true
-      description: "PII leak prevention"
-    - repo: profbernardoj/everclaw
-      path: skills/three-shifts
-      required: false
-      description: "Cyclic shift execution engine"
+    tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security"]
 ---
 
 <!-- ─── AGENT INSTRUCTIONS (read by OpenClaw agents) ─────────────── -->
@@ -141,7 +120,7 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key <API_KEY> --a
 
 Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. Access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
 
-> 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/DavidAJohnston/everclaw-inference](https://clawhub.ai/DavidAJohnston/everclaw-inference)
+> 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/EverClaw/everclaw-inference](https://clawhub.ai/EverClaw/everclaw-inference)
 >
 > ⚠️ **Name Collision Warning:** A different product ("Everclaw Vault") uses the bare `everclaw` slug on ClawHub. **Always use `everclaw-inference`** — never `clawhub install everclaw` or `clawhub update everclaw`. See `CLAWHUB_WARNING.md` for details.
 
@@ -1141,7 +1120,7 @@ tail -f ~/.openclaw/logs/guardian.log
 | `MAX_STUCK_DURATION_SEC` | `1800` | Circuit breaker: kill sub-agents stuck >30 min |
 | `STUCK_CHECK_INTERVAL` | `300` | Circuit breaker check interval (5 min) |
 | `OWNER_SIGNAL` | `+1XXXXXXXXXX` | Signal number for notifications |
-| `SIGNAL_ACCOUNT` | `+15129488566` | Signal sender account |
+| `SIGNAL_ACCOUNT` | `+1XXXXXXXXXX` | Signal sender account |
 
 ### State Files
 

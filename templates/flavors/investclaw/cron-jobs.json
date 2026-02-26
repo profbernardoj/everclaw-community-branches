@@ -1,0 +1,50 @@
+{
+  "_description": "InvestClaw cron jobs",
+  "_flavor": "investclaw",
+  "jobs": [
+    {
+      "name": "Morning Market Briefing",
+      "description": "Pre-market overview of portfolio and market conditions",
+      "schedule": { "kind": "cron", "expr": "30 6 * * 1-5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning market briefing. Include: 1) Overnight market moves — futures, Asian/European markets, crypto. 2) My portfolio snapshot — current values, 24h change for each position. 3) Any positions that hit alert thresholds. 4) Key events today — earnings reports, Fed meetings, token unlocks. 5) Watchlist check — anything approaching target prices. Keep it data-dense but scannable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Daily Portfolio Snapshot",
+      "description": "Save end-of-day portfolio values for tracking",
+      "schedule": { "kind": "cron", "expr": "0 17 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Take a daily portfolio snapshot. Fetch current prices for all holdings in TOOLS.md. Calculate total portfolio value, daily change ($ and %), and per-position performance. Save to memory/portfolio/YYYY-MM-DD.md. Compare to yesterday's snapshot and note any significant moves."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekend Crypto Review",
+      "description": "Weekend crypto-only market review",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekend crypto review. 1) Weekly performance for all crypto holdings. 2) DeFi yields check — any significant rate changes on protocols I'm in. 3) On-chain notable events — large transfers, protocol upgrades, governance votes. 4) Upcoming week catalysts — token unlocks, mainnet launches, etc. 5) Staking rewards accrued this week if trackable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly Performance Report",
+      "description": "Monthly portfolio performance and tax event summary",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my monthly portfolio report. 1) Portfolio value: start of month, end of month, change. 2) Best and worst performers. 3) Any taxable events this month (sells, swaps, realized gains/losses). 4) Year-to-date performance vs benchmarks (S&P 500, BTC). 5) Allocation drift — has the portfolio drifted from target allocation? Read from memory/portfolio/ daily snapshots."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

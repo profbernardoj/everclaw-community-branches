@@ -1,0 +1,28 @@
+{
+  "_description": "WindowsClaw cron jobs",
+  "_flavor": "windowsclaw",
+  "jobs": [
+    {
+      "name": "Morning Windows Brief",
+      "description": "Daily system status for Windows + WSL2",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning Windows briefing. 1) System: disk usage (C: and data drives), pending Windows Updates, Defender status. 2) WSL2: distro running? Docker status? 3) Failed scheduled tasks in last 24h. 4) Any security alerts from Defender or Event Viewer. Keep it dashboard-style — green/yellow/red for each."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Patch Tuesday Check",
+      "description": "Monthly check after Patch Tuesday for Windows Updates",
+      "schedule": { "kind": "cron", "expr": "0 10 8-14 * 3", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Patch Tuesday check. 1) List all pending Windows Updates with KB numbers. 2) Flag any that are security-critical. 3) Check if a reboot is pending. 4) Note any known issues with this month's patches (search recent reports). 5) Recommend: install now, defer, or skip specific patches. Present clearly so I can make a quick decision."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

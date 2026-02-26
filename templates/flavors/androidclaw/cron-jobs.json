@@ -1,0 +1,28 @@
+{
+  "_description": "AndroidClaw cron jobs — lightweight, battery-conscious",
+  "_flavor": "androidclaw",
+  "jobs": [
+    {
+      "name": "Morning Mobile Brief",
+      "description": "Quick daily overview optimized for mobile",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate a mobile-optimized morning brief. Keep it SHORT — this is read on a phone screen. 1) Device: battery, storage, any issues. 2) Weather: today's forecast in one line. 3) Calendar: next 3 events. 4) Any queued tasks from overnight. Use bullet points, no long paragraphs. Under 200 words."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Sync Check",
+      "description": "Verify file sync between mobile and other devices",
+      "schedule": { "kind": "cron", "expr": "0 12 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quick sync check. If sync is configured in TOOLS.md: 1) Is the device on WiFi? 2) When was the last successful sync? 3) Any files out of sync? If sync is not configured or device is on cellular, skip. Only send a message if there's an issue."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

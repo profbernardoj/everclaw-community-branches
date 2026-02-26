@@ -1,0 +1,28 @@
+{
+  "_description": "LlamaClaw cron jobs",
+  "_flavor": "llamaclaw",
+  "jobs": [
+    {
+      "name": "Local Model Health Check",
+      "description": "Verify local Llama models are running and healthy",
+      "schedule": { "kind": "cron", "expr": "0 */6 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Local model health check. 1) Is Ollama/llama.cpp/vLLM running? 2) Which models are loaded? 3) GPU/VRAM usage — any pressure? 4) Quick test prompt to verify response quality. Only send a message if something is wrong or degraded."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Community & Release Check",
+      "description": "Check for new Llama models and notable community releases",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Llama ecosystem update. 1) New official releases from Meta — any new Llama models or updates? 2) Notable community fine-tunes trending on Hugging Face. 3) Benchmark updates — any shifts on the Open LLM Leaderboard? 4) Tooling updates — new Ollama/llama.cpp/vLLM versions with relevant improvements. 5) Should I update any of my deployed models? Only report if there's something actionable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

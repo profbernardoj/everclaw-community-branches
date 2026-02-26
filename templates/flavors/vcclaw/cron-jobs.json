@@ -1,0 +1,39 @@
+{
+  "_description": "VCIClaw cron jobs",
+  "_flavor": "vciclaw",
+  "jobs": [
+    {
+      "name": "Morning Deal Flow Brief",
+      "description": "Daily overview of pipeline, meetings, and market intel",
+      "schedule": { "kind": "cron", "expr": "0 7 * * 1-5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning VC briefing. Include: 1) New inbound deals since yesterday (check email for pitch decks, warm intros). 2) Pipeline update — any deals needing follow-up today? Term sheet deadlines? 3) Today's meetings — who am I meeting and do I have prep briefs ready? 4) Portfolio alerts — any portfolio companies with updates or issues. 5) Market intel — notable funding rounds, exits, or sector news from the last 24h. Keep it tight and actionable."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Pipeline Review",
+      "description": "End-of-week pipeline and deployment summary",
+      "schedule": { "kind": "cron", "expr": "0 16 * * 5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my weekly pipeline review. 1) Pipeline snapshot — deals by stage with last activity date. 2) Deals that advanced or stalled this week. 3) Follow-ups overdue. 4) New deals added this week. 5) Deployment pace — capital deployed this quarter vs plan. 6) Key meetings next week. Present as a structured report I can share with partners."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly Portfolio Report",
+      "description": "Monthly portfolio company performance summary",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my monthly portfolio report. For each portfolio company in memory/portfolio/: 1) Latest KPIs (MRR, burn, runway, headcount). 2) Key milestones hit or missed. 3) Any flags (runway <6 months, declining metrics, team changes). 4) Follow-on decision points approaching. 5) Overall fund metrics — deployment, reserves, TVPI estimate. Read from memory/portfolio/ files."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

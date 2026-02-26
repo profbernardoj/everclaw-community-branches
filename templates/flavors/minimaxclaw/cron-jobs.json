@@ -1,0 +1,28 @@
+{
+  "_description": "MiniMaxClaw cron jobs",
+  "_flavor": "minimaxclaw",
+  "jobs": [
+    {
+      "name": "MiniMax Availability Check",
+      "description": "Verify MiniMax models are available and responsive",
+      "schedule": { "kind": "cron", "expr": "0 */8 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "MiniMax availability check. 1) Morpheus Gateway — is MiniMax-M2.5 responding? What's the current latency? 2) Venice — is minimax-m21 available? 3) Compare latency to baseline. Only send a message if a provider is down, latency is >2x normal, or quality seems degraded."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly MiniMax Report",
+      "description": "Monthly review of MiniMax usage, quality, and alternatives",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Monthly MiniMax report. 1) Usage: how many requests routed to MiniMax this month? What types of tasks? 2) Latency: average response time, worst-case, trend. 3) Quality: any tasks where MiniMax excelled or struggled vs alternatives? 4) Provider reliability: Morpheus Gateway uptime for MiniMax specifically. 5) New releases: any new MiniMax models or multimodal capabilities available? 6) Recommendation: should routing strategy change for next month?"
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

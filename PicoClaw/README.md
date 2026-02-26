@@ -29,7 +29,7 @@ The setup script merges Morpheus models into your `~/.picoclaw/config.json`. If 
 PROXY_HOST=127.0.0.1
 
 # Separate device (e.g., proxy on a Pi 4, PicoClaw on a $10 board)
-PROXY_HOST=192.168.1.100
+PROXY_HOST=YOUR_PROXY_HOST
 ```
 
 ### 3. Verify

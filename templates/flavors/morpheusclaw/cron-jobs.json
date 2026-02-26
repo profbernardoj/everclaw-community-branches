@@ -1,0 +1,39 @@
+{
+  "_description": "MorpheusClaw cron jobs",
+  "_flavor": "morpheusclaw",
+  "jobs": [
+    {
+      "name": "Morning Morpheus Brief",
+      "description": "Daily overview of MOR, network health, and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily Morpheus briefing. 1) MOR price and 24h change. 2) Local node status — is the proxy router responding? Which models are available? 3) Gateway status — is api.mor.org responding? 4) Staking rewards update if tracked. 5) Any notable Morpheus ecosystem news — new MRCs, protocol updates, provider changes. 6) Inference quality note — any issues with model responses observed recently? Keep it technical and concise."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Node Health Check",
+      "description": "Periodic check that local Morpheus node is running",
+      "schedule": { "kind": "cron", "expr": "0 */4 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quick node health check. Ping the local proxy router at http://127.0.0.1:8083/v1/models. If it responds, note which models are available and skip sending a message. If it's DOWN, alert me immediately with the error. Also check the Morpheus Gateway at https://api.mor.org/api/v1 as backup status."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Morpheus Ecosystem Report",
+      "description": "Weekly deep dive on Morpheus network metrics and developments",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly Morpheus ecosystem report. 1) MOR price: weekly performance and trend. 2) Network metrics: active providers, models available, inference volume if available. 3) GitHub activity: new MRCs, significant PRs, community discussions. 4) Staking summary: rewards accrued this week, current APY estimate. 5) Competitive landscape: any notable developments from other decentralized inference projects (Bittensor, Akash, etc.). 6) Inference cost comparison: Morpheus vs centralized API pricing for our most-used models."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

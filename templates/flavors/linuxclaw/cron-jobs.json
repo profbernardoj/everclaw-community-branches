@@ -1,0 +1,39 @@
+{
+  "_description": "LinuxClaw cron jobs",
+  "_flavor": "linuxclaw",
+  "jobs": [
+    {
+      "name": "Morning System Report",
+      "description": "Daily system health and security overview",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning system report. Run these checks: 1) System uptime and load average. 2) Disk usage — flag any partition >85%. 3) Memory usage. 4) Failed systemd services. 5) Pending security updates count. 6) Docker container status (if Docker is running). 7) Last backup status from memory/backups/. 8) Any unusual SSH login attempts in last 24h. Present as a clean dashboard — green/yellow/red status for each."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Security Audit",
+      "description": "Weekly security check and hardening review",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 1", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly security audit. 1) List all pending updates — especially security patches. 2) Fail2ban summary: total bans this week, top banned IPs. 3) SSH: failed login attempts summary, any new authorized keys added. 4) Open ports: compare current listening ports against expected list in TOOLS.md. 5) Docker: any containers running as root that shouldn't be? Images with known vulnerabilities? 6) File permissions: any world-writable files in sensitive directories? Recommend actions for any findings."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Backup Verification",
+      "description": "Verify backups are running and test restoration",
+      "schedule": { "kind": "cron", "expr": "0 3 * * 0", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Backup verification check. 1) When did the last backup run? Was it successful? 2) Backup size — consistent with previous runs or anomalous? 3) If possible, run a test restore of a small file to verify backup integrity. 4) Check backup retention — are old backups being cleaned up per policy? 5) Update memory/backups/ with verification results."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

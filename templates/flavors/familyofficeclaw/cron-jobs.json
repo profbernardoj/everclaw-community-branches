@@ -1,0 +1,39 @@
+{
+  "_description": "FamilyOfficeClaw cron jobs",
+  "_flavor": "familyofficeclaw",
+  "jobs": [
+    {
+      "name": "Morning Wealth Brief",
+      "description": "Daily overview of markets, portfolio, and action items",
+      "schedule": { "kind": "cron", "expr": "0 7 * * 1-5", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my morning wealth briefing. 1) Market overnight — any significant moves affecting our positions? 2) Portfolio pulse — concentrated positions, any crossing alert thresholds. 3) Calendar — tax deadlines, advisor meetings, entity filings in next 14 days. 4) Capital calls — any PE/VC commitments due this week. 5) Pending advisor items. Keep it executive-level — numbers and actions, no filler."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Monthly Financial Review",
+      "description": "Comprehensive monthly review of all financial activities",
+      "schedule": { "kind": "cron", "expr": "0 9 1 * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate the monthly family office review. 1) Net worth snapshot — total across all entities and asset classes. 2) Month-over-month change by asset class. 3) Allocation drift — current vs target, flag any class >5% off target. 4) Cash flow summary — income, expenses, distributions, capital calls. 5) Tax items — estimated payment status, harvested losses YTD, upcoming deadlines. 6) Real estate — rental income, vacancies, maintenance items. 7) Insurance — any renewals in next 60 days. 8) Action items for advisors."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Quarterly Estate Review",
+      "description": "Quarterly check on estate planning and entity compliance",
+      "schedule": { "kind": "cron", "expr": "0 10 1 1,4,7,10 *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quarterly estate and entity review. 1) Trust status — any distributions due? Trustee changes needed? Review dates approaching? 2) Entity compliance — annual filings, registered agent renewals, operating agreement updates. 3) Beneficiary review — any life changes (births, marriages, deaths) that affect estate plans? 4) Philanthropy — DAF distributions YTD vs annual target. 5) Insurance adequacy — coverage still appropriate given current net worth? Flag items that need attorney or CPA attention."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

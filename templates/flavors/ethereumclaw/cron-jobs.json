@@ -1,0 +1,39 @@
+{
+  "_description": "EthereumClaw cron jobs",
+  "_flavor": "ethereumclaw",
+  "jobs": [
+    {
+      "name": "Morning Ethereum Briefing",
+      "description": "Daily overview of ETH, gas, DeFi, and ecosystem",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily Ethereum briefing. Include: 1) ETH price, 24h change, and gas prices (current and trend). 2) DeFi position health — any lending positions at risk? Yield changes? 3) Active governance votes in tracked protocols (check TOOLS.md). 4) Notable ecosystem news — protocol upgrades, L2 developments, regulatory. 5) Staking rewards update if applicable. Data-dense, concise format."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Gas Price Alert",
+      "description": "Alert when gas drops below threshold — good time for transactions",
+      "schedule": { "kind": "cron", "expr": "0 */3 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quick gas check. If mainnet gas is below the low threshold in TOOLS.md (default 15 gwei), alert me — this is a good window for pending transactions. Include current gas price and how long the low period has lasted. If gas is normal or high, skip — do not send a message."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly DeFi Report",
+      "description": "Weekly review of DeFi positions and yield landscape",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly DeFi report. 1) Position recap — all tracked DeFi positions with current value and weekly P&L. 2) Yield changes — which rates went up/down significantly. 3) Token approval audit — any unlimited approvals that should be revoked? 4) Protocol health — any incidents, exploits, or concerns in protocols I'm using. 5) Opportunities — any notably high yields on reputable (audited) protocols worth looking at."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

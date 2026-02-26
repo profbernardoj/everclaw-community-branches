@@ -1,0 +1,39 @@
+{
+  "_description": "BriefingClaw cron jobs",
+  "_flavor": "briefingclaw",
+  "jobs": [
+    {
+      "name": "Morning Briefing",
+      "description": "Daily intelligence briefing covering watchlist topics",
+      "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my daily morning briefing. Read TOOLS.md for my watchlist topics and preferred format. Search for developments in the last 24 hours across all primary and secondary topics. Structure as: Top Stories (3-5 items, 2 sentences each with source), Industry Watch (notable moves in my tracked companies/people), Market Context (if relevant), and Worth Reading (2-3 links to full articles). Be concise and analytical, not breathless."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Evening Update",
+      "description": "Brief end-of-day update on anything that developed since morning",
+      "schedule": { "kind": "cron", "expr": "0 18 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Quick evening update. Check if anything significant happened in my watchlist topics since this morning. If nothing notable, just say so in one sentence. Don't repeat the morning briefing — only new developments. Max 200 words."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Deep Dive",
+      "description": "In-depth weekly analysis of the most important trend",
+      "schedule": { "kind": "cron", "expr": "0 9 * * 6", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Generate my weekly deep dive. Pick the single most important trend or development from this week across my watchlist topics. Write a 500-800 word analysis: what happened, why it matters, what it means going forward, and how it connects to my interests. Include sources. This should read like a thoughtful analyst note, not a news summary."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

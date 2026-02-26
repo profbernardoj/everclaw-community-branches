@@ -1,0 +1,28 @@
+{
+  "_description": "InstallOpenClaw cron jobs — lightweight, focused on onboarding",
+  "_flavor": "installopenclaw",
+  "jobs": [
+    {
+      "name": "Daily Check-in (First Week)",
+      "description": "Proactive daily check-in during the first week to help with onboarding",
+      "schedule": { "kind": "cron", "expr": "0 9 * * *", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "New user check-in. Read memory/setup-progress.md for where the user is in setup. If setup is not yet complete: 1) Acknowledge what they've accomplished so far. 2) Suggest the next step in their setup journey. 3) Offer one tip or capability they might not know about. Keep it encouraging and brief — one useful nudge, not a lecture. If setup is marked complete, suggest upgrading to a specific flavor based on their interests and disable this job."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    },
+    {
+      "name": "Weekly Health Check",
+      "description": "Simple weekly check that everything is running smoothly",
+      "schedule": { "kind": "cron", "expr": "0 10 * * 1", "tz": "{{TIMEZONE}}" },
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Weekly OpenClaw health check. 1) Is OpenClaw running without errors? 2) Are all configured skills/services working? 3) Any pending OpenClaw updates available? 4) Storage and system health quick glance. Only send a message if there's something that needs attention or an update is available. Otherwise skip."
+      },
+      "sessionTarget": "isolated",
+      "delivery": { "mode": "announce" }
+    }
+  ]
+}

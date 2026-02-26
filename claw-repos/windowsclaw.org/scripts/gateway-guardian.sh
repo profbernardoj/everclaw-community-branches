@@ -65,7 +65,7 @@ BILLING_BACKOFF_INTERVAL=1800  # When billing-dead, only check every 30 min (not
 
 # Notification settings
 OWNER_SIGNAL="+1XXXXXXXXXX"
-SIGNAL_ACCOUNT="+15129488566"
+SIGNAL_ACCOUNT="+1XXXXXXXXXX"
 
 # Install script URL for nuclear option
 INSTALL_URL="https://clawd.bot/install.sh"
