@@ -70,4 +70,4 @@ scripts/.last-sync.json
 scripts/finance-tracker-x402.mjs
 scripts/asset-tracker.sh
 finance-tracker/
-mission-control/dashboard-data.json
+mission-control/dashboard-data.jsonscripts/finance-tracker.sh
