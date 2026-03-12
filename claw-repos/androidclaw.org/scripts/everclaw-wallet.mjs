@@ -17,14 +17,22 @@
  */
 
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, chmodSync } from "node:fs";
+import { join } from "node:path";
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
 import { createPublicClient, createWalletClient, http, formatEther, parseEther, formatUnits, parseUnits, encodeFunctionData, parseAbi, maxUint256 } from "viem";
 import { base } from "viem/chains";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { platform } from "node:os";
 
 // --- Configuration ---
 const KEYCHAIN_ACCOUNT = process.env.EVERCLAW_KEYCHAIN_ACCOUNT || "everclaw-agent";
 const KEYCHAIN_SERVICE = process.env.EVERCLAW_KEYCHAIN_SERVICE || "everclaw-wallet-key";
 const RPC_URL = process.env.EVERCLAW_RPC || "https://base-mainnet.public.blastapi.io";
+const KEY_STORE_PATH = process.env.EVERCLAW_KEY_STORE || join(process.env.HOME || "", ".everclaw", "wallet.enc");
+
+// --- Cross-platform key storage backend ---
+const OS = platform();
 
 // --- Contract Addresses (Base Mainnet) ---
 const MOR_TOKEN = "0x7431aDa8a591C955a994a21710752EF9b882b8e3";
@@ -46,17 +54,21 @@ const SWAP_ROUTER_ABI = parseAbi([
   "function exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)) payable returns (uint256 amountOut)",
 ]);
 
-// --- Keychain Helpers ---
-function keychainStore(key) {
+// --- Cross-Platform Key Storage ---
+// Backend priority:
+//   macOS  → macOS Keychain (security CLI)
+//   Linux  → libsecret (secret-tool CLI) if available
+//   All    → encrypted file fallback (~/.everclaw/wallet.enc)
+
+// -- macOS Keychain backend --
+function macKeychainStore(key) {
   try {
-    // Try update first, then add
     try {
       execSync(
         `security add-generic-password -a "${KEYCHAIN_ACCOUNT}" -s "${KEYCHAIN_SERVICE}" -w "${key}" -U`,
         { stdio: "pipe" }
       );
     } catch {
-      // If add fails, try delete + add
       try { execSync(`security delete-generic-password -a "${KEYCHAIN_ACCOUNT}" -s "${KEYCHAIN_SERVICE}"`, { stdio: "pipe" }); } catch {}
       execSync(
         `security add-generic-password -a "${KEYCHAIN_ACCOUNT}" -s "${KEYCHAIN_SERVICE}" -w "${key}"`,
@@ -65,25 +77,150 @@ function keychainStore(key) {
     }
     return true;
   } catch (e) {
-    console.error("❌ Failed to store key in Keychain:", e.message);
+    console.error("❌ macOS Keychain store failed:", e.message);
     return false;
   }
 }
 
-function keychainRetrieve() {
+function macKeychainRetrieve() {
   try {
-    const key = execSync(
+    return execSync(
       `security find-generic-password -a "${KEYCHAIN_ACCOUNT}" -s "${KEYCHAIN_SERVICE}" -w`,
       { stdio: "pipe", encoding: "utf-8" }
     ).trim();
-    return key;
   } catch {
     return null;
   }
 }
 
+// -- Linux libsecret backend (secret-tool) --
+function hasSecretTool() {
+  try {
+    execSync("which secret-tool", { stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function libsecretStore(key) {
+  try {
+    execSync(
+      `echo -n "${key}" | secret-tool store --label="Everclaw Wallet" service "${KEYCHAIN_SERVICE}" account "${KEYCHAIN_ACCOUNT}"`,
+      { stdio: "pipe", input: key }
+    );
+    return true;
+  } catch (e) {
+    console.error("❌ secret-tool store failed:", e.message);
+    return false;
+  }
+}
+
+function libsecretRetrieve() {
+  try {
+    return execSync(
+      `secret-tool lookup service "${KEYCHAIN_SERVICE}" account "${KEYCHAIN_ACCOUNT}"`,
+      { stdio: "pipe", encoding: "utf-8" }
+    ).trim();
+  } catch {
+    return null;
+  }
+}
+
+// -- Encrypted file backend (universal fallback) --
+// Uses AES-256-GCM with a key derived from machine-id + username.
+// This is NOT as secure as Keychain/libsecret (key derivation input is guessable),
+// but it's far better than plaintext and works on headless servers.
+function getFileEncryptionKey() {
+  // Derive from machine-id + username — stable across reboots, unique per machine
+  let machineId = "everclaw-fallback";
+  try {
+    if (existsSync("/etc/machine-id")) {
+      machineId = readFileSync("/etc/machine-id", "utf-8").trim();
+    } else if (existsSync("/var/lib/dbus/machine-id")) {
+      machineId = readFileSync("/var/lib/dbus/machine-id", "utf-8").trim();
+    }
+  } catch {}
+  const salt = `everclaw-${KEYCHAIN_ACCOUNT}-${process.env.USER || "agent"}`;
+  return scryptSync(machineId, salt, 32);
+}
+
+function encryptedFileStore(key) {
+  try {
+    const dir = join(process.env.HOME || "", ".everclaw");
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true, mode: 0o700 });
+    }
+
+    const encKey = getFileEncryptionKey();
+    const iv = randomBytes(16);
+    const cipher = createCipheriv("aes-256-gcm", encKey, iv);
+    const encrypted = Buffer.concat([cipher.update(key, "utf-8"), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+
+    // Store as: iv (16) + authTag (16) + ciphertext
+    const blob = Buffer.concat([iv, authTag, encrypted]);
+    writeFileSync(KEY_STORE_PATH, blob);
+    chmodSync(KEY_STORE_PATH, 0o600);
+    return true;
+  } catch (e) {
+    console.error("❌ Encrypted file store failed:", e.message);
+    return false;
+  }
+}
+
+function encryptedFileRetrieve() {
+  try {
+    if (!existsSync(KEY_STORE_PATH)) return null;
+    const blob = readFileSync(KEY_STORE_PATH);
+    if (blob.length < 33) return null; // iv(16) + authTag(16) + at least 1 byte
+
+    const iv = blob.subarray(0, 16);
+    const authTag = blob.subarray(16, 32);
+    const encrypted = blob.subarray(32);
+
+    const encKey = getFileEncryptionKey();
+    const decipher = createDecipheriv("aes-256-gcm", encKey, iv);
+    decipher.setAuthTag(authTag);
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return decrypted.toString("utf-8");
+  } catch {
+    return null;
+  }
+}
+
+// -- Unified interface --
+function keychainStore(key) {
+  if (OS === "darwin") {
+    return macKeychainStore(key);
+  }
+  if (OS === "linux" && hasSecretTool()) {
+    if (libsecretStore(key)) return true;
+    // Fall through to file backend on failure
+  }
+  return encryptedFileStore(key);
+}
+
+function keychainRetrieve() {
+  if (OS === "darwin") {
+    return macKeychainRetrieve();
+  }
+  if (OS === "linux" && hasSecretTool()) {
+    const val = libsecretRetrieve();
+    if (val) return val;
+    // Fall through to check file backend (migration case)
+  }
+  return encryptedFileRetrieve();
+}
+
 function keychainExists() {
   return keychainRetrieve() !== null;
+}
+
+function getBackendName() {
+  if (OS === "darwin") return "macOS Keychain";
+  if (OS === "linux" && hasSecretTool()) return "libsecret (secret-tool)";
+  return `encrypted file (${KEY_STORE_PATH})`;
 }
 
 // --- Viem Clients ---
@@ -130,14 +267,15 @@ async function cmdSetup() {
     process.exit(1);
   }
 
+  const backend = getBackendName();
   console.log("");
   console.log("╔══════════════════════════════════════════════════════════════╗");
   console.log("║  ♾️  Everclaw Wallet Created                                ║");
   console.log("╠══════════════════════════════════════════════════════════════╣");
   console.log(`║  Address: ${account.address}  ║`);
   console.log("║                                                              ║");
-  console.log("║  Private key stored in macOS Keychain (encrypted at rest).   ║");
-  console.log("║  Protected by your login password / Touch ID.                ║");
+  console.log(`║  Key stored via: ${backend.padEnd(42)}║`);
+  console.log("║  Encrypted at rest.                                          ║");
   console.log("║                                                              ║");
   console.log("║  NEXT STEPS:                                                 ║");
   console.log("║  1. Send ETH to the address above (for gas + MOR swap)      ║");
@@ -356,7 +494,7 @@ async function cmdImportKey(privateKey) {
     }
     console.log(`\n✅ Key imported successfully.`);
     console.log(`   Address: ${account.address}`);
-    console.log(`   Stored in macOS Keychain.\n`);
+    console.log(`   Backend: ${getBackendName()}\n`);
   } catch (e) {
     console.error(`❌ Invalid private key: ${e.message}`);
     process.exit(1);
@@ -368,7 +506,7 @@ function showHelp() {
 ♾️  Everclaw Wallet — Self-sovereign key management
 
 Commands:
-  setup                    Generate wallet, store in macOS Keychain
+  setup                    Generate wallet, store securely
   address                  Show wallet address
   balance                  Show ETH, MOR, USDC balances
   swap eth <amount>        Swap ETH for MOR via Uniswap V3
@@ -377,10 +515,18 @@ Commands:
   export-key               Print private key (use with caution)
   import-key <0xkey>       Import existing private key
 
+Key Storage Backends (auto-detected):
+  macOS    → macOS Keychain (security CLI)
+  Linux    → libsecret/secret-tool if available, encrypted file fallback
+  Other    → encrypted file (~/.everclaw/wallet.enc)
+
 Environment:
-  EVERCLAW_RPC             Base RPC URL (default: public blastapi)
-  EVERCLAW_KEYCHAIN_ACCOUNT  Keychain account name (default: everclaw-agent)
-  EVERCLAW_KEYCHAIN_SERVICE  Keychain service name (default: everclaw-wallet-key)
+  EVERCLAW_RPC               Base RPC URL (default: public blastapi)
+  EVERCLAW_KEY_STORE         Override encrypted file path (default: ~/.everclaw/wallet.enc)
+  EVERCLAW_KEYCHAIN_ACCOUNT  Keychain/libsecret account name (default: everclaw-agent)
+  EVERCLAW_KEYCHAIN_SERVICE  Keychain/libsecret service name (default: everclaw-wallet-key)
+
+Current backend: ${getBackendName()}
 
 Examples:
   node everclaw-wallet.mjs setup
