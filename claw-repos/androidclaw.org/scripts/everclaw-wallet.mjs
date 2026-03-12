@@ -46,6 +46,15 @@ const SWAP_ROUTER_ABI = parseAbi([
   "function exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)) payable returns (uint256 amountOut)",
 ]);
 
+const QUOTER_ABI = parseAbi([
+  "function quoteExactInputSingle((address tokenIn, address tokenOut, uint256 amountIn, uint24 fee, uint160 sqrtPriceLimitX96)) returns (uint256 amountOut, uint160 sqrtPriceX96After, uint32 initializedTicksCrossed, uint256 gasEstimate)",
+]);
+
+// --- Slippage Configuration ---
+// Default 3% slippage tolerance — override with EVERCLAW_SLIPPAGE_BPS (basis points)
+const DEFAULT_SLIPPAGE_BPS = 300; // 3%
+const SLIPPAGE_BPS = parseInt(process.env.EVERCLAW_SLIPPAGE_BPS || String(DEFAULT_SLIPPAGE_BPS), 10);
+
 // --- Keychain Helpers ---
 function keychainStore(key) {
   try {
@@ -232,9 +241,40 @@ async function cmdSwap(tokenIn, amountStr) {
 
   console.log(`\n🔄 Swapping ${amountStr} ${tokenIn.toUpperCase()} → MOR on Uniswap V3...\n`);
 
-  // For USDC, approve the router first
+  // Step 1: Get a quote to determine minimum acceptable output
+  console.log("   Fetching quote from QuoterV2...");
+  let quotedAmountOut;
+  try {
+    const quoteResult = await publicClient.simulateContract({
+      address: UNISWAP_QUOTER,
+      abi: QUOTER_ABI,
+      functionName: "quoteExactInputSingle",
+      args: [{
+        tokenIn: tokenInAddress,
+        tokenOut: MOR_TOKEN,
+        amountIn,
+        fee,
+        sqrtPriceLimitX96: 0n,
+      }],
+      ...(isETH ? { value: amountIn } : {}),
+    });
+    quotedAmountOut = quoteResult.result[0];
+    console.log(`   Quoted output: ${formatEther(quotedAmountOut)} MOR`);
+  } catch (e) {
+    console.error(`\n   ❌ Quote failed: ${e.shortMessage || e.message}`);
+    console.error("   Cannot swap without price quote (slippage protection).");
+    console.error("   This may indicate insufficient liquidity or an invalid pool.");
+    process.exit(1);
+  }
+
+  // Step 2: Calculate minimum output with slippage tolerance
+  const amountOutMinimum = quotedAmountOut * BigInt(10000 - SLIPPAGE_BPS) / 10000n;
+  console.log(`   Slippage tolerance: ${SLIPPAGE_BPS / 100}%`);
+  console.log(`   Minimum output: ${formatEther(amountOutMinimum)} MOR`);
+
+  // Step 3: Approve USDC if needed
   if (isUSDC) {
-    console.log("   Approving USDC for swap router...");
+    console.log("\n   Approving USDC for swap router...");
     const approveTx = await walletClient.writeContract({
       address: USDC_TOKEN,
       abi: ERC20_ABI,
@@ -246,14 +286,14 @@ async function cmdSwap(tokenIn, amountStr) {
     console.log("   ✓ Approved\n");
   }
 
-  // Execute swap
+  // Step 4: Execute swap with slippage-protected minimum
   const swapParams = {
     tokenIn: tokenInAddress,
     tokenOut: MOR_TOKEN,
     fee,
     recipient: account.address,
     amountIn,
-    amountOutMinimum: 0n, // Accept any amount (slippage tolerance for simplicity)
+    amountOutMinimum,
     sqrtPriceLimitX96: 0n,
   };
 
@@ -379,6 +419,7 @@ Commands:
 
 Environment:
   EVERCLAW_RPC             Base RPC URL (default: public blastapi)
+  EVERCLAW_SLIPPAGE_BPS    Slippage tolerance in basis points (default: 300 = 3%)
   EVERCLAW_KEYCHAIN_ACCOUNT  Keychain account name (default: everclaw-agent)
   EVERCLAW_KEYCHAIN_SERVICE  Keychain service name (default: everclaw-wallet-key)
 
