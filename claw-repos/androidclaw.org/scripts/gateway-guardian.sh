@@ -68,7 +68,9 @@ BILLING_BACKOFF_INTERVAL=1800  # When billing-dead, only check every 30 min (not
 OWNER_SIGNAL="+1XXXXXXXXXX"
 SIGNAL_ACCOUNT="+1XXXXXXXXXX"
 
-# Install script URL for nuclear option
+# Nuclear reinstall is disabled by default (security risk: unverified remote code execution).
+# Set GUARDIAN_ALLOW_NUCLEAR=1 to re-enable at your own risk.
+GUARDIAN_ALLOW_NUCLEAR="${GUARDIAN_ALLOW_NUCLEAR:-0}"
 INSTALL_URL="https://clawd.bot/install.sh"
 
 # Guardian probe session
@@ -266,13 +268,53 @@ do_kickstart() {
 }
 
 do_nuclear_reinstall() {
-  log "Step 4: NUCLEAR — full reinstall via $INSTALL_URL"
+  # SECURITY: curl | bash executes unverified remote code. If the remote host
+  # (clawd.bot) is compromised or DNS-hijacked, this auto-installs malware on
+  # an unattended schedule. Disabled by default — set GUARDIAN_ALLOW_NUCLEAR=1
+  # to opt in at your own risk.
+  if [[ "$GUARDIAN_ALLOW_NUCLEAR" != "1" ]]; then
+    log "Step 4: NUCLEAR reinstall SKIPPED (disabled by default for security)."
+    log "Step 4: To enable, set GUARDIAN_ALLOW_NUCLEAR=1 in environment."
+    log "Step 4: Manual reinstall: curl -fsSL $INSTALL_URL | bash"
+    notify_signal "🔴 Gateway Guardian: All recovery steps failed after $((INFERENCE_FAIL_COUNT * 2))+ min. Nuclear reinstall is disabled. Manual intervention required: curl -fsSL $INSTALL_URL | bash"
+    return 1
+  fi
+
+  log "Step 4: NUCLEAR — full reinstall via $INSTALL_URL (GUARDIAN_ALLOW_NUCLEAR=1)"
 
   notify_signal "🚨 Gateway Guardian: All recovery steps failed after $((INFERENCE_FAIL_COUNT * 2))+ min. Executing nuclear reinstall now."
 
-  log "Executing: curl -fsSL $INSTALL_URL | bash"
+  # Download first, then verify before executing
+  local tmp_script
+  tmp_script=$(mktemp /tmp/guardian-reinstall.XXXXXX.sh)
+  local dl_rc=0
+  curl -fsSL "$INSTALL_URL" -o "$tmp_script" 2>/dev/null || dl_rc=$?
+
+  if [[ "$dl_rc" -ne 0 ]] || [[ ! -s "$tmp_script" ]]; then
+    log "Step 4: Failed to download install script (exit code $dl_rc)."
+    rm -f "$tmp_script"
+    return 1
+  fi
+
+  # Basic sanity check — reject if suspiciously small or contains no bash
+  local script_size
+  script_size=$(wc -c < "$tmp_script")
+  if [[ "$script_size" -lt 100 ]]; then
+    log "Step 4: Downloaded script is suspiciously small (${script_size} bytes). Aborting."
+    rm -f "$tmp_script"
+    return 1
+  fi
+
+  if ! head -1 "$tmp_script" | grep -qE '^#!/bin/(ba)?sh'; then
+    log "Step 4: Downloaded script doesn't start with a shell shebang. Aborting."
+    rm -f "$tmp_script"
+    return 1
+  fi
+
+  log "Executing: $tmp_script (${script_size} bytes)"
   local nuclear_rc=0
-  curl -fsSL "$INSTALL_URL" | bash >> "$LOG_FILE" 2>&1 || nuclear_rc=$?
+  bash "$tmp_script" >> "$LOG_FILE" 2>&1 || nuclear_rc=$?
+  rm -f "$tmp_script"
 
   if [[ "$nuclear_rc" -ne 0 ]]; then
     log "Step 4: Nuclear reinstall script exited with code $nuclear_rc."
@@ -300,9 +342,10 @@ restart_all_steps() {
   do_kickstart && return 0
   do_nuclear_reinstall && return 0
 
-  log "CRITICAL: All restart attempts including nuclear reinstall FAILED."
-  log "CRITICAL: Manual intervention required: curl -fsSL $INSTALL_URL | bash"
-  notify_signal "🔴 Gateway Guardian: ALL recovery steps failed (graceful → hard → kickstart → nuclear). Manual intervention required."
+  log "CRITICAL: All restart attempts FAILED."
+  log "CRITICAL: Manual intervention required. Run: openclaw gateway restart"
+  log "CRITICAL: If that fails, try: curl -fsSL $INSTALL_URL | bash"
+  notify_signal "🔴 Gateway Guardian: ALL recovery steps failed. Manual intervention required: openclaw gateway restart"
   return 1
 }
 
