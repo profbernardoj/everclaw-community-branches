@@ -10,23 +10,30 @@ set -euo pipefail
 MORPHEUS_DIR="$HOME/morpheus"
 API_BASE="http://localhost:8082"
 
-# Model name → model ID mapping (must match session.sh)
-declare -A MODEL_IDS=(
-  ["kimi-k2.5:web"]="0xb487ee62516981f533d9164a0a3dcca836b06144506ad47a5c024a7a2a33fc58"
-  ["kimi-k2.5"]="0xbb9eaf3df30bbada0a6e3bdf3c836c792e3be34a64e68832874bbf0de7351e43"
-  ["kimi-k2-thinking"]="0xc40b937ae4b89e8680520070e48e6b507b869e6010429c7da0fe1e3c0c0f5436"
-  ["glm-4.7-flash"]="0xfdc5a596cf66236acb19c2825b7e4c3e48c2c463a183e3df4a8b46dc7e5b1a0e"
-  ["glm-4.7"]="0xed0a70b5e93cb9389c498e16837a96012e41baabde942dfc11ada58877c27b2a"
-  ["qwen3-235b"]="0x2a716a21c89a018e6e8e7e5f8a38505adff2e47bdd1be09f3e98e1a45c5ff76c"
-  ["qwen3-coder-480b"]="0x4709f1237a3e0faacbe09e8988e2902a2bca88e6470e7e7a8e4708e2c1b7ee74"
-  ["hermes-3-llama-3.1-405b"]="0x7e14da4e80529ca44e5e052ba855e7e6b5071635c0014e510e5be8493fabf54d"
-  ["llama-3.3-70b"]="0xc75321f1a21f09d9b8a0e2bab6c4fa942e6e5e85fc5e2c2e3f5d5f46c7e5a37b"
-  ["gpt-oss-120b"]="0x2e72a1b82478928e3481bab7f92e90f6a750f34c71da5e4b2ee54e7a98b2c231"
-  ["venice-uncensored"]="0xa003c4fba6bdb87b5a05c8b2c1657db8270827db0e87fcc2eaef17029aa01e6b"
-  ["whisper-v3-large-turbo"]="0x3e4f8c1a2b5d6e7f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7"
-  ["tts-kokoro"]="0x4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5"
-  ["text-embedding-bge-m3"]="0x5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6"
-)
+# Model name → model ID mapping
+# Uses a function instead of declare -A to avoid bash arithmetic parsing
+# issues with hyphenated keys (e.g. kimi-k2.5 is parsed as kimi minus k2.5)
+resolve_model_id() {
+  case "$1" in
+    kimi-k2.5:web)          echo "0xb487ee62516981f533d9164a0a3dcca836b06144506ad47a5c024a7a2a33fc58" ;;
+    kimi-k2.5)              echo "0xbb9e920d94ad3fa2861e1e209d0a969dbe9e1af1cf1ad95c49f76d7b63d32d93" ;;
+    kimi-k2-thinking)       echo "0xc40b0a1ea1b20e042449ae44ffee8e87f3b8ba3d0be3ea61b86e6a89ba1a44e3" ;;
+    glm-4.7-flash)          echo "0xfdc54de0b7f3e3525b4173f49e3819aebf1ed31e06d96be4eefaca04f2fcaeff" ;;
+    glm-4.7)                echo "0xed0a2bc2a6e28cc87a9b55bc24b61f089f3c86b15d94e5776bc0312e0b4df34b" ;;
+    qwen3-235b)             echo "0x2a71d1dfad6a7ead6e0c7f3d87d9a3c64e8bfa53f9a62fb71b83e7f49e3a6c0b" ;;
+    llama-3.3-70b)          echo "0xc753061a5d2640decfbbc1d1d35744e6805015d30d32872f814a93784c627fc3" ;;
+    gpt-oss-120b)           echo "0x2e7228fe07523d84307838aa617141a5e47af0e00b4eaeab1522bc71985ffd11" ;;
+    *)                      echo "" ;;
+  esac
+}
+
+# List available models for help text
+list_models() {
+  echo "    kimi-k2.5          kimi-k2.5:web"
+  echo "    kimi-k2-thinking   glm-4.7-flash"
+  echo "    glm-4.7            qwen3-235b"
+  echo "    llama-3.3-70b      gpt-oss-120b"
+}
 
 # Parse arguments
 MODEL_NAME="${1:?Usage: chat.sh <model_name> \"prompt text\" [--stream]}"
@@ -48,13 +55,11 @@ COOKIE_PASS=$(cat "$MORPHEUS_DIR/.cookie" | cut -d: -f2)
 if [[ "$MODEL_NAME" == 0x* ]]; then
   MODEL_ID="$MODEL_NAME"
 else
-  MODEL_ID="${MODEL_IDS[$MODEL_NAME]:-}"
+  MODEL_ID="$(resolve_model_id "$MODEL_NAME")"
   if [[ -z "$MODEL_ID" ]]; then
     echo "❌ Unknown model: $MODEL_NAME" >&2
     echo "   Available models:" >&2
-    for key in "${!MODEL_IDS[@]}"; do
-      echo "     $key" >&2
-    done
+    list_models >&2
     exit 1
   fi
 fi
