@@ -2,6 +2,31 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.3.14] - 2026-03-12
+
+### Fixed
+- **BUG-001: bash arithmetic crash** — chat.sh `declare -A` with hyphenated keys + `set -u` caused parsing crash; replaced with case statement
+- **BUG-002: balance.sh jq parsing** — SESSION_COUNT newline parsing fixed with `-r` flag
+- **BUG-003: bootstrap undefined values** — Added model fallback chain in testKey() + defensive displays for status/test
+- **BUG-004: session.sh missing commands** — Added `status` command for balance + session summary
+- **BUG-005: update check garbled** — Completely rewritten openclaw-update-check.sh from scratch (was single-line mangled JSON)
+- **BUG-006: pii-scan phone detection** — Added 4 builtin phone regex patterns (E.164, intl, US formats)
+- **BUG-007: boot templates empty** — Added 7 `__PLACEHOLDER__` tokens across 4 templates
+- **BUG-008: website stale version** — Updated hero from v0.9.8.2 to v2026.3.14, rewrote What's New section
+- **BUG-009: footer link broken** — Release link updated to v2026.3.14
+- **BUG-010: website version scheme** — Migrated What's New history to 2026.x.x date-based scheme
+- **BUG-011: gateway-guardian drift** — Synced SmartAgent copy to v5 (was 43 lines behind)
+- **BUG-012: key-api server truncated** — Restored from minified root file, beautified
+- **BUG-013: Dockerfile stale versions** — Updated OPENCLAW=v2026.3.2, EVERCLAW=2026.3.14
+- **BUG-014: GLM-5 gateway fallback** — Added gateway routing for mor-gateway/glm-5 model IDs
+- **BUG-015: default model mismatch** — Set glm-5 as default in morpheus-proxy.mjs
+
+### Changed
+- **Website refreshed** — Hero, What's New, and footer all updated for v2026.3.14
+- **14 files changed** — +165/-60 lines across scripts, templates, website, Dockerfile
+
+---
+
 ## [2026.3.13] - 2026-03-11
 
 ### Fixed
