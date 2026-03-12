@@ -201,34 +201,41 @@ function sigmoid(distance, steepness) {
 // ─── Main Classifier ────────────────────────────────────────────────────────
 
 export function classify(prompt, systemPrompt) {
-  const text = `${systemPrompt ?? ""} ${prompt}`.toLowerCase();
+  const fullText = `${systemPrompt ?? ""} ${prompt}`.toLowerCase();
   const userText = prompt.toLowerCase();
-  const estimatedTokens = Math.ceil(text.length / 4);
+  // Token estimation uses full text (system + user) since that's what the model processes
+  const estimatedTokens = Math.ceil(fullText.length / 4);
 
+  // IMPORTANT: All keyword scoring uses userText (user prompt only), NOT fullText.
+  // System prompts from OpenClaw contain words like "architecture", "deploy", "install",
+  // "debug", "verify", "edit", "modify", "scan", "audit" etc. as part of the agent's
+  // standard instructions. Including these inflates complexity scores for every request,
+  // causing the router to over-classify simple prompts as STANDARD or HEAVY.
+  //
+  // Only token count estimation uses the full text, since that reflects actual
+  // inference cost regardless of where the tokens come from.
   const dimensions = [
     scoreTokenCount(estimatedTokens),
-    scoreKeywords(text, CONFIG.codeKeywords, "codePresence", "code",
+    scoreKeywords(userText, CONFIG.codeKeywords, "codePresence", "code",
       { low: 1, high: 3 }, { none: 0, low: 0.5, high: 1.0 }),
-    // Reasoning uses USER text only (system prompts often contain "step by step")
     scoreKeywords(userText, CONFIG.reasoningKeywords, "reasoningMarkers", "reasoning",
       { low: 1, high: 2 }, { none: 0, low: 0.6, high: 1.0 }),
-    scoreKeywords(text, CONFIG.technicalKeywords, "technicalTerms", "technical",
+    scoreKeywords(userText, CONFIG.technicalKeywords, "technicalTerms", "technical",
       { low: 2, high: 4 }, { none: 0, low: 0.5, high: 1.0 }),
-    scoreKeywords(text, CONFIG.creativeKeywords, "creativeMarkers", "creative",
+    scoreKeywords(userText, CONFIG.creativeKeywords, "creativeMarkers", "creative",
       { low: 1, high: 2 }, { none: 0, low: 0.4, high: 0.6 }),
-    // Simple indicators score NEGATIVE (push toward LIGHT)
-    scoreSimple(text),
-    scoreMultiStep(text),
+    scoreSimple(userText),
+    scoreMultiStep(userText),
     scoreQuestionComplexity(prompt),
-    scoreKeywords(text, CONFIG.agenticKeywords, "agenticTask", "agentic",
+    scoreKeywords(userText, CONFIG.agenticKeywords, "agenticTask", "agentic",
       { low: 2, high: 4 }, { none: 0, low: 0.3, high: 0.6 }),
-    scoreKeywords(text, CONFIG.constraintKeywords, "constraintCount", "constraints",
+    scoreKeywords(userText, CONFIG.constraintKeywords, "constraintCount", "constraints",
       { low: 1, high: 3 }, { none: 0, low: 0.3, high: 0.6 }),
-    scoreKeywords(text, CONFIG.domainKeywords, "domainSpecificity", "domain",
+    scoreKeywords(userText, CONFIG.domainKeywords, "domainSpecificity", "domain",
       { low: 1, high: 2 }, { none: 0, low: 0.5, high: 0.8 }),
-    scoreKeywords(text, CONFIG.outputFormatKeywords, "outputFormat", "format",
+    scoreKeywords(userText, CONFIG.outputFormatKeywords, "outputFormat", "format",
       { low: 1, high: 2 }, { none: 0, low: 0.3, high: 0.5 }),
-    scoreKeywords(text, CONFIG.synthesisKeywords, "synthesis", "synthesis",
+    scoreKeywords(userText, CONFIG.synthesisKeywords, "synthesis", "synthesis",
       { low: 1, high: 2 }, { none: 0, low: 0.5, high: 0.8 }),
   ];
 
