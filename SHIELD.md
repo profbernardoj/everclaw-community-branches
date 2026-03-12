@@ -274,5 +274,49 @@ To avoid context overflow:
 
 ---
 
-*Last updated: 2026-02-07. Threat feed sourced from MoltThreats, Moltbook community reports, and ClawdStrike audit findings.*
+## Enforcement Scope & Limitations
+
+> **IMPORTANT:** This section documents what SHIELD.md does and does not protect.
+> Understanding the enforcement boundary is critical for accurate threat modeling.
+
+### What SHIELD.md protects
+
+SHIELD.md is a **prompt-based policy document**. It works by being loaded into the LLM's context window and relying on the model to read, parse, and voluntarily comply with the DECISION block protocol before taking actions.
+
+This means SHIELD.md is effective for:
+- **Agent tool calls** — when the LLM session uses `tool.call`, `skill.execute`, etc.
+- **Agent-initiated network requests** — when the LLM decides to fetch a URL or call an API
+- **Agent-initiated secret access** — when the LLM reads credentials via tools
+- **Skill installation via agent** — when the LLM processes a `clawhub install` request
+
+In short: SHIELD.md governs actions that flow through the LLM's reasoning loop.
+
+### What SHIELD.md does NOT protect
+
+Any code that executes **outside** the LLM session bypasses SHIELD.md entirely:
+
+| Component | Runs outside LLM? | SHIELD coverage |
+|-----------|-------------------|-----------------|
+| `gateway-guardian.sh` | ✅ bash script (launchd/cron) | ❌ No coverage |
+| `morpheus-proxy.mjs` | ✅ standalone Node.js server | ❌ No coverage |
+| `everclaw-wallet.mjs` | ✅ standalone CLI | ❌ No coverage |
+| `install.sh` / `install-proxy.sh` | ✅ bash scripts | ❌ No coverage |
+| Cron jobs (non-agentTurn) | ✅ systemEvent injection | ❌ No coverage |
+| Sub-agent sessions | ⚠️ Only if SHIELD.md is in context | ⚠️ Partial |
+
+**Concrete example:** THREAT-005 blocks `outbound request to ngrok.io`. If the guardian's nuclear reinstall step downloads a compromised script that phones home to ngrok.io, SHIELD.md cannot detect or prevent it — the guardian is a bash script, not an LLM session.
+
+### Recommendations for hardening
+
+1. **Infrastructure scripts should enforce their own policies.** Scripts like the guardian should validate URLs against an allowlist, verify checksums, or refuse to execute remote code — independent of SHIELD.md.
+
+2. **Document the trust boundary explicitly.** Users should know that SHIELD.md protects agent behavior but not the surrounding infrastructure. This prevents false confidence.
+
+3. **Consider a runtime enforcement layer.** A lightweight process-level policy (e.g., a proxy that checks outbound requests against the threat feed before allowing them) would cover the gap between prompt-based and infrastructure-level enforcement.
+
+4. **Sub-agent sessions** should explicitly load SHIELD.md or inherit threat policies from the parent session to avoid policy gaps in isolated runs.
+
+---
+
+*Last updated: 2026-03-12. Threat feed sourced from MoltThreats, Moltbook community reports, and ClawdStrike audit findings.*
 *Next review: Update when installing new skills or on weekly security check.*
