@@ -2,6 +2,44 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.3.16] - 2026-03-12
+
+### Changed
+- **install-with-deps.sh** — Complete zero-prompt rewrite (5-stage build)
+  - `curl -fsSL https://get.everclaw.xyz | bash` now fully unattended
+  - Hardware detection (RAM, disk, GPU) ported from setup-ollama.sh
+  - All dependencies auto-install without prompts (Homebrew, Node.js, git, curl, OpenClaw)
+  - EverClaw clone/update is automatic (no "Update? [y/N]" prompt)
+  - Bootstrap key provisioned automatically (failure is non-fatal)
+  - Morpheus proxy-router auto-installs when ≥2 GB disk free
+  - Ollama local fallback auto-installs when ≥5 GB disk + ≥2 GB RAM
+  - Config merge via setup.mjs --apply --restart runs automatically
+  - Dashboard auto-opens after successful install (macOS/Linux)
+  - Dynamic success banner shows installed components + inference chain
+  - New flags: --skip-ollama, --skip-proxy (--auto-install now legacy no-op)
+  - --check-only shows hardware stats + gating preview for all components
+  - Zero `read -p` prompts in entire script (was 3)
+  - PII scan clean, bash -n syntax verified
+
+---
+
+## [2026.3.15] - 2026-03-12
+
+### Added
+- **setup-ollama.sh** — Hardware-aware local Ollama inference fallback
+  - Auto-detects OS, CPU arch, total/available RAM, GPU (Apple Metal, NVIDIA CUDA, AMD ROCm)
+  - Selects optimal Qwen3.5 model (0.8B–35B) based on available resources
+  - Model sizes verified against Ollama registry (0.8b, 2b, 4b, 9b, 27b, 35b)
+  - Installs Ollama, pulls model, configures OpenClaw provider + fallback chain
+  - Sets up auto-start service (launchd on macOS, systemd on Linux)
+  - Tests inference after setup, dry-run by default
+  - `--uninstall` cleanly removes from config without touching Ollama binary
+  - Never exceeds 70% of total RAM — safe for all hardware
+- **setup.mjs --with-ollama** — Integrated Ollama setup into main config flow
+- **Config templates** — Both mac and linux templates now include ollama provider + fallback
+
+---
+
 ## [2026.3.14] - 2026-03-12
 
 ### Fixed
