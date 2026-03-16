@@ -22,11 +22,21 @@ services:
     container_name: everclaw
     restart: unless-stopped
     ports:
+      # Default: accessible from all interfaces.
+      # For local-only use, bind to localhost instead:
+      # - "127.0.0.1:18789:18789"
+      # - "127.0.0.1:8083:8083"
       - "18789:18789"  # OpenClaw Gateway (web UI)
       - "8083:8083"    # Morpheus inference proxy
     environment:
-      # OpenClaw settings
+      # OpenClaw auth token — auto-generated on first run if not set.
+      # Set this to use a specific token (useful for automation/CI).
+      # Note: `docker compose down -v` removes volumes, so a new token is
+      # generated on next start and old bookmarked URLs stop working.
       - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN:-}
+      # Set to "true" to re-enable device pairing in Docker
+      # (advanced — not recommended, Docker bridge breaks device auth):
+      # - OPENCLAW_ENABLE_DEVICE_AUTH=true
       # Morpheus proxy settings
       - EVERCLAW_PROXY_PORT=8083
       - EVERCLAW_PROXY_HOST=0.0.0.0
