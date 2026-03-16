@@ -1,0 +1,104 @@
+name: EverClaw CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  syntax-check:
+    name: Syntax & Shell Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Node syntax check
+        run: node --check scripts/*.mjs
+
+      - name: Shell syntax check
+        run: bash -n scripts/*.sh
+
+  unit-tests:
+    name: Wallet Tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Run wallet test suite
+        run: node --test scripts/everclaw-wallet.test.mjs
+
+  proxy-tests:
+    name: Proxy Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Start proxy with test key
+        env:
+          MORPHEUS_PROXY_API_KEY: "ci-test-key"
+        run: |
+          node scripts/morpheus-proxy.mjs &
+          sleep 4
+
+      - name: Test /health endpoint
+        run: curl -f http://127.0.0.1:8083/health
+
+  security-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gitleaks (CLI)
+        run: |
+          wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz
+          tar -xzf gitleaks_8.21.2_linux_x64.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+
+      - name: Scan for secrets
+        run: gitleaks detect --source . --verbose --no-git
+
+  docker-smoke:
+    name: Docker Build Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t everclaw-test .
+
+      - name: Basic container smoke test
+        run: docker run --rm everclaw-test node --check scripts/setup.mjs
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
