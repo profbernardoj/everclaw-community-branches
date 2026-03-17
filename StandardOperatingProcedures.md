@@ -780,14 +780,14 @@ The EverClaw sales funnel has 5 stages. Each stage is supported by dedicated AI 
 
 | Agent ID | Agent Name | Model | Stages | Role | Signal Group ID |
 |----------|------------|-------|--------|------|-----------------|
-| `content-writer` | Content Writer | morpheus/glm-5 | 1 | Write blog posts, landing page copy, X threads, flavor-specific marketing materials for all 28 flavors. Takes persona and flavor context as input. | *(TBD — create first)* |
-| `social-manager` | Social Manager | morpheus/glm-5 | 1 | Draft social posts for X/Farcaster/Discord/Telegram. Track engagement, draft responses to mentions, coordinate influencer outreach. | *(TBD)* |
-| `lead-tracker` | Lead Tracker | morpheus/glm-5 | 1–2 | Track inbound interest (GitHub stars, website visits, install counts, DMs). Maintain CRM data. Score and qualify leads. | *(TBD)* |
-| `onboarding-agent` | Onboarding Agent | morpheus/glm-5 | 2, 5 | Guide new users through VM setup or DIY hardware setup. Answer setup questions. Escalate blockers. Track conversion from signup → running agent. | *(TBD)* |
-| `inference-support` | Inference Support | morpheus/glm-5 | 3 | Help users connect to Morpheus inference. Troubleshoot MOR staking, proxy-router setup, model selection. Monitor inference health. | *(TBD)* |
-| `sales-closer` | Sales Closer | morpheus/glm-5 | 3–4 | Nurture users from VM → hardware purchase. Handle objections. Track pipeline from trial → ClawBox order. Coordinate with IronHill. | *(TBD)* |
-| `community-manager` | Community Manager | morpheus/glm-5 | 1–5 | Manage Discord/Telegram communities per flavor. Welcome new members, answer FAQs, escalate issues, run engagement campaigns. | *(TBD)* |
-| `analytics-agent` | Analytics Agent | morpheus/glm-5 | 1–5 | Track funnel metrics across all stages: conversion rates, drop-off points, install counts, active users, MOR staking growth. Produce weekly reports. | *(TBD)* |
+| `content-writer` | Content Writer | morpheus/glm-5 | 1 | Write blog posts, landing page copy, X threads, flavor-specific marketing materials for all 28 flavors. Takes persona and flavor context as input. | `L33pPTSPmX7vgOhTjWWJIqUhs+T2i2erb4gO+GPYRv0=` |
+| `social-manager` | Social Manager | morpheus/glm-5 | 1 | Draft social posts for X/Farcaster/Discord/Telegram. Track engagement, draft responses to mentions, coordinate influencer outreach. | `HG7jhfrk5F9jnwzZMXYLhCgFJumSXTvIJQs8a06Y1t0=` |
+| `lead-tracker` | Lead Tracker | morpheus/glm-5 | 1–2 | Track inbound interest (GitHub stars, website visits, install counts, DMs). Maintain CRM data. Score and qualify leads. | `ve3o3EJZlJCO6lXnFcwB9pVxmaBRYFAQbmSp8/05q9w=` |
+| `onboarding-agent` | Onboarding Agent | morpheus/glm-5 | 2, 5 | Guide new users through VM setup or DIY hardware setup. Answer setup questions. Escalate blockers. Track conversion from signup → running agent. | `+4cUWjjPju+8b6klwQ/1o5BRqGED94go490mWXY18Yg=` |
+| `inference-support` | Inference Support | morpheus/glm-5 | 3 | Help users connect to Morpheus inference. Troubleshoot MOR staking, proxy-router setup, model selection. Monitor inference health. | `KN5ycpjeU1Ge7OlTCEqA/tQkc6W3qqLubWBfj6GiztQ=` |
+| `sales-closer` | Sales Closer | morpheus/glm-5 | 3–4 | Nurture users from VM → hardware purchase. Handle objections. Track pipeline from trial → ClawBox order. Coordinate with IronHill. | `8SfeDCsivG8n/RZZ8YqpUcWNBA2t1aoytOhiIvQsZD0=` |
+| `community-manager` | Community Manager | morpheus/glm-5 | 1–5 | Manage Discord/Telegram communities per flavor. Welcome new members, answer FAQs, escalate issues, run engagement campaigns. | `OmV9k3tDGP9FqZRdqsmocUBlRBZUStcObwAt0SWO8Aw=` |
+| `analytics-agent` | Analytics Agent | morpheus/glm-5 | 1–5 | Track funnel metrics across all stages: conversion rates, drop-off points, install counts, active users, MOR staking growth. Produce weekly reports. | `U9WymONIRKHKoEDEObVHBiQtdko1hJPYUZCJNhehMYI=` |
 
 **Total new agents: 8**
 
