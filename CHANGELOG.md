@@ -2,6 +2,27 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.3.23] - 2026-03-17
+
+### Added
+- **agent-chat skill v0.1.0**: Real-time XMTP E2E-encrypted messaging
+  - Always-on daemon with `@xmtp/agent-sdk` v2.3.0
+  - Filesystem bridge (outbox/inbox) for OpenClaw IPC
+  - 3-policy consent system (open/handshake/strict)
+  - Middleware chain: Consent → CommsGuard V6 → Router
+  - Two-tier identity: 28 flavor canonical + per-user wallets
+  - launchd (macOS) + systemd (Linux) service templates
+  - CLI: status, health, groups, setup commands
+  - 36-test suite (unit + adversarial, 114ms)
+
+### Security
+- **agent-chat router.mjs**: Path traversal vulnerability fixed — `correlationId` sanitized to `[a-zA-Z0-9_-]` before inbox file write
+- **agent-chat identity.mjs**: Runtime warning when wallet key length ≠ 66 (catches truncated keys)
+- **agent-chat setup-identity.mjs**: Post-setup PII sanity check scans source files for leaked address
+
+### Process
+- Full SOP-001 pipeline: Research → Architecture (v2.3) → Code (Phases A/B/C) → Cross-model audit (Grok 4.2 + Claude 4.6) → Testing (36/36) → PII scan → Deploy → Ecosystem sync (30/31)
+
 ## [2026.3.22] - 2026-03-16
 
 ### Security
