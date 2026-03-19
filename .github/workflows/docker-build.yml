@@ -33,6 +33,10 @@ jobs:
         id: version
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
+      - name: Get OpenClaw version from Dockerfile
+        id: openclaw_version
+        run: echo "OPENCLAW_VERSION=$(grep -m1 'ARG OPENCLAW_VERSION=' Dockerfile | sed 's/ARG OPENCLAW_VERSION=//')" >> $GITHUB_OUTPUT
+
       - name: Set up QEMU (for multi-arch)
         uses: docker/setup-qemu-action@v3
 
@@ -70,9 +74,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             EVERCLAW_VERSION=${{ steps.version.outputs.VERSION }}
-            OPENCLAW_VERSION=v2026.3.11
+            OPENCLAW_VERSION=${{ steps.openclaw_version.outputs.OPENCLAW_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          no-cache-filter: openclaw-builder
           platforms: linux/amd64,linux/arm64
 
       - name: Output image info

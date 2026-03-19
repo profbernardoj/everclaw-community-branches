@@ -1,6 +1,6 @@
 {
   "name": "everclaw",
-  "version": "2026.3.29",
+  "version": "2026.3.30",
   "private": true,
   "description": "Morpheus inference skill for OpenClaw agents",
   "type": "module",
