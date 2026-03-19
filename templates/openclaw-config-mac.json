@@ -8,8 +8,10 @@
   ],
   "gateway": {
     "controlUi": {
-      "_comment": "Required when gateway binds to non-loopback (0.0.0.0 / lan). Without this, gateway crashes on startup.",
+      "_comment": "Required when gateway binds to non-loopback (0.0.0.0 / lan). Without this, gateway crashes on startup. dangerouslyDisableDeviceAuth and allowInsecureAuth are needed for HTTP access from non-localhost IPs.",
       "enabled": true,
+      "dangerouslyDisableDeviceAuth": true,
+      "allowInsecureAuth": true,
       "allowedOrigins": [
         "http://localhost:18789",
         "http://127.0.0.1:18789",

@@ -2,6 +2,18 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.3.28] - 2026-03-19
+
+### Fixed
+- **"Disconnected from Gateway" / "Device Identity Required" on container LAN access** — Browsers block `crypto.subtle` on plain HTTP from non-localhost IPs, preventing Ed25519 device keypair generation. The gateway rejected the WebSocket connect with `DEVICE_IDENTITY_REQUIRED`. Fixed by adding `dangerouslyDisableDeviceAuth: true` and `allowInsecureAuth: true` across all config paths: Dockerfile default template, all 3 config templates (mac/linux/gateway-only), docker-entrypoint.sh jq merges, and setup.mjs safe-merge. Matches upstream OpenClaw issues #11590, #44485, #40812, #44967.
+- **Race condition: gateway could start before config was fully patched** — Added a defensive config verification step in docker-entrypoint.sh that runs AFTER auth injection but BEFORE gateway start. Forces `dangerouslyDisableDeviceAuth` and `allowInsecureAuth` if missing (respects `OPENCLAW_ENABLE_DEVICE_AUTH=true` env var to opt out).
+- **Default config missing `gateway.auth` block** — Added `gateway.auth.mode: "none"` to `openclaw-default.json` so the gateway has a defined auth state from first read. Entrypoint cleanly upgrades to `"token"` mode.
+
+### Changed
+- Bumped OpenClaw from v2026.3.11 to v2026.3.13 (22 security patches + auth fixes for device identity handling)
+- All config templates now include both `dangerouslyDisableDeviceAuth` and `allowInsecureAuth` for consistent container/headless support
+- `setup.mjs` mergeConfig now propagates `dangerouslyDisableDeviceAuth` and `allowInsecureAuth` from templates (only if user hasn't explicitly set them)
+
 ## [2026.3.27] - 2026-03-19
 
 ### Fixed

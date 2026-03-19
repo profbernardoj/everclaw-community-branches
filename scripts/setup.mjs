@@ -141,6 +141,14 @@ function mergeConfig(existing, template) {
     if (merged.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback === undefined) {
       merged.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback = tplControlUi.dangerouslyAllowHostHeaderOriginFallback;
     }
+    // Set device auth bypass if not already set (needed for HTTP access from non-localhost)
+    if (merged.gateway.controlUi.dangerouslyDisableDeviceAuth === undefined && tplControlUi.dangerouslyDisableDeviceAuth !== undefined) {
+      merged.gateway.controlUi.dangerouslyDisableDeviceAuth = tplControlUi.dangerouslyDisableDeviceAuth;
+    }
+    // Set insecure auth if not already set (needed for HTTP access from non-localhost)
+    if (merged.gateway.controlUi.allowInsecureAuth === undefined && tplControlUi.allowInsecureAuth !== undefined) {
+      merged.gateway.controlUi.allowInsecureAuth = tplControlUi.allowInsecureAuth;
+    }
     console.log('🔧 Auto-configured safe gateway.controlUi defaults');
   }
 

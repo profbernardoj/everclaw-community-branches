@@ -34,7 +34,7 @@
 # Pin OpenClaw version for reproducible builds.
 # Update this when upgrading to a new release.
 
-ARG OPENCLAW_VERSION=v2026.3.11
+ARG OPENCLAW_VERSION=v2026.3.13
 
 FROM node:22-bookworm AS openclaw-builder
 
@@ -108,8 +108,13 @@ WORKDIR /app
 RUN cat > /home/node/.openclaw/openclaw-default.json << 'DEFAULTCONFIG'
 {
   "gateway": {
+    "auth": {
+      "mode": "none"
+    },
     "controlUi": {
       "enabled": true,
+      "dangerouslyDisableDeviceAuth": true,
+      "allowInsecureAuth": true,
       "allowedOrigins": [
         "http://localhost:18789",
         "http://127.0.0.1:18789",
@@ -166,7 +171,7 @@ RUN chmod +x /app/docker-entrypoint.sh
 
 # ─── Environment ──────────────────────────────────────────────────────────────
 
-ARG EVERCLAW_VERSION=2026.3.27
+ARG EVERCLAW_VERSION=2026.3.28
 ENV EVERCLAW_VERSION=${EVERCLAW_VERSION}
 ENV NODE_ENV=production
 ENV EVERCLAW_PROXY_PORT=8083
