@@ -1,3 +1,4 @@
+<!-- template-version: 2026.3.20 -->
 # USER.md - About Your Human
 
 *Learn about the person you're helping. Update this as you go.*

@@ -5,7 +5,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, appendFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -28,13 +28,25 @@ function saveIndex(index) {
 
 function createContact(name, category, options = {}) {
   const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+  // Path traversal defense (defense-in-depth)
+  if (!slug || slug.includes('..') || slug.startsWith('/') || slug.startsWith('-')) {
+    throw new Error(`Invalid contact name "${name}" — path traversal attempt blocked`);
+  }
+
   const categoryDir = join(MEMORY_ROOT, category);
+  const filePath = join(categoryDir, `${slug}.md`);
+
+  // Canonical path validation — ensure we stay inside MEMORY_ROOT
+  const safePath = resolve(filePath);
+  const safeRoot = resolve(MEMORY_ROOT);
+  if (!safePath.startsWith(safeRoot + '/')) {
+    throw new Error(`Invalid contact path — outside memory root`);
+  }
 
   if (!existsSync(categoryDir)) {
     mkdirSync(categoryDir, { recursive: true });
   }
-
-  const filePath = join(categoryDir, `${slug}.md`);
 
   const content = `# ${name}
 

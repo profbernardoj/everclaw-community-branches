@@ -18,6 +18,29 @@
 
 set -euo pipefail
 
+# === Concurrent Execution Lock (prevents overlapping pushes) ===
+LOCK_DIR="/tmp/everclaw-ecosystem-sync.lock"
+if mkdir "$LOCK_DIR" 2>/dev/null; then
+  trap 'rm -rf "$LOCK_DIR"' EXIT
+else
+  # Check if stale (older than 10 minutes)
+  lock_age=0
+  if [[ -f "$LOCK_DIR/pid" ]]; then
+    lock_ts=$(stat -f %m "$LOCK_DIR/pid" 2>/dev/null || stat -c %Y "$LOCK_DIR/pid" 2>/dev/null || echo 0)
+    lock_age=$(( $(date +%s) - lock_ts ))
+  fi
+  if (( lock_age > 600 )); then
+    echo "⚠️  Stale lock detected (${lock_age}s old) — removing and continuing"
+    rm -rf "$LOCK_DIR"
+    mkdir "$LOCK_DIR" 2>/dev/null
+    trap 'rm -rf "$LOCK_DIR"' EXIT
+  else
+    echo "❌ Another ecosystem-sync is already running. Exiting." >&2
+    exit 1
+  fi
+fi
+echo $$ > "$LOCK_DIR/pid"
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BRANCH="main"

@@ -1,3 +1,4 @@
+<!-- template-version: 2026.3.20 -->
 # AGENTS.md - Your Workspace
 
 This folder is home. Treat it that way.
