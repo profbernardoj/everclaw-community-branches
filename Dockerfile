@@ -130,7 +130,18 @@ RUN cat > /home/node/.openclaw/openclaw-default.json << 'DEFAULTCONFIG'
   "models": {
     "mode": "merge",
     "providers": {
+      "mor-gateway": {
+        "baseUrl": "https://api.mor.org/api/v1",
+        "apiKey": "YOUR_MOR_GATEWAY_API_KEY",
+        "api": "openai-completions",
+        "models": [
+          { "id": "glm-5", "name": "GLM-5 (Morpheus Gateway)", "reasoning": false },
+          { "id": "glm-4.7-flash", "name": "GLM 4.7 Flash (Morpheus Gateway)", "reasoning": false },
+          { "id": "kimi-k2.5", "name": "Kimi K2.5 (Morpheus Gateway)", "reasoning": false }
+        ]
+      },
       "morpheus-local": {
+        "_note": "Local P2P proxy — only active when MORPHEUS_PROXY_API_KEY env var is set",
         "baseUrl": "http://127.0.0.1:8083/v1",
         "api": "openai-completions",
         "models": [
@@ -139,26 +150,28 @@ RUN cat > /home/node/.openclaw/openclaw-default.json << 'DEFAULTCONFIG'
           { "id": "kimi-k2.5", "name": "Kimi K2.5 (Morpheus Local)", "reasoning": false },
           { "id": "kimi-k2-thinking", "name": "Kimi K2 Thinking (Morpheus Local)", "reasoning": true }
         ]
-      },
-      "mor-gateway": {
-        "baseUrl": "https://api.mor.org/api/v1",
-        "api": "openai-completions",
-        "models": [
-          { "id": "glm-5", "name": "GLM-5 (Morpheus Gateway)", "reasoning": false },
-          { "id": "glm-4.7-flash", "name": "GLM 4.7 Flash (Morpheus Gateway)", "reasoning": false },
-          { "id": "kimi-k2.5", "name": "Kimi K2.5 (Morpheus Gateway)", "reasoning": false }
-        ]
       }
     }
   },
   "agents": {
     "defaults": {
+      "_morpheusNote": "Morpheus Gateway models can take 30-120s on first request due to P2P provider discovery. 300s timeout required.",
+      "timeoutSeconds": 300,
       "model": {
-        "primary": "morpheus-local/glm-5",
+        "primary": "mor-gateway/glm-5",
         "fallbacks": [
-          "mor-gateway/glm-5",
-          "mor-gateway/kimi-k2.5"
+          "mor-gateway/kimi-k2.5",
+          "mor-gateway/glm-4.7-flash"
         ]
+      },
+      "models": {
+        "mor-gateway/glm-5": { "streaming": true },
+        "mor-gateway/kimi-k2.5": { "streaming": true },
+        "mor-gateway/glm-4.7-flash": { "streaming": true },
+        "morpheus-local/glm-5": { "streaming": true },
+        "morpheus-local/kimi-k2.5": { "streaming": true },
+        "morpheus-local/glm-4.7-flash": { "streaming": true },
+        "morpheus-local/kimi-k2-thinking": { "streaming": true }
       }
     }
   }
@@ -175,7 +188,7 @@ RUN chmod +x /app/docker-entrypoint.sh
 
 # ─── Environment ──────────────────────────────────────────────────────────────
 
-ARG EVERCLAW_VERSION=2026.3.20.1823
+ARG EVERCLAW_VERSION=2026.3.20.1950
 ENV EVERCLAW_VERSION=${EVERCLAW_VERSION}
 ENV NODE_ENV=production
 ENV EVERCLAW_PROXY_PORT=8083

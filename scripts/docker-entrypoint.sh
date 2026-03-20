@@ -344,7 +344,32 @@ if jq . "$CONFIG_FILE" > /dev/null 2>&1; then
   fi
 fi
 
-# ─── Start Morpheus Proxy (background) ──────────────────────────────────────
+# ─── Smart Model Routing: Fix primary model if proxy isn't available ──────────
+# If primary model points at morpheus-local/* but MORPHEUS_PROXY_API_KEY isn't set,
+# the local proxy won't start and every request hits a dead endpoint → instant timeout.
+# Swap primary to mor-gateway equivalent so users with only a Gateway API key work out of the box.
+
+if jq . "$CONFIG_FILE" > /dev/null 2>&1; then
+  CURRENT_PRIMARY=$(jq -r '.agents.defaults.model.primary // empty' "$CONFIG_FILE" 2>/dev/null)
+  if [[ "$CURRENT_PRIMARY" == morpheus-local/* ]] && [ -z "${MORPHEUS_PROXY_API_KEY:-}" ]; then
+    # Extract the model name (e.g., "glm-5" from "morpheus-local/glm-5")
+    MODEL_NAME="${CURRENT_PRIMARY#morpheus-local/}"
+    NEW_PRIMARY="mor-gateway/${MODEL_NAME}"
+    TMP_CONFIG=$(mktemp)
+    # Swap primary + any morpheus-local/* entries in fallbacks array
+    if jq --arg old "$CURRENT_PRIMARY" --arg new "$NEW_PRIMARY" '
+      .agents.defaults.model.primary = $new |
+      .agents.defaults.model.fallbacks |= map(if . == $old then $new else . end)
+    ' "$CONFIG_FILE" > "$TMP_CONFIG" 2>/dev/null; then
+      mv "$TMP_CONFIG" "$CONFIG_FILE"
+      echo "🔄 Primary model: ${CURRENT_PRIMARY} → ${NEW_PRIMARY} (local proxy not configured)"
+    else
+      rm -f "$TMP_CONFIG"
+    fi
+  fi
+fi
+
+# ─── Start Morpheus Proxy (background, only if configured) ──────────────────
 
 # Trap signals to clean up all children on exit
 cleanup() {
@@ -366,10 +391,15 @@ trap cleanup EXIT INT TERM
 
 PROXY_SCRIPT="${SKILLS_DIR}/scripts/morpheus-proxy.mjs"
 
-if [ -f "$PROXY_SCRIPT" ]; then
+if [ -f "$PROXY_SCRIPT" ] && [ -n "${MORPHEUS_PROXY_API_KEY:-}" ]; then
   echo "🚀 Starting Morpheus proxy on port ${EVERCLAW_PROXY_PORT:-8083}..."
   node "$PROXY_SCRIPT" &
   PROXY_PID=$!
+elif [ -f "$PROXY_SCRIPT" ] && [ -z "${MORPHEUS_PROXY_API_KEY:-}" ]; then
+  echo "ℹ️  Morpheus local proxy skipped (MORPHEUS_PROXY_API_KEY not set)"
+  echo "   Using Morpheus API Gateway (mor-gateway) for inference"
+  echo "   This is the recommended setup for gateway-only installs."
+  PROXY_PID=""
 else
   echo "⚠️  Morpheus proxy script not found at $PROXY_SCRIPT"
   echo "   Skipping proxy — OpenClaw will use API Gateway providers only"

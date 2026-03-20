@@ -2,6 +2,16 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.3.20.1950] - 2026-03-20
+
+### Fixed
+- **Docker default config routed to dead local proxy** — The Dockerfile's inline default config set `morpheus-local/glm-5` as primary model, which requires a running local proxy + `MORPHEUS_PROXY_API_KEY`. Most Docker users only have a Gateway API key → proxy fails on startup → every request hits dead endpoint → instant timeout. Fix:
+  - Dockerfile default config now uses `mor-gateway/glm-5` as primary (works with just `MORPHEUS_GATEWAY_API_KEY`)
+  - `morpheus-local` provider kept as optional (only useful when `MORPHEUS_PROXY_API_KEY` is set)
+  - Default config includes `timeoutSeconds: 300` and streaming overrides
+  - Entrypoint auto-detects: if primary is `morpheus-local/*` but `MORPHEUS_PROXY_API_KEY` isn't set, swaps to `mor-gateway/*` equivalent
+  - Morpheus local proxy now only starts when `MORPHEUS_PROXY_API_KEY` is set (no more scary error on startup)
+
 ## [2026.3.20.1823] - 2026-03-20
 
 ### Fixed
