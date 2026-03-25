@@ -41,16 +41,8 @@ tmp
 temp
 *.tmp
 
-# Private memory — NEVER push personal data
-memory/campaigns/
-memory/daily/
-memory/events/
-memory/goals/
-memory/insights/
-memory/marketing/
-memory/projects/
-memory/reference/
-memory/relationships/
+# Private memory — NEVER push personal data (ALL memory files)
+memory/
 MEMORY.md
 
 # PII / Sensitive business data - NEVER COMMIT
@@ -68,7 +60,8 @@ scripts/.last-sync.json
 scripts/finance-tracker-x402.mjs
 scripts/asset-tracker.sh
 finance-tracker/
-mission-control/dashboard-data.jsonscripts/finance-tracker.sh
+mission-control/dashboard-data.json
+scripts/finance-tracker.sh
 *.plist
 __pycache__/
 
