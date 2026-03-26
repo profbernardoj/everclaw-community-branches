@@ -1,4 +1,4 @@
-# Enable Morpheus — Decentralized Inference for NullClaw
+# Enable [REDACTED] — Decentralized Inference for NullClaw
 
 ## Proxy
 

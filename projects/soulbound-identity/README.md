@@ -21,7 +21,7 @@ that serves as the agent's on-chain wallet.
 ## Agent Roster
 
 ### Business Agents (Mac Mini #1)
-1. **Web3 Agent** — Morpheus ecosystem, decentralized inference
+1. **Web3 Agent** — [REDACTED] ecosystem, decentralized inference
 2. **Agentic AI Agent** — EverClaw, 28 flavors, ClawHub
 3. **Corporate Agent** — Based AI, enterprise
 4. **Advisor Agent** — External project advisory

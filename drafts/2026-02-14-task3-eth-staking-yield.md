@@ -1,4 +1,4 @@
-# Task 3: ETH Staking Yield Model for Morpheus — Research Brief
+# Task 3: ETH Staking Yield Model for [REDACTED] — Research Brief
 
 **Date:** 2026-02-14
 **Status:** Complete
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-ETH staking currently yields ~3.3% APY (2.84% consensus + MEV/priority fees). This yield is the engine that powers Morpheus capital contracts — depositors redirect staking yield to the protocol and receive MOR emissions in return. With the v2 upgrade, Morpheus now also captures yield from USDC, USDT, and wBTC via Aave lending markets. The key insight: Morpheus capital providers earn MOR emissions that may significantly exceed the yield they contribute, making it an attractive proposition especially when MOR price appreciates.
+ETH staking currently yields ~3.3% APY (2.84% consensus + MEV/priority fees). This yield is the engine that powers [REDACTED] capital contracts — depositors redirect staking yield to the protocol and receive MOR emissions in return. With the v2 upgrade, [REDACTED] now also captures yield from USDC, USDT, and wBTC via Aave lending markets. The key insight: [REDACTED] capital providers earn MOR emissions that may significantly exceed the yield they contribute, making it an attractive proposition especially when MOR price appreciates.
 
 ---
 
@@ -47,11 +47,11 @@ ETH staking currently yields ~3.3% APY (2.84% consensus + MEV/priority fees). Th
 
 ---
 
-## How Morpheus Captures This Yield
+## How [REDACTED] Captures This Yield
 
 ### stETH Flow (Original v1)
 
-1. User deposits stETH into Morpheus `DepositPool` on Ethereum
+1. User deposits stETH into [REDACTED] `DepositPool` on Ethereum
 2. stETH rebases daily (~2.5-3% APY) — new stETH accrues to the pool
 3. The **yield portion** (rebasing increase) is captured by the `Distributor`
 4. Yield is converted to wstETH → bridged to Arbitrum via LayerZero
@@ -71,7 +71,7 @@ ETH staking currently yields ~3.3% APY (2.84% consensus + MEV/priority fees). Th
 
 ---
 
-## Yield Comparison: Morpheus vs Alternatives
+## Yield Comparison: [REDACTED] vs Alternatives
 
 ### If You Just Stake ETH Directly
 
@@ -82,14 +82,14 @@ ETH staking currently yields ~3.3% APY (2.84% consensus + MEV/priority fees). Th
 | Coinbase cbETH | ~2.8% APY | Counterparty |
 | EigenLayer restaking | ~3.3% + points | Additional smart contract risk |
 
-### If You Deposit stETH into Morpheus
+### If You Deposit stETH into [REDACTED]
 
 | Component | Value |
 |-----------|-------|
 | ETH staking yield sacrificed | ~3% APY (goes to protocol) |
 | MOR emissions received | Variable — depends on total deposits and MOR price |
 | Principal risk | None (can withdraw, 7-day lock) |
-| Additional risk | Smart contract risk (Morpheus contracts) |
+| Additional risk | Smart contract risk ([REDACTED] contracts) |
 
 ### The MOR Emission Value Proposition
 
@@ -105,21 +105,21 @@ With 320,000 ETH having flowed through contracts (not all still deposited), the 
 
 **At current MOR price (~$0.76), the trade is negative** — you give up more yield than you receive in MOR.
 
-**However:** Early depositors got much higher MOR allocations (fewer depositors = bigger share). And if MOR appreciates (it was $16+ in 2024), the calculus changes dramatically. This is essentially a bet on Morpheus ecosystem growth.
+**However:** Early depositors got much higher MOR allocations (fewer depositors = bigger share). And if MOR appreciates (it was $16+ in 2024), the calculus changes dramatically. This is essentially a bet on [REDACTED] ecosystem growth.
 
 ---
 
 ## Risk Analysis
 
 ### Smart Contract Risk
-- Morpheus contracts audited but complex (multi-chain: Ethereum → Arbitrum → Base)
+- [REDACTED] contracts audited but complex (multi-chain: Ethereum → Arbitrum → Base)
 - Dependency chain: Lido + Aave + Chainlink + LayerZero + Uniswap
 - Each layer adds potential vulnerability surface
 
 ### stETH De-Peg Risk
 - stETH historically traded at slight discount during market stress (2022: ~5% depeg)
 - Currently trades ~1:1 with ETH
-- Morpheus contracts don't protect against depeg losses
+- [REDACTED] contracts don't protect against depeg losses
 
 ### MOR Price Risk
 - MOR is volatile ($16+ → $0.76 over ~18 months)
@@ -144,5 +144,5 @@ With 320,000 ETH having flowed through contracts (not all still deposited), the 
 3. **Multi-asset v2 expansion is the key growth lever** — USDC/USDT are easier for newcomers than stETH (no ETH exposure needed)
 4. **Net negative staking flows on Ethereum** (late 2025) could reduce overall ETH staking yield competition — bullish for staking-based protocols
 5. **Aave integration is battle-tested** — good trust signal for institutional capital providers
-6. **The "no principal risk" framing is powerful** — emphasize this in all Morpheus capital marketing
+6. **The "no principal risk" framing is powerful** — emphasize this in all [REDACTED] capital marketing
 7. **Consider creating a yield calculator** for Everclaw/SmartAgent that shows expected MOR emissions based on deposit amount and current TVL

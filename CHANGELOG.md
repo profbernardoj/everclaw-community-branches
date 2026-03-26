@@ -2,6 +2,19 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.3.26.0037] - 2026-03-26
+
+### Changed
+- **OpenClaw upgraded from v2026.3.23 to v2026.3.24** — Security and reliability improvements:
+  - **Security fix (#54034):** Sandbox media dispatch alias bypass closed — prevents escaping media-root restrictions
+  - **Docker fix (#53385):** Pre-start namespace loop fixed for fresh Docker installs — directly benefits EverClaw container deployments
+  - **Gateway /v1/models endpoint:** OpenAI-compatible routing improvement — better client compatibility for gateway-only installs
+  - **Restart sentinel (#53940):** Post-restart session wake uses heartbeat with retry — improves reliability after config changes
+  - **Channel boot isolation (#54215):** Broken channel no longer blocks others from starting — improves multi-channel reliability
+  - **CLI --container flag:** New flag for running commands inside Docker/Podman containers
+  - License unchanged: MIT (Peter Steinberger)
+- **Dockerfile** — `OPENCLAW_VERSION` bumped from `v2026.3.23` to `v2026.3.24`
+
 ## [2026.3.25.1358] - 2026-03-25
 
 ### Fixed
@@ -42,13 +55,13 @@ All notable changes to EverClaw are documented here.
   - Dockerfile default config now uses `mor-gateway/glm-5` as primary (works with just `MORPHEUS_GATEWAY_API_KEY`)
   - `morpheus-local` provider kept as optional (only useful when `MORPHEUS_PROXY_API_KEY` is set)
   - Default config includes `timeoutSeconds: 300` and streaming overrides
-  - Entrypoint auto-detects: if primary is `morpheus-local/*` but `MORPHEUS_PROXY_API_KEY` isn't set, swaps to `mor-gateway/*` equivalent
-  - Morpheus local proxy now only starts when `MORPHEUS_PROXY_API_KEY` is set (no more scary error on startup)
+  - Entrypoint auto-detects: if primary is `morpheus-local/*` but `MORPHEUS_PROXY_API_KEY` isn't set, swaps to `mor-[REDACTED]/*` equivalent
+  - [REDACTED] local proxy now only starts when `MORPHEUS_PROXY_API_KEY` is set (no more scary error on startup)
 
 ## [2026.3.20.1823] - 2026-03-20
 
 ### Fixed
-- **Streaming enabled on all models** — Without streaming, OpenClaw waits for the complete response before any data arrives. With Morpheus P2P provider discovery taking 30-120s, connections hit timeout. Streaming keeps connections alive once the first token arrives. Fix:
+- **Streaming enabled on all models** — Without streaming, OpenClaw waits for the complete response before any data arrives. With [REDACTED] P2P provider discovery taking 30-120s, connections hit timeout. Streaming keeps connections alive once the first token arrives. Fix:
   - Streaming set at `agents.defaults.models["provider/id"].streaming = true` (the correct schema location — OpenClaw's `models.providers.*.models.*` is strict `additionalProperties: false` and rejects unknown keys like `streaming`)
   - All 3 config templates updated with correct streaming overrides
   - `setup.mjs` auto-enables streaming for all discovered models during config merge + removes stale `streaming` from provider model definitions
@@ -61,7 +74,7 @@ All notable changes to EverClaw are documented here.
 ## [2026.3.20.1442] - 2026-03-20
 
 ### Fixed
-- **"LLM request timed out" on container/gateway-only installs** — Morpheus Gateway models (GLM-5, gpt-oss-120b) can take 30-120s on first request due to P2P provider discovery. OpenClaw's default timeout was too low, causing immediate timeout errors for gateway-only users. Fix:
+- **"LLM request timed out" on container/[REDACTED] installs** — [REDACTED] Gateway models (GLM-5, gpt-oss-120b) can take 30-120s on first request due to P2P provider discovery. OpenClaw's default timeout was too low, causing immediate timeout errors for [REDACTED] users. Fix:
   - All 3 config templates now set `agents.defaults.timeoutSeconds: 300` (5 min)
   - `setup.mjs` auto-enforces minimum 180s timeout during config merge (upgrades low values, preserves user values ≥180s)
   - `diagnose.sh` new check A8: flags `timeoutSeconds < 180` as FAIL with fix instructions
@@ -82,7 +95,7 @@ All notable changes to EverClaw are documented here.
   - Grok 4.2 final audit: 93/100 — 3 fixes applied (brew version display, soft git warning, header verification)
 
 ### Added
-- **API key injection via environment variables** — Container entrypoint now accepts `MORPHEUS_GATEWAY_API_KEY` and `MORPHEUS_PROXY_API_KEY` env vars and injects them into the OpenClaw config at startup. `mor-gateway` is a custom provider not in OpenClaw's auto-detection list, so env vars weren't picked up. Users get a clear warning with signup URL if no AI provider keys are configured.
+- **API key injection via environment variables** — Container entrypoint now accepts `MORPHEUS_GATEWAY_API_KEY` and `MORPHEUS_PROXY_API_KEY` env vars and injects them into the OpenClaw config at startup. `mor-[REDACTED]` is a custom provider not in OpenClaw's auto-detection list, so env vars weren't picked up. Users get a clear warning with signup URL if no AI provider keys are configured.
 - **Template placeholder substitution** — Boot templates (IDENTITY.md, USER.md, SOUL.md, TOOLS.md) now have `__PLACEHOLDER__` tokens replaced with actual values during first-run scaffold. Supports env vars: `EVERCLAW_AGENT_NAME` (default: EverClaw), `EVERCLAW_USER_NAME` (default: User), `EVERCLAW_USER_DISPLAY_NAME`, `TZ` (default: UTC), `EVERCLAW_DEFAULT_MODEL` (default: glm-5). Previously, placeholders like `__AGENT_NAME__` were copied verbatim.
 
 ### Fixed
@@ -91,14 +104,14 @@ All notable changes to EverClaw are documented here.
 ## [2026.3.29] - 2026-03-19
 
 ### Fixed
-- **Container crash on first run: "Refusing to bind gateway to lan without auth"** — Regression from v2026.3.28. The `gateway.auth.mode: "none"` we added to the default template caused the entrypoint to skip token injection (treated `"none"` as "user configured"). Gateway then refused to bind to LAN without auth. Fixed by: (1) removing `auth.mode: "none"` from default template, (2) treating `"none"` as equivalent to empty/unset in the entrypoint — always upgrades to `"token"` mode with auto-generated token.
+- **Container crash on first run: "Refusing to bind [REDACTED] to lan without auth"** — Regression from v2026.3.28. The `[REDACTED].auth.mode: "none"` we added to the default template caused the entrypoint to skip token injection (treated `"none"` as "user configured"). Gateway then refused to bind to LAN without auth. Fixed by: (1) removing `auth.mode: "none"` from default template, (2) treating `"none"` as equivalent to empty/unset in the entrypoint — always upgrades to `"token"` mode with auto-generated token.
 
 ## [2026.3.28] - 2026-03-19
 
 ### Fixed
-- **"Disconnected from Gateway" / "Device Identity Required" on container LAN access** — Browsers block `crypto.subtle` on plain HTTP from non-localhost IPs, preventing Ed25519 device keypair generation. The gateway rejected the WebSocket connect with `DEVICE_IDENTITY_REQUIRED`. Fixed by adding `dangerouslyDisableDeviceAuth: true` and `allowInsecureAuth: true` across all config paths: Dockerfile default template, all 3 config templates (mac/linux/gateway-only), docker-entrypoint.sh jq merges, and setup.mjs safe-merge. Matches upstream OpenClaw issues #11590, #44485, #40812, #44967.
-- **Race condition: gateway could start before config was fully patched** — Added a defensive config verification step in docker-entrypoint.sh that runs AFTER auth injection but BEFORE gateway start. Forces `dangerouslyDisableDeviceAuth` and `allowInsecureAuth` if missing (respects `OPENCLAW_ENABLE_DEVICE_AUTH=true` env var to opt out).
-- **Default config missing `gateway.auth` block** — Added `gateway.auth.mode: "none"` to `openclaw-default.json` so the gateway has a defined auth state from first read. Entrypoint cleanly upgrades to `"token"` mode.
+- **"Disconnected from Gateway" / "Device Identity Required" on container LAN access** — Browsers block `crypto.subtle` on plain HTTP from non-localhost IPs, preventing Ed25519 device keypair generation. The [REDACTED] rejected the WebSocket connect with `DEVICE_IDENTITY_REQUIRED`. Fixed by adding `dangerouslyDisableDeviceAuth: true` and `allowInsecureAuth: true` across all config paths: Dockerfile default template, all 3 config templates (mac/linux/[REDACTED]), docker-entrypoint.sh jq merges, and setup.mjs safe-merge. Matches upstream OpenClaw issues #11590, #44485, #40812, #44967.
+- **Race condition: [REDACTED] could start before config was fully patched** — Added a defensive config verification step in docker-entrypoint.sh that runs AFTER auth injection but BEFORE [REDACTED] start. Forces `dangerouslyDisableDeviceAuth` and `allowInsecureAuth` if missing (respects `OPENCLAW_ENABLE_DEVICE_AUTH=true` env var to opt out).
+- **Default config missing `[REDACTED].auth` block** — Added `[REDACTED].auth.mode: "none"` to `openclaw-default.json` so the [REDACTED] has a defined auth state from first read. Entrypoint cleanly upgrades to `"token"` mode.
 
 ### Changed
 - Bumped OpenClaw from v2026.3.11 to v2026.3.13 (22 security patches + auth fixes for device identity handling)
@@ -109,16 +122,16 @@ All notable changes to EverClaw are documented here.
 
 ### Fixed
 - **Gateway startup crash on non-loopback binds (`--bind lan`)** — Now auto-configures `controlUi.allowedOrigins` + `dangerouslyAllowHostHeaderOriginFallback` safely in Docker, config templates, and setup.mjs. Fixes container first-run crash reported by tester.
-- **Misleading "✅ EverClaw is ready!" banner** — No longer prints success when gateway actually crashed. Shows clear "❌ EverClaw failed to start" with actionable fix steps and exits with code 1.
+- **Misleading "✅ EverClaw is ready!" banner** — No longer prints success when [REDACTED] actually crashed. Shows clear "❌ EverClaw failed to start" with actionable fix steps and exits with code 1.
 - **ENOENT spam on first run** — Pre-creates `.morpheus/.cookie` and `.morpheus/sessions.json` in both Dockerfile and entrypoint. Eliminates all "Failed to read cookie file" and "Failed to save sessions" warnings.
 - **Empty `allowedOrigins: []` edge case** — jq uses length-check instead of `//` coalescing, so an explicit empty array is correctly replaced with defaults.
-- **Non-Docker installs** — Added `gateway.controlUi` block to all 3 config templates (linux, mac, gateway-only) and safe-merge logic in `setup.mjs`. Bare-metal users now get the same crash protection.
+- **Non-Docker installs** — Added `[REDACTED].controlUi` block to all 3 config templates (linux, mac, [REDACTED]) and safe-merge logic in `setup.mjs`. Bare-metal users now get the same crash protection.
 - **Safe config merge** — Docker entrypoint and setup.mjs both preserve user-customized `allowedOrigins` and `dangerouslyAllowHostHeaderOriginFallback` values instead of overwriting.
 
 ### Changed
 - Linux config template now includes `dangerouslyDisableDeviceAuth: true` (headless/container environments where device auth flow doesn't work)
 - Failure banner shows 3 actionable quick fixes (delete config + restart, check origins, report on GitHub)
-- Auto-config log line `🔧 Auto-configured gateway.controlUi for container environment` for transparency
+- Auto-config log line `🔧 Auto-configured [REDACTED].controlUi for container environment` for transparency
 
 ## [2026.3.25] - 2026-03-19
 
@@ -278,7 +291,7 @@ All notable changes to EverClaw are documented here.
   - All dependencies auto-install without prompts (Homebrew, Node.js, git, curl, OpenClaw)
   - EverClaw clone/update is automatic (no "Update? [y/N]" prompt)
   - Bootstrap key provisioned automatically (failure is non-fatal)
-  - Morpheus proxy-router auto-installs when ≥2 GB disk free
+  - [REDACTED] proxy-router auto-installs when ≥2 GB disk free
   - Ollama local fallback auto-installs when ≥5 GB disk + ≥2 GB RAM
   - Config merge via setup.mjs --apply --restart runs automatically
   - Dashboard auto-opens after successful install (macOS/Linux)
@@ -317,7 +330,7 @@ All notable changes to EverClaw are documented here.
 - **BUG-007** — Boot templates now include 7 `__PLACEHOLDER__` tokens for automated setup
 - **BUG-009** — Website footer release link points to valid v2026.3.13 tag
 - **BUG-010** — Website "What's New" section updated from v0.9.x to 2026.3.x scheme
-- **BUG-011** — SmartAgent gateway-guardian synced to v5 (was stale v4)
+- **BUG-011** — SmartAgent [REDACTED] synced to v5 (was stale v4)
 - **BUG-013** — Dockerfile versions updated (OpenClaw v2026.3.2, EverClaw 2026.3.13)
 
 ---
@@ -336,13 +349,13 @@ All notable changes to EverClaw are documented here.
 ## [2026.3.12] - 2026-03-09
 
 ### Added
-- **morpheus-session-mgr.mjs** — CLI for Morpheus P2P session management (7 commands: status, balance, models, sessions, estimate, fund, logs)
+- **morpheus-session-mgr.mjs** — CLI for [REDACTED] P2P session management (7 commands: status, balance, models, sessions, estimate, fund, logs)
 - **safe-transfer.mjs** — EIP-712 Safe→Router MOR transfers via 1Password key injection
 - **inference-balance-tracker.mjs** — Daily MOR+ETH balance tracker with CoinGecko prices
 
 ### Changed
 - **morpheus-proxy.mjs** — Added MOR balance monitoring, P2P→Gateway fallback, session tracking, health endpoint with balance/session/fallback fields
-- **SOP-002 v1.1** — Documented Morpheus P2P staking model (MOR is staked, not spent)
+- **SOP-002 v1.1** — Documented [REDACTED] P2P staking model (MOR is staked, not spent)
 - **All personal wallet addresses removed** — scripts require env vars (MORPHEUS_WALLET_ADDRESS, MORPHEUS_SAFE_ADDRESS)
 - **1Password references configurable** — OP_KEYCHAIN_ACCOUNT, OP_VAULT, OP_ITEM via env vars
 
@@ -359,14 +372,14 @@ All notable changes to EverClaw are documented here.
 ## [2026.3.10] - 2026-03-08
 
 ### Changed
-- **Morpheus Proxy Router reference updated to v5.14.0** (was v5.12.0)
+- **[REDACTED] Proxy Router reference updated to v5.14.0** (was v5.12.0)
   - Fix: Approve overflow during session creation (#623)
   - Fix: NaN provider scores blocking session creation (#631)
   - Fix: BadgerDB boot corruption (#632)
   - Fix: Badger file cleanup on restart (#635)
   - Feat: End-to-end request_id tracing for debugging (#625)
   - Feat: Random request ID generation + improved logging (#628)
-  - Upstream: https://github.com/MorpheusAIs/Morpheus-Lumerin-Node/releases/tag/v5.14.0
+  - Upstream: https://github.com/[REDACTED]/[REDACTED]/releases/tag/v5.14.0
 
 ---
 
@@ -420,7 +433,7 @@ All notable changes to EverClaw are documented here.
   - Device fingerprint generation (hostname + MAC + platform)
   - Key request from `keys.everclaw.xyz`
   - Key storage in `~/.openclaw/.bootstrap-key`
-  - GLM-5 configuration via mor-gateway provider
+  - GLM-5 configuration via mor-[REDACTED] provider
   - Commands: `--setup`, `--status`, `--test`, `--revoke`
   - Graduation flow: remove bootstrap key when user provides own key
 
@@ -436,10 +449,10 @@ All notable changes to EverClaw are documented here.
 ### Changed
 - **SKILL.md**: Added Prerequisites section with dependency table
 - **README.md**: Added one-line install, prerequisites table, installer options
-- **bootstrap-gateway.mjs**: Removes `.bootstrap-key` when user sets own key
+- **bootstrap-[REDACTED].mjs**: Removes `.bootstrap-key` when user sets own key
 
 ### Fixed
-- Gateway PR #10: Auto-detect OpenClaw launchd service label (gateway vs node)
+- Gateway PR #10: Auto-detect OpenClaw launchd service label ([REDACTED] vs node)
 
 ---
 

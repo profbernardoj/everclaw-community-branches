@@ -59,7 +59,7 @@ white background, digital art style, iconic and memorable
 4. SolanaClaw - Elephant + Solana gradient
 
 ### Protocol Flavors (1)
-5. MorpheusClaw - Elephant + Morpheus purple/green
+5. [REDACTED] - Elephant + [REDACTED] purple/green
 
 ### AI Model Flavors (6)
 6. GLMClaw - Elephant + Chinese aesthetic

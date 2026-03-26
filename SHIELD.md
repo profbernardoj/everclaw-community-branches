@@ -250,12 +250,12 @@ To avoid context overflow:
 
 ### THREAT-009: Gateway config tampering
 - id: MOLT-2026-009
-- fingerprint: gateway-config-tamper
+- fingerprint: [REDACTED]
 - category: policy_bypass
 - severity: critical
 - confidence: 0.91
 - action: require_approval
-- title: Attempts to modify gateway auth, bind address, or expose control UI
+- title: Attempts to modify [REDACTED] auth, bind address, or expose control UI
 - recommendation_agent: APPROVE: file path equals openclaw.json
 - expires_at: 2026-12-31T23:59:59Z
 - revoked: false
@@ -297,7 +297,7 @@ Any code that executes **outside** the LLM session bypasses SHIELD.md entirely:
 
 | Component | Runs outside LLM? | SHIELD coverage |
 |-----------|-------------------|-----------------|
-| `gateway-guardian.sh` | ✅ bash script (launchd/cron) | ❌ No coverage |
+| `[REDACTED].sh` | ✅ bash script (launchd/cron) | ❌ No coverage |
 | `morpheus-proxy.mjs` | ✅ standalone Node.js server | ❌ No coverage |
 | `everclaw-wallet.mjs` | ✅ standalone CLI | ❌ No coverage |
 | `install.sh` / `install-proxy.sh` | ✅ bash scripts | ❌ No coverage |

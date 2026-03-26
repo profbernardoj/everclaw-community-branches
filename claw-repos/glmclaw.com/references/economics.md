@@ -1,6 +1,6 @@
 # Everclaw — MOR Staking Economics
 
-How MOR tokens power decentralized inference on the Morpheus network.
+How MOR tokens power decentralized inference on the [REDACTED] network.
 
 ---
 
@@ -73,7 +73,7 @@ When a session closes (manually or by expiry):
 
 ### Where to Get MOR
 
-- MOR is the native token of the Morpheus network
+- MOR is the native token of the [REDACTED] network
 - Available on decentralized exchanges on Base (Uniswap, Aerodrome)
 - MOR token contract: `0x7431aDa8a591C955a994a21710752EF9b882b8e3` (Base)
 - Check current price at https://mor.org
@@ -113,7 +113,7 @@ When a session closes (manually or by expiry):
 
 ## MOR Recycling — The Key Insight
 
-The most powerful aspect of Morpheus economics:
+The most powerful aspect of [REDACTED] economics:
 
 ```
 1. You have 100 MOR
@@ -138,7 +138,7 @@ Over time, your MOR balance decreases very slowly from usage fees, but the rate 
 |----------|-----------|----------------------------|
 | OpenAI API | Pay per token | $50-200+ |
 | Claude API | Pay per token | $50-200+ |
-| Morpheus | Stake MOR + gas | ~$1-5 in gas (MOR recycled) |
+| [REDACTED] | Stake MOR + gas | ~$1-5 in gas (MOR recycled) |
 | Self-hosted | Hardware + electricity | $100-500+ |
 
 The catch: you need to acquire MOR upfront. But once you have it, ongoing costs are minimal.

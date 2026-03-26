@@ -1,13 +1,13 @@
 # nano-everclaw — EverClaw for NanoClaw
 
-Decentralized Morpheus inference for your [NanoClaw](https://github.com/nano-claw) WhatsApp/Telegram agent.
+Decentralized [REDACTED] inference for your [NanoClaw](https://github.com/nano-claw) WhatsApp/Telegram agent.
 
-**Hybrid mode:** Keep Claude for orchestration and swarms, route heavy inference to Morpheus (GLM-5, Kimi K2.5, Qwen3 — free, decentralized).
+**Hybrid mode:** Keep Claude for orchestration and swarms, route heavy inference to [REDACTED] (GLM-5, Kimi K2.5, Qwen3 — free, decentralized).
 
 ## Architecture
 
 ```
-NanoClaw (Claude Code, Docker) → host proxy (port 8083) → Morpheus P2P Network → AI Model
+NanoClaw (Claude Code, Docker) → host proxy (port 8083) → [REDACTED] P2P Network → AI Model
 ```
 
 NanoClaw runs Claude inside Docker containers. The EverClaw proxy runs on the **host** machine, and NanoClaw reaches it via Docker networking (`host.docker.internal` on macOS/Windows, `172.17.0.1` on Linux).
@@ -20,7 +20,7 @@ NanoClaw runs Claude inside Docker containers. The EverClaw proxy runs on the **
 bash setup.sh
 ```
 
-### 2. Add the Morpheus skill to NanoClaw
+### 2. Add the [REDACTED] skill to NanoClaw
 
 ```bash
 # The setup script creates this automatically:
@@ -44,15 +44,15 @@ NanoClaw keeps Claude for:
 - Complex multi-step reasoning where Claude excels
 - Tool use and function calling
 
-And routes to Morpheus for:
+And routes to [REDACTED] for:
 - Bulk text generation (summaries, drafts, rewrites)
 - Research and analysis tasks
 - Sub-agent workloads
 - Any task where open-source models match Claude quality
 
-The `lite-proxy/` bridge translates Anthropic API format → OpenAI format → Morpheus, so NanoClaw can use Morpheus models with Claude-style API calls.
+The `lite-proxy/` bridge translates Anthropic API format → OpenAI format → [REDACTED], so NanoClaw can use [REDACTED] models with Claude-style API calls.
 
-## Available Models (via Morpheus)
+## Available Models (via [REDACTED])
 
 | Model | Best For | Tier |
 |-------|----------|------|
@@ -97,7 +97,7 @@ MOR tokens are staked, not spent — returned when sessions close.
 
 - **Skills-first** — everything is a Claude skill, no core code changes
 - **Container isolation preserved** — proxy is on host, NanoClaw stays in Docker
-- **Hybrid model** — Claude handles orchestration, Morpheus handles bulk inference
+- **Hybrid model** — Claude handles orchestration, [REDACTED] handles bulk inference
 - **Zero manual config** — Claude applies the skill and patches networking automatically
 
 ## Contributing
@@ -105,7 +105,7 @@ MOR tokens are staked, not spent — returned when sessions close.
 PRs welcome for:
 - Additional NanoClaw integration patterns
 - Docker Compose examples
-- Multi-agent swarm configs with Morpheus routing
+- Multi-agent swarm configs with [REDACTED] routing
 - WhatsApp/Telegram-specific optimizations
 
 ## Included with EverClaw v2026.2.21
@@ -115,7 +115,7 @@ When you install the EverClaw proxy via `setup.sh`, you get these features autom
 - **Three-Shift Task Planning** — Morning/Afternoon/Night shift system proposes prioritized task plans with approval workflow. Nothing executes without your say-so.
 - **Gateway Guardian v5** — Self-healing watchdog with direct curl inference probes, billing-aware escalation, DIEM credit monitoring, and 4-stage restart escalation. No more Signal spam from failed health checks.
 - **Smart Session Archiver** — Automatically archives old sessions when size exceeds threshold, preventing browser slowdowns.
-- **Model Router** — Open-source first: routes all tiers to Morpheus by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
+- **Model Router** — Open-source first: routes all tiers to [REDACTED] by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
 - **Multi-Key Auth Rotation** — Configure multiple API keys; auto-rotates when credits drain.
 
 See the main [EverClaw README](../README.md) for full documentation.

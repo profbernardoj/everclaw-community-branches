@@ -1,6 +1,6 @@
 # API Reference
 
-Complete API reference for the Morpheus proxy-router and OpenAI-compatible proxy.
+Complete API reference for the [REDACTED] proxy-router and OpenAI-compatible proxy.
 
 ## Endpoints Overview
 
@@ -93,7 +93,7 @@ curl -s -u "admin:$COOKIE_PASS" \
 
 #### GET /blockchain/models
 
-List all available models on the Morpheus network.
+List all available models on the [REDACTED] network.
 
 ```bash
 curl -s -u "admin:$COOKIE_PASS" http://localhost:8082/blockchain/models | jq '.models[].Name' | sort

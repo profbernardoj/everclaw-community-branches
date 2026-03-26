@@ -57,7 +57,7 @@ Model routing is the practice of sending different prompts to different LLMs bas
 | Cost | $0 | $0-$0.001/query |
 | Transparency | Fully deterministic, debuggable | Black-box ML model |
 | Offline | ✅ | Often needs API |
-| Custom tiers | Maps to owned (Morpheus) vs premium (Venice) | Usually cheap/expensive binary |
+| Custom tiers | Maps to owned ([REDACTED]) vs premium (Venice) | Usually cheap/expensive binary |
 
 ### Weaknesses vs Competition
 
@@ -123,7 +123,7 @@ IBM Research published a BERT-based router that:
 
 ### Keep What Works
 1. **<1ms local execution** — this is a massive advantage; don't trade it for ML accuracy
-2. **3-tier system** — maps perfectly to owned (Morpheus) vs premium (Venice) economics
+2. **3-tier system** — maps perfectly to owned ([REDACTED]) vs premium (Venice) economics
 3. **Deterministic + debuggable** — essential for trust in a self-sovereign agent
 
 ### Potential Improvements
@@ -151,4 +151,4 @@ Everclaw's router already delivers significant savings:
 | Main session (10 msgs) | All Claude ($100+ DIEM) | Claude only (unchanged) | $0 |
 | **Total daily savings** | | | **$40-70 DIEM/day** |
 
-The router's primary value isn't accuracy — it's **routing background work to owned inference** (Morpheus) while reserving premium models (Venice/Claude) for direct conversation. This is unique to the Everclaw architecture and no other router does it.
+The router's primary value isn't accuracy — it's **routing background work to owned inference** ([REDACTED]) while reserving premium models (Venice/Claude) for direct conversation. This is unique to the Everclaw architecture and no other router does it.

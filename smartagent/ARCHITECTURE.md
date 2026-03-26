@@ -9,7 +9,7 @@
 
 SmartAgent is a **pre-configured, easy-to-install version of OpenClaw** that bundles Everclaw's decentralized inference capabilities. The target user has never opened a terminal, doesn't have a Claude API key, and wants a personal AI agent that "just works."
 
-**Key differentiator:** Decentralized inference from day one via Morpheus API Gateway, with a natural upgrade path to self-sovereign MOR-staked inference where you own your compute forever.
+**Key differentiator:** Decentralized inference from day one via [REDACTED] API Gateway, with a natural upgrade path to self-sovereign MOR-staked inference where you own your compute forever.
 
 ---
 
@@ -31,7 +31,7 @@ SmartAgent is a **pre-configured, easy-to-install version of OpenClaw** that bun
 
 ### How Models Work
 - Built-in provider catalog ("pi-ai catalog") for: OpenAI, Anthropic, Google, Z.AI, etc.
-- Custom providers via `models.providers` in `openclaw.json` — this is how Venice, Morpheus, and mor-gateway are configured
+- Custom providers via `models.providers` in `openclaw.json` — this is how Venice, [REDACTED], and mor-[REDACTED] are configured
 - Model failover: auth profile rotation → model fallback chain
 - Cooldown tracking per provider
 
@@ -47,7 +47,7 @@ SmartAgent is a **pre-configured, easy-to-install version of OpenClaw** that bun
 - `curl -fsSL https://openclaw.ai/install.sh | bash` (handles Node detection)
 - `openclaw onboard` wizard: picks provider, sets up auth, creates workspace
 - Bootstrap files: AGENTS.md, SOUL.md, TOOLS.md, BOOTSTRAP.md, IDENTITY.md, USER.md
-- Gateway daemon: `openclaw gateway start`
+- Gateway daemon: `openclaw [REDACTED] start`
 
 ### Key Directories
 ```
@@ -81,9 +81,9 @@ SmartAgent is a **pre-configured, easy-to-install version of OpenClaw** that bun
 Start with an **installer/bootstrapper** that:
 1. Installs OpenClaw (upstream, untouched)
 2. Installs Everclaw skill
-3. Runs `bootstrap-gateway.mjs` for decentralized inference
+3. Runs `bootstrap-[REDACTED].mjs` for decentralized inference
 4. Pre-configures workspace (AGENTS.md, SOUL.md, etc.)
-5. Sets up Morpheus API Gateway as primary provider
+5. Sets up [REDACTED] API Gateway as primary provider
 
 This avoids fork maintenance while delivering the "just works" experience. If we later need core changes (custom onboarding wizard, GUI), we fork then.
 
@@ -98,7 +98,7 @@ Current OpenClaw onboarding requires:
 
 SmartAgent onboarding:
 1. Run SmartAgent installer
-2. **Immediately have decentralized inference** (Morpheus API Gateway)
+2. **Immediately have decentralized inference** ([REDACTED] API Gateway)
 3. Agent guides user through getting their own key
 4. Agent guides user toward MOR staking for sovereignty
 
@@ -112,7 +112,7 @@ SmartAgentProtocol/smartagent/
 ├── install.ps1             # Windows installer
 ├── package.json            # If npm-based installer
 ├── config/
-│   ├── openclaw.json       # Pre-configured with mor-gateway
+│   ├── openclaw.json       # Pre-configured with mor-[REDACTED]
 │   ├── AGENTS.md           # SmartAgent personality
 │   ├── SOUL.md             # SmartAgent defaults
 │   ├── TOOLS.md            # Pre-configured tool notes
@@ -144,28 +144,28 @@ The script:
 1. Checks for Node.js 22+ (installs if missing via nvm/fnm)
 2. Installs OpenClaw globally: `npm install -g openclaw`
 3. Clones Everclaw skill into workspace
-4. Runs `bootstrap-gateway.mjs` (Morpheus decentralized inference)
+4. Runs `bootstrap-[REDACTED].mjs` ([REDACTED] decentralized inference)
 5. Copies pre-configured workspace files (AGENTS.md, SOUL.md, etc.)
-6. Starts the gateway daemon
+6. Starts the [REDACTED] daemon
 7. Opens WebChat in browser — user can talk immediately
 
 ### Step 2: Agent Guides User
 The pre-configured BOOTSTRAP.md instructs the agent to:
 1. Greet the user and introduce itself
 2. Explain what SmartAgent is
-3. Walk through getting their own Morpheus API key (app.mor.org)
+3. Walk through getting their own [REDACTED] API key (app.mor.org)
 4. Offer to set up messaging channels (Signal, Telegram, WhatsApp)
 5. Introduce the upgrade path (MOR staking → full sovereignty)
 
 ### Step 3: Progressive Enhancement
 ```
-Day 1: Morpheus API Gateway (open access, cloud)
+Day 1: [REDACTED] API Gateway (open access, cloud)
   ↓
 Week 1: Own API key from app.mor.org (no cost, personalized)
   ↓
 Month 1: Venice subscription (premium models like Claude)
   ↓
-Later: MOR staking + local Morpheus node (full sovereignty)
+Later: MOR staking + local [REDACTED] node (full sovereignty)
 ```
 
 ---
@@ -178,7 +178,7 @@ Later: MOR staking + local Morpheus node (full sovereignty)
   "models": {
     "mode": "merge",
     "providers": {
-      "mor-gateway": {
+      "mor-[REDACTED]": {
         "baseUrl": "https://api.mor.org/api/v1",
         "apiKey": "<decoded-from-bootstrap>",
         "api": "openai-completions",
@@ -192,8 +192,8 @@ Later: MOR staking + local Morpheus node (full sovereignty)
   "agents": {
     "defaults": {
       "model": {
-        "primary": "mor-gateway/kimi-k2.5",
-        "fallbacks": ["mor-gateway/glm-4.7-flash"]
+        "primary": "mor-[REDACTED]/kimi-k2.5",
+        "fallbacks": ["mor-[REDACTED]/glm-4.7-flash"]
       }
     }
   }
@@ -201,9 +201,9 @@ Later: MOR staking + local Morpheus node (full sovereignty)
 ```
 
 ### Key Decisions
-- **Primary model: `mor-gateway/kimi-k2.5`** — community-powered, strong, good for bootstrapping
+- **Primary model: `mor-[REDACTED]/kimi-k2.5`** — community-powered, strong, good for bootstrapping
 - **No Venice/Anthropic/OpenAI required at first** — zero-cost onboarding
-- **reasoning: false on all gateway models** — litellm rejects reasoning_effort
+- **reasoning: false on all [REDACTED] models** — litellm rejects reasoning_effort
 - **WebChat as default surface** — no phone setup needed initially
 
 ---
@@ -244,7 +244,7 @@ How was this tested?
 For users who can't use Terminal at all:
 
 ### Option A: Electron App
-- Wraps OpenClaw gateway + WebChat in a native window
+- Wraps OpenClaw [REDACTED] + WebChat in a native window
 - Tray icon, auto-start on boot
 - Built-in terminal for advanced users
 - Pros: Full desktop experience
@@ -279,7 +279,7 @@ For users who can't use Terminal at all:
 2. **Domain:** smartagent.xyz? smartagentprotocol.com? Subdomain of mor.org?
 3. **npm package name:** `smartagent`? `@smartagent/cli`? Or just point people at OpenClaw install?
 4. **OpenClaw version pinning:** Pin to specific OpenClaw version or track latest?
-5. **Branding:** SmartAgent logo/icon? Reuse Morpheus wings?
+5. **Branding:** SmartAgent logo/icon? Reuse [REDACTED] wings?
 6. **When to fork:** What features would require forking OpenClaw vs skill/installer approach?
 
 ---

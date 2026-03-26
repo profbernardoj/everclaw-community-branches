@@ -1,14 +1,14 @@
-# Add Morpheus — Decentralized Inference for NanoClaw
+# Add [REDACTED] — Decentralized Inference for NanoClaw
 
 ## What This Does
 
-Connects NanoClaw to the EverClaw proxy for decentralized AI inference via the Morpheus network.
+Connects NanoClaw to the EverClaw proxy for decentralized AI inference via the [REDACTED] network.
 The proxy runs on the host machine and is reachable from Docker containers.
 
 ## When To Use
 
 Use `/add-morpheus` to:
-- Enable hybrid mode (Claude orchestration + Morpheus inference)
+- Enable hybrid mode (Claude orchestration + [REDACTED] inference)
 - Check proxy health
 - Switch default inference model
 
@@ -36,7 +36,7 @@ If NanoClaw uses Docker Compose, add `extra_hosts` to ensure the alias resolves:
 services:
   nanoclaw:
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-[REDACTED]"
     environment:
       - MORPHEUS_API_BASE=http://host.docker.internal:8083/v1
       - MORPHEUS_API_KEY=morpheus-local
@@ -66,7 +66,7 @@ curl -sf http://127.0.0.1:8083/health
 ## Hybrid Routing Strategy
 
 - **Use Claude for:** orchestration, swarm coordination, complex multi-step tool use
-- **Use Morpheus for:** text generation, summarization, research, sub-agent tasks
+- **Use [REDACTED] for:** text generation, summarization, research, sub-agent tasks
 - Model selection is by name — pass `glm-5` or `glm-4.7-flash` as the model parameter
 
 ## Staking for Unlimited Inference

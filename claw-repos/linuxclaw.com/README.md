@@ -1,10 +1,10 @@
 # ♾️ Everclaw — AI Inference You Own, Forever Powering Your OpenClaw Agents
 
-**Open-source first.** Everclaw connects your [OpenClaw](https://github.com/openclaw/openclaw) agent to the [Morpheus](https://mor.org) decentralized inference network — putting open-source models like GLM-5 (Opus 4.5-level) front and center as your default, with Claude as a fallback only when needed.
+**Open-source first.** Everclaw connects your [OpenClaw](https://github.com/openclaw/openclaw) agent to the [[REDACTED]](https://mor.org) decentralized inference network — putting open-source models like GLM-5 (Opus 4.5-level) front and center as your default, with Claude as a fallback only when needed.
 
 Your agent runs on inference you own: GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models powered by staked MOR tokens that recycle back to you. No API bills, no credit limits, no surprise costs. MOR is staked — not spent — so you maintain access for as long as you hold your tokens.
 
-> **New: [DIY Setup Guide](https://github.com/betterbrand/Mac-Mini-Morpheus-Agent-DIY-Guide)** — Want to build an always-on Morpheus-powered agent from scratch on a Mac mini? Complete walkthrough with identity separation, on-chain guardrails, three-tier inference fallback, and 9 documented gotchas. Every step tested on real hardware.
+> **New: [DIY Setup Guide](https://github.com/betterbrand/Mac-Mini-[REDACTED])** — Want to build an always-on [REDACTED] agent from scratch on a Mac mini? Complete walkthrough with identity separation, on-chain guardrails, three-tier inference fallback, and 9 documented gotchas. Every step tested on real hardware.
 
 ---
 
@@ -34,7 +34,7 @@ Then configure your OpenClaw agent:
 
 ```bash
 # Easiest: Gateway only (no local proxy needed)
-node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --template gateway-only --key YOUR_KEY --apply --test --restart
+node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --template [REDACTED] --key YOUR_KEY --apply --test --restart
 
 # Full: Local P2P + Gateway (auto-detects OS)
 node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key YOUR_KEY --apply --test --restart
@@ -45,7 +45,7 @@ Get a free API key at [app.mor.org](https://app.mor.org). Run without `--apply` 
 **Want local P2P inference too?** Set up the wallet, proxy, and guardian:
 
 ```bash
-# Step 1: Install the Morpheus proxy-router
+# Step 1: Install the [REDACTED] proxy-router
 bash ~/.openclaw/workspace/skills/everclaw/scripts/install.sh
 
 # Step 2: Create your wallet (stored in macOS Keychain — no external accounts)
@@ -90,7 +90,7 @@ If you've ever had your AI assistant go dark because an API key expired or credi
 5. **Repeat forever** — MOR is recycled, not consumed
 
 ```
-Your Agent → Everclaw Proxy (port 8083) → Morpheus P2P Network → AI Model
+Your Agent → Everclaw Proxy (port 8083) → [REDACTED] P2P Network → AI Model
 ```
 
 The proxy handles all the blockchain complexity: opening sessions, renewing before expiry, authenticating with the network, and routing requests. Your agent just talks to a standard OpenAI-compatible API.
@@ -102,20 +102,20 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 ### ♾️ Core — Decentralized Inference
 | Component | What It Does |
 |-----------|-------------|
-| **Morpheus Proxy Router** | Connects to the Morpheus P2P network and routes inference requests to providers |
-| **OpenAI-Compatible Proxy** | Translates standard API calls into Morpheus format — any OpenAI client works |
+| **[REDACTED] Proxy Router** | Connects to the [REDACTED] P2P network and routes inference requests to providers |
+| **OpenAI-Compatible Proxy** | Translates standard API calls into [REDACTED] format — any OpenAI client works |
 | **Auto-Session Manager** | Opens 7-day blockchain sessions on demand, renews before expiry, recycles MOR |
 | **Session Auto-Retry** | If a session expires mid-request, opens a fresh one and retries automatically (v0.5) |
-| **Cooldown-Safe Errors** | Returns proper OpenAI error types so failover engines don't misclassify Morpheus errors as billing errors (v0.5) |
+| **Cooldown-Safe Errors** | Returns proper OpenAI error types so failover engines don't misclassify [REDACTED] errors as billing errors (v0.5) |
 | **Model Router** | Open-source first 3-tier classifier — routes simple tasks to GLM Flash, standard + complex tasks to GLM-5, Claude fallback only (v0.9.8) |
 | **x402 Payment Client** | Automatic HTTP 402 payment handling — signs USDC on Base via EIP-712, with budget controls and dry-run mode (v0.7) |
 | **ERC-8004 Agent Registry** | Discover agents on-chain — reads Identity + Reputation registries on Base, resolves registration files, checks trust signals (v0.7) |
-| **API Gateway Bootstrap** | One-command setup for community-powered Morpheus inference — no API key, no wallet, no node required. New users get instant AI access (v0.8) |
+| **API Gateway Bootstrap** | One-command setup for community-powered [REDACTED] inference — no API key, no wallet, no node required. New users get instant AI access (v0.8) |
 | **Multi-Key Auth Rotation** | Configure multiple Venice API keys — OpenClaw rotates through them automatically when credits drain, keeping you on premium models longer (v0.9.1) |
 | **Gateway Guardian v4** | Billing-aware escalation — classifies errors (billing vs transient), skips useless restarts for credit exhaustion, notifies owner with DIEM reset ETA. Through-OpenClaw inference probes, circuit breaker, 4-stage self-healing, proactive credit monitoring (v0.9.3) |
 | **MOR Swap Scripts** | Swap ETH or USDC for MOR tokens directly from the command line |
 
-**Benefit:** Your agent runs on inference you own — GLM-5 (Opus 4.5-level), GLM-4.7 Flash, Kimi K2.5, and 30+ open-source models via staked MOR tokens. No API bills, no credit limits — stake once, use forever. MOR tokens are staked, not consumed — returned when sessions close and restaked indefinitely. The open-source first model router (v0.9.8) sends all tiers to Morpheus by default — Claude is only the escape hatch for tasks GLM-5 can't handle. Cron jobs, heartbeats, research, coding, and complex reasoning all run on inference you own. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get instant inference from their very first launch — no API key needed.
+**Benefit:** Your agent runs on inference you own — GLM-5 (Opus 4.5-level), GLM-4.7 Flash, Kimi K2.5, and 30+ open-source models via staked MOR tokens. No API bills, no credit limits — stake once, use forever. MOR tokens are staked, not consumed — returned when sessions close and restaked indefinitely. The open-source first model router (v0.9.8) sends all tiers to [REDACTED] by default — Claude is only the escape hatch for tasks GLM-5 can't handle. Cron jobs, heartbeats, research, coding, and complex reasoning all run on inference you own. The x402 client and agent registry (v0.7) let your agent discover and pay other agents on-chain. And with the API Gateway bootstrap (v0.8), new users get instant inference from their very first launch — no API key needed.
 
 ### 💸 Agent Economy — x402 Payments + ERC-8004 Registry
 | Component | What It Does |
@@ -133,7 +133,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 |-----------|-------------|
 | **Billing-Aware Escalation** | Classifies errors as `billing` vs `transient` vs `timeout`. Billing → backs off + notifies (restart is useless). Transient → restarts as before |
 | **DIEM Reset Awareness** | Calculates hours to midnight UTC (daily DIEM reset). Billing-dead → 30-min probe interval. Auto-clears on UTC day rollover |
-| **Through-OpenClaw Inference Probes** | Tests the full stack: gateway → auth → provider → response every 2 minutes |
+| **Through-OpenClaw Inference Probes** | Tests the full stack: [REDACTED] → auth → provider → response every 2 minutes |
 | **Proactive Credit Monitoring** | Reads Venice DIEM balance from response headers. Warns when balance drops below threshold |
 | **Circuit Breaker** | Detects sub-agents stuck >30 min with repeated timeouts and kills them |
 | **Fixed Restart Chain** | No more `set -e` silent exits or pkill self-kill. ERR trap logs unexpected failures |
@@ -197,7 +197,7 @@ The proxy handles all the blockchain complexity: opening sessions, renewing befo
 
 All models are accessed through the same proxy endpoint. Switch models by changing the model name in your request.
 
-**Why GLM-5?** Zhipu's 744B MoE model (40B active) matches Claude Opus 4.5 on benchmarks: 92.7% AIME 2026, 86% GPQA-Diamond, 50.4 Humanity's Last Exam (with tools). Industry-leading hallucination resistance. Handles reasoning, coding, structured output, and agentic tasks at frontier quality — all through Morpheus inference you own.
+**Why GLM-5?** Zhipu's 744B MoE model (40B active) matches Claude Opus 4.5 on benchmarks: 92.7% AIME 2026, 86% GPQA-Diamond, 50.4 Humanity's Last Exam (with tools). Industry-leading hallucination resistance. Handles reasoning, coding, structured output, and agentic tasks at frontier quality — all through [REDACTED] inference you own.
 
 ---
 
@@ -263,10 +263,10 @@ That's it. No external accounts. No API keys. No subscriptions.
 
 ## Links
 
-- **Morpheus AI:** [mor.org](https://mor.org)
+- **[REDACTED] AI:** [mor.org](https://mor.org)
 - **OpenClaw:** [openclaw.ai](https://openclaw.ai)
 - **MOR on Base:** [Uniswap](https://app.uniswap.org/explore/tokens/base/0x7431ada8a591c955a994a21710752ef9b882b8e3)
-- **Morpheus GitHub:** [MorpheusAIs/Morpheus-Lumerin-Node](https://github.com/MorpheusAIs/Morpheus-Lumerin-Node)
+- **[REDACTED] GitHub:** [[REDACTED]/[REDACTED]](https://github.com/[REDACTED]/[REDACTED])
 - **x402 Protocol:** [x402.org](https://x402.org)
 - **ERC-8004:** [eips.ethereum.org/EIPS/eip-8004](https://eips.ethereum.org/EIPS/eip-8004)
 - **8004scan:** [8004scan.io](https://www.8004scan.io)

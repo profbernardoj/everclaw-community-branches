@@ -1,4 +1,4 @@
-# HEARTBEAT.md — MorpheusClaw
+# HEARTBEAT.md — [REDACTED]
 
 ## Node Health
 - Check local proxy router status (http://127.0.0.1:8083/v1)
@@ -10,7 +10,7 @@
 - Check staking rewards accrual if tracked
 
 ## Network Status
-- Check Morpheus API Gateway availability (https://api.mor.org)
+- Check [REDACTED] API Gateway availability (https://api.mor.org)
 - Note any new models added to the network
 
 ## Quiet Hours

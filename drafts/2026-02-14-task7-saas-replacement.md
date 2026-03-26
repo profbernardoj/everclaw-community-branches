@@ -120,7 +120,7 @@ Year 1:  Agent handles 80% of what 10 SaaS tools did
 ### Revenue Model for Based AI
 
 If SmartAgent proves the thesis, Based AI can offer:
-- **Free tier:** Morpheus inference (community-powered)
+- **Free tier:** [REDACTED] inference (community-powered)
 - **Pro tier ($8/mo):** Venice subscription for premium models
 - **Enterprise:** Custom agents replacing enterprise SaaS stacks
 - **Agent marketplace:** x402-enabled specialist agents (hire a research agent, hire an analysis agent)

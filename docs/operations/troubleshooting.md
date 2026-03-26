@@ -21,7 +21,7 @@ curl -s -u "admin:$COOKIE_PASS" "http://localhost:8082/v1/chat/completions" \
 curl -s ... -d '{"session_id":"0x...","model_id":"0x...","model":"kimi-k2.5","messages":[...]}'
 ```
 
-This is the **#1 most common mistake** with the Morpheus proxy-router.
+This is the **#1 most common mistake** with the [REDACTED] proxy-router.
 
 ---
 
@@ -92,12 +92,12 @@ The blockchain still has your session, and staked MOR is still locked until the 
 
 ---
 
-## MorpheusUI Conflicts
+## [REDACTED] Conflicts
 
-**Cause:** The MorpheusUI desktop app manages its own proxy-router process. Running both simultaneously causes port conflicts and the UI may kill your headless router.
+**Cause:** The [REDACTED] desktop app manages its own proxy-router process. Running both simultaneously causes port conflicts and the UI may kill your headless router.
 
 **Fix:**
-- Don't run MorpheusUI and headless proxy-router at the same time
+- Don't run [REDACTED] and headless proxy-router at the same time
 - If you need to switch, fully quit one before starting the other
 - Check for rogue processes: `pgrep -f proxy-router`
 
@@ -227,8 +227,8 @@ Should show 40+ models including GLM-5.
 
 **Fix:**
 ```bash
-# Restart gateway to clear cooldowns
-openclaw gateway restart
+# Restart [REDACTED] to clear cooldowns
+openclaw [REDACTED] restart
 
 # Or check cooldown status
 cat ~/.openclaw/state/cooldown.json

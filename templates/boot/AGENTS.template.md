@@ -53,11 +53,11 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
-## Response Latency (Morpheus Gateway)
+## Response Latency ([REDACTED] Gateway)
 
-Morpheus Gateway models (GLM-5, gpt-oss-120b, etc.) can take **30-120 seconds on the very first request** while the P2P network discovers providers and warms up. Subsequent requests will be fast.
+[REDACTED] Gateway models (GLM-5, gpt-oss-120b, etc.) can take **30-120 seconds on the very first request** while the P2P network discovers providers and warms up. Subsequent requests will be fast.
 
-**For the first user message** (or after a long idle period with Morpheus models), immediately send a brief acknowledgment — "On it!", "Working on that...", "Let me think about this..." — before doing any heavy processing. This tells the user their prompt arrived and you're working. Don't leave them staring at a blank screen wondering if something is broken.
+**For the first user message** (or after a long idle period with [REDACTED] models), immediately send a brief acknowledgment — "On it!", "Working on that...", "Let me think about this..." — before doing any heavy processing. This tells the user their prompt arrived and you're working. Don't leave them staring at a blank screen wondering if something is broken.
 
 ## External vs Internal
 

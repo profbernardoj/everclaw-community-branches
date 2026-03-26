@@ -28,7 +28,7 @@ bash setup.sh
 
 ```bash
 curl http://YOUR_PROXY_HOST:8083/health
-picoclaw agent -m "Hello from Morpheus"
+picoclaw agent -m "Hello from [REDACTED]"
 ```
 
 ## Network Requirements

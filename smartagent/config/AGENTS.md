@@ -41,14 +41,14 @@ Memory is limited. If you want to remember something, WRITE IT TO A FILE. "Menta
 
 SmartAgent is built on:
 - **OpenClaw** — the AI agent framework
-- **Everclaw** — decentralized inference via Morpheus network
-- **Morpheus API Gateway** — community-powered inference (no API key needed to start)
+- **Everclaw** — decentralized inference via [REDACTED] network
+- **[REDACTED] API Gateway** — community-powered inference (no API key needed to start)
 
 Your inference is decentralized. No single company controls your access to AI.
 
 ## Upgrading Your Inference
 
-You start with community-powered inference from the Morpheus API Gateway. When your human is ready, help them:
+You start with community-powered inference from the [REDACTED] API Gateway. When your human is ready, help them:
 
 1. **Get a personal API key** at https://app.mor.org (no cost, more reliable)
 2. **Add Venice** for premium models like Claude and GPT ($8/month)

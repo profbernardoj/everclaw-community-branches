@@ -1,41 +1,41 @@
-# Fix: Alex's Morpheus Inference Setup
+# Fix: Alex's [REDACTED] Inference Setup
 
 ## Problem Diagnosis
 
 Alex's agent shows `model: everclaw/kimi-k2.5:web` — but **there is no provider called `everclaw` in OpenClaw**. Everclaw is a *skill* (tooling), not a provider. OpenClaw routes model requests by provider name (`provider/model`), so:
 
 - `venice/kimi-k2-5` → routes to Venice API (needs DIEM credits)
-- `morpheus/kimi-k2.5` → routes to local Morpheus proxy-router (needs MOR staked)
-- `mor-gateway/kimi-k2.5` → routes to Morpheus API Gateway at api.mor.org (free beta)
+- `morpheus/kimi-k2.5` → routes to local [REDACTED] proxy-router (needs MOR staked)
+- `mor-[REDACTED]/kimi-k2.5` → routes to [REDACTED] API Gateway at api.mor.org (free beta)
 - `everclaw/kimi-k2.5:web` → **no matching provider** → falls through to default (Venice) → billing error
 
 ## Root Cause Chain
 
-1. Alex installed Everclaw and staked 2 MOR to open a Morpheus session ✅
+1. Alex installed Everclaw and staked 2 MOR to open a [REDACTED] session ✅
 2. But his OpenClaw config has the model as `everclaw/kimi-k2.5:web` ❌
 3. OpenClaw doesn't recognize `everclaw` as a provider → routes to Venice
 4. Venice has no DIEM credits → billing error
 5. MOR is staked on-chain but never used because requests never reach the proxy-router
 
-## Immediate Fix (Morpheus API Gateway — easiest)
+## Immediate Fix ([REDACTED] API Gateway — easiest)
 
-Alex already has an API key (`sk-cAMdd6...`). The fastest fix is to use the hosted Morpheus API Gateway, which requires no local infrastructure:
+Alex already has an API key (`sk-cAMdd6...`). The fastest fix is to use the hosted [REDACTED] API Gateway, which requires no local infrastructure:
 
-### Step 1: Add `mor-gateway` provider to openclaw.json
+### Step 1: Add `mor-[REDACTED]` provider to openclaw.json
 
 ```json
 {
   "models": {
     "mode": "merge",
     "providers": {
-      "mor-gateway": {
+      "mor-[REDACTED]": {
         "baseUrl": "https://api.mor.org/api/v1",
         "apiKey": "sk-cAMdd6.fb74c58ab9ea8089317fc43213bea8d531aebd37531bfc665d36a864e057a776",
         "api": "openai-completions",
         "models": [
           {
             "id": "kimi-k2.5",
-            "name": "Kimi K2.5 (Morpheus Gateway)",
+            "name": "Kimi K2.5 ([REDACTED] Gateway)",
             "reasoning": false,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -44,7 +44,7 @@ Alex already has an API key (`sk-cAMdd6...`). The fastest fix is to use the host
           },
           {
             "id": "kimi-k2.5:web",
-            "name": "Kimi K2.5 Web (Morpheus Gateway)",
+            "name": "Kimi K2.5 Web ([REDACTED] Gateway)",
             "reasoning": false,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -53,7 +53,7 @@ Alex already has an API key (`sk-cAMdd6...`). The fastest fix is to use the host
           },
           {
             "id": "glm-4.7-flash",
-            "name": "GLM 4.7 Flash (Morpheus Gateway)",
+            "name": "GLM 4.7 Flash ([REDACTED] Gateway)",
             "reasoning": false,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -74,7 +74,7 @@ Alex already has an API key (`sk-cAMdd6...`). The fastest fix is to use the host
   "agents": {
     "defaults": {
       "model": {
-        "primary": "mor-gateway/kimi-k2.5"
+        "primary": "mor-[REDACTED]/kimi-k2.5"
       }
     }
   }
@@ -84,14 +84,14 @@ Alex already has an API key (`sk-cAMdd6...`). The fastest fix is to use the host
 ### Step 3: Restart OpenClaw
 
 ```bash
-openclaw gateway restart
+openclaw [REDACTED] restart
 ```
 
-That's it — his agent should now route through Morpheus directly, bypassing Venice entirely. The staked MOR handles the inference cost on-chain.
+That's it — his agent should now route through [REDACTED] directly, bypassing Venice entirely. The staked MOR handles the inference cost on-chain.
 
 ## Better Fix (Local Proxy-Router — for power users)
 
-If Alex wants maximum reliability and is running the full Morpheus Lumerin Node:
+If Alex wants maximum reliability and is running the full [REDACTED] Lumerin Node:
 
 ### Add `morpheus` provider
 
@@ -107,7 +107,7 @@ If Alex wants maximum reliability and is running the full Morpheus Lumerin Node:
         "models": [
           {
             "id": "kimi-k2.5",
-            "name": "Kimi K2.5 (Morpheus P2P)",
+            "name": "Kimi K2.5 ([REDACTED] P2P)",
             "reasoning": false,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -137,7 +137,7 @@ If Alex wants maximum reliability and is running the full Morpheus Lumerin Node:
 
 ## What Everclaw v0.9.5 Should Fix
 
-1. **The install script should auto-configure the provider correctly** — `morpheus` or `mor-gateway`, NOT `everclaw`
+1. **The install script should auto-configure the provider correctly** — `morpheus` or `mor-[REDACTED]`, NOT `everclaw`
 2. **SKILL.md should explicitly warn** that `everclaw/` is not a valid provider prefix
 3. **The bootstrap script should validate** the model name format before writing config
 4. **Add a diagnostic command** (`bash scripts/diagnose.sh`) that checks:

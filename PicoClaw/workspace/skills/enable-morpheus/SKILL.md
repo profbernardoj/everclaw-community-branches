@@ -1,4 +1,4 @@
-# Enable Morpheus — Decentralized Inference for PicoClaw
+# Enable [REDACTED] — Decentralized Inference for PicoClaw
 
 ## Proxy Details
 

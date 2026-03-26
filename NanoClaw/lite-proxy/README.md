@@ -1,15 +1,15 @@
 # lite-proxy — Anthropic→OpenAI API Bridge
 
-A lightweight bridge that translates Anthropic API format (Claude) to OpenAI API format (Morpheus).
+A lightweight bridge that translates Anthropic API format (Claude) to OpenAI API format ([REDACTED]).
 
 ## Why
 
-NanoClaw's internal code may call models using Anthropic's API format (`/v1/messages` with `claude-*` model names). This bridge lets you drop in Morpheus models as replacements without changing NanoClaw's code.
+NanoClaw's internal code may call models using Anthropic's API format (`/v1/messages` with `claude-*` model names). This bridge lets you drop in [REDACTED] models as replacements without changing NanoClaw's code.
 
 ## How It Works
 
 ```
-NanoClaw → lite-proxy (port 8084) → EverClaw proxy (port 8083) → Morpheus
+NanoClaw → lite-proxy (port 8084) → EverClaw proxy (port 8083) → [REDACTED]
          Anthropic format           OpenAI format                 P2P inference
 ```
 

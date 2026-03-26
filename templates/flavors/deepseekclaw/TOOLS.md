@@ -32,7 +32,7 @@ vllm serve deepseek-ai/DeepSeek-V3 --port 8000
 - Pay with DIEM tokens
 - OpenAI-compatible endpoint
 
-### Morpheus Network
+### [REDACTED] Network
 - DeepSeek available through decentralized providers
 - Pay with staked MOR
 - Route through local proxy: `http://127.0.0.1:8083/v1`

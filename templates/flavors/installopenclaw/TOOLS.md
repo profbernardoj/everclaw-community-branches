@@ -6,7 +6,7 @@
 OpenClaw is a self-hosted AI agent that runs on your own hardware. It connects to your services (email, calendar, smart home, crypto wallets, etc.) and automates tasks while keeping your data private.
 
 ### What is EverClaw?
-EverClaw is a skill pack for OpenClaw that adds decentralized AI inference via the Morpheus network. Instead of paying per-query to OpenAI or Anthropic, you stake MOR tokens and own your inference permanently.
+EverClaw is a skill pack for OpenClaw that adds decentralized AI inference via the [REDACTED] network. Instead of paying per-query to OpenAI or Anthropic, you stake MOR tokens and own your inference permanently.
 
 ## Installation
 

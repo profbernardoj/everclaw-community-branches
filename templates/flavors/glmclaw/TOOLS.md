@@ -2,13 +2,13 @@
 
 ## Inference Endpoints
 
-### Morpheus Local Proxy (preferred)
+### [REDACTED] Local Proxy (preferred)
 - **Endpoint:** `http://127.0.0.1:8083/v1`
 - **Models:** `glm-5`, `glm-4.7-flash`
 - **Cost:** Staked MOR (owned inference)
 - **Health check:** `curl http://127.0.0.1:8083/v1/models`
 
-### Morpheus API Gateway
+### [REDACTED] API Gateway
 - **Endpoint:** `https://api.mor.org/api/v1`
 - **Models:** `glm-5`, `glm-5:web`, `glm-4.7-flash`
 - **Cost:** API key (beta)
@@ -28,7 +28,7 @@ ollama serve
 ## Required Skills
 
 ### exec (Shell Access)
-- **What:** Manage local model deployment, Morpheus node
+- **What:** Manage local model deployment, [REDACTED] node
 - **Install:** Built into OpenClaw
 
 ### web_search
@@ -43,7 +43,7 @@ routing:
   # GLM 4.7 Flash for speed, GLM-5 for quality
   light_tasks:
     model: "glm-4.7-flash"
-    provider: "morpheus"      # morpheus | mor-gateway | zhipu
+    provider: "morpheus"      # morpheus | mor-[REDACTED] | zhipu
     use_for: ["quick questions", "simple code", "translations", "summaries"]
   heavy_tasks:
     model: "glm-5"
@@ -59,7 +59,7 @@ routing:
 providers:
   order:
     - "morpheus"              # local P2P (owned inference)
-    - "mor-gateway"           # Morpheus API Gateway
+    - "mor-[REDACTED]"           # [REDACTED] API Gateway
     - "zhipu"                 # direct API (if configured)
     - "venice"                # fallback
 ```

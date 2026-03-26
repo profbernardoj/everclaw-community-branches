@@ -10,7 +10,7 @@
 | SOP # | Title | Created |
 |-------|-------|---------|
 | 001 | Development & Deployment | 2026-03-08 |
-| 002 | Morpheus P2P Session Management | 2026-03-09 |
+| 002 | [REDACTED] P2P Session Management | 2026-03-09 |
 | 003 | XMTP Agent-to-Agent Communication | 2026-03-14 |
 | 004 | Marketing & Sales Pipeline | 2026-03-17 |
 
@@ -282,16 +282,16 @@ David / Bernardo (main)
 
 ---
 
-## SOP-002: Morpheus P2P Session Management
+## SOP-002: [REDACTED] P2P Session Management
 
 **Version:** 1.1
 **Created:** 2026-03-09
 **Updated:** 2026-03-09
-**Purpose:** Manage Morpheus P2P staking sessions for decentralized inference — wallet operations, session lifecycle, balance monitoring, and fallback behavior.
+**Purpose:** Manage [REDACTED] P2P staking sessions for decentralized inference — wallet operations, session lifecycle, balance monitoring, and fallback behavior.
 
-### How Morpheus Inference Staking Works
+### How [REDACTED] Inference Staking Works
 
-**CRITICAL: MOR is STAKED, not spent.** There are two modes on the Morpheus network:
+**CRITICAL: MOR is STAKED, not spent.** There are two modes on the [REDACTED] network:
 
 1. **Staking Mode (`directPayment:false`)** — MOR is temporarily locked in the Diamond smart contract for the session duration. After the session closes, **all staked MOR is returned** to the consumer's wallet (with a short delay). This is how our router is configured.
 
@@ -312,16 +312,16 @@ David / Bernardo (main)
 
 ### Overview
 
-Morpheus P2P inference requires staking MOR tokens to open sessions with providers. The staked MOR is returned after the session closes. This SOP documents the architecture, operational procedures, and upgrade roadmap for reliable session management.
+[REDACTED] P2P inference requires staking MOR tokens to open sessions with providers. The staked MOR is returned after the session closes. This SOP documents the architecture, operational procedures, and upgrade roadmap for reliable session management.
 
 ---
 
 ### Architecture
 
 ```
-OpenClaw → morpheus-proxy (port 8083) → proxy-router (port 8082) → Morpheus P2P Network
+OpenClaw → morpheus-proxy (port 8083) → proxy-router (port 8082) → [REDACTED] P2P Network
                   ↓ (fallback)
-           Morpheus Gateway API (api.mor.org)
+           [REDACTED] Gateway API (api.mor.org)
                   ↓ (fallback)
            Venice API (api.venice.ai)
 ```
@@ -467,7 +467,7 @@ curl -s -u "admin:$(cat ~/morpheus/.cookie)" http://127.0.0.1:8082/blockchain/mo
 |---------|-------|-----|
 | `transfer amount exceeds balance` | Not enough MOR | Fund router (Procedure 2) |
 | `Unknown model: X` | Model not on P2P | Use Gateway or different model |
-| `502 Morpheus session unavailable` | Session creation failed | Check balance, restart proxy |
+| `502 [REDACTED] session unavailable` | Session creation failed | Check balance, restart proxy |
 | High `consecutiveFailures` | Persistent P2P issues | Will auto-fallback after threshold |
 | `fallbackMode: true` | Using Gateway instead of P2P | Wait for retry timer or restart proxy |
 
@@ -747,13 +747,13 @@ The `xmtp-comms-guard` skill at `skills/xmtp-comms-guard/` provides the full V3 
 
 ### Overview
 
-The EverClaw sales funnel has 5 stages. Each stage is supported by dedicated AI agents running on GLM-5 (Morpheus). All agents operate in **draft-and-approve** mode — they produce drafts, David reviews and approves before anything goes external.
+The EverClaw sales funnel has 5 stages. Each stage is supported by dedicated AI agents running on GLM-5 ([REDACTED]). All agents operate in **draft-and-approve** mode — they produce drafts, David reviews and approves before anything goes external.
 
 **Core Message:** "Own your AI agent. Hardware, data, inference — all yours."
 
 **Language Rules:**
 - NEVER say "free inference" → say "own your inference"
-- Morpheus = ownership, not rental
+- [REDACTED] = ownership, not rental
 - MOR is staked, not spent — all staked MOR returns after session close
 - Don't highlight Llama 3.3
 
@@ -765,7 +765,7 @@ The EverClaw sales funnel has 5 stages. Each stage is supported by dedicated AI 
 |-------|------|------|---------------|
 | 1 | **Discovery & Sales** | User finds a flavor site, gets hooked on the ownership message | David |
 | 2 | **VM Setup** | User gets EverClaw running in a hosted VM — zero hardware needed | StarkClaw / TBD |
-| 3 | **Inference Access** | User connects to decentralized inference via Morpheus | Thomas Borrel / BasedAI |
+| 3 | **Inference Access** | User connects to decentralized inference via [REDACTED] | Thomas Borrel / BasedAI |
 | 4 | **Hardware Purchase** | User buys a ClawBox — owns their compute | Eric Bravick / IronHill |
 | 5 | **DIY Setup** | User sets up their own hardware from scratch | Scott B. |
 
@@ -784,7 +784,7 @@ The EverClaw sales funnel has 5 stages. Each stage is supported by dedicated AI 
 | `social-manager` | Social Manager | morpheus/glm-5 | 1 | Draft social posts for X/Farcaster/Discord/Telegram. Track engagement, draft responses to mentions, coordinate influencer outreach. | `HG7jhfrk5F9jnwzZMXYLhCgFJumSXTvIJQs8a06Y1t0=` |
 | `lead-tracker` | Lead Tracker | morpheus/glm-5 | 1–2 | Track inbound interest (GitHub stars, website visits, install counts, DMs). Maintain CRM data. Score and qualify leads. | `ve3o3EJZlJCO6lXnFcwB9pVxmaBRYFAQbmSp8/05q9w=` |
 | `onboarding-agent` | Onboarding Agent | morpheus/glm-5 | 2, 5 | Guide new users through VM setup or DIY hardware setup. Answer setup questions. Escalate blockers. Track conversion from signup → running agent. | `+4cUWjjPju+8b6klwQ/1o5BRqGED94go490mWXY18Yg=` |
-| `inference-support` | Inference Support | morpheus/glm-5 | 3 | Help users connect to Morpheus inference. Troubleshoot MOR staking, proxy-router setup, model selection. Monitor inference health. | `KN5ycpjeU1Ge7OlTCEqA/tQkc6W3qqLubWBfj6GiztQ=` |
+| `inference-support` | Inference Support | morpheus/glm-5 | 3 | Help users connect to [REDACTED] inference. Troubleshoot MOR staking, proxy-router setup, model selection. Monitor inference health. | `KN5ycpjeU1Ge7OlTCEqA/tQkc6W3qqLubWBfj6GiztQ=` |
 | `sales-closer` | Sales Closer | morpheus/glm-5 | 3–4 | Nurture users from VM → hardware purchase. Handle objections. Track pipeline from trial → ClawBox order. Coordinate with IronHill. | `8SfeDCsivG8n/RZZ8YqpUcWNBA2t1aoytOhiIvQsZD0=` |
 | `community-manager` | Community Manager | morpheus/glm-5 | 1–5 | Manage Discord/Telegram communities per flavor. Welcome new members, answer FAQs, escalate issues, run engagement campaigns. | `OmV9k3tDGP9FqZRdqsmocUBlRBZUStcObwAt0SWO8Aw=` |
 | `analytics-agent` | Analytics Agent | morpheus/glm-5 | 1–5 | Track funnel metrics across all stages: conversion rates, drop-off points, install counts, active users, MOR staking growth. Produce weekly reports. | `U9WymONIRKHKoEDEObVHBiQtdko1hJPYUZCJNhehMYI=` |
@@ -830,7 +830,7 @@ Each agent follows the same workspace pattern as SOP-001:
                            │ user running on VM
                            ▼
                     ┌─────────────────┐
-                    │inference-support│  Stage 3: Connect to Morpheus
+                    │inference-support│  Stage 3: Connect to [REDACTED]
                     └──────┬──────────┘
                            │ user staking MOR
                            ▼
@@ -887,7 +887,7 @@ Flavor categories for content strategy:
 
 | Category | Flavors | Messaging Angle |
 |----------|---------|-----------------|
-| **Protocol/Chain** | BitcoinClaw, EthereumClaw, SolanaClaw, BaseClaw, ArbClaw, MorpheusClaw | Self-custody meets AI — own your inference like you own your keys |
+| **Protocol/Chain** | BitcoinClaw, EthereumClaw, SolanaClaw, BaseClaw, ArbClaw, [REDACTED] | Self-custody meets AI — own your inference like you own your keys |
 | **Model-Specific** | GLMClaw, GrokClaw, KimiClaw, LlamaClaw, MiniMaxClaw, DeepSeekClaw | Your favorite model, your hardware, no API landlord |
 | **Platform** | AndroidClaw, AppleClaw, LinuxClaw, WindowsClaw | Native AI agent for your OS — no cloud dependency |
 | **Use Case** | EmailClaw, BookingClaw, BriefingClaw, InvestClaw, FamilyClaw, HomeClaw, OfficeClaw, FriendClaw, FamilyOfficeClaw, VCClaw | AI that works for you, not a subscription service |
@@ -913,7 +913,7 @@ Weekly report to David covering:
 |--------|--------|
 | GitHub stars / forks per flavor | GitHub API |
 | Install counts (`curl \| bash` hits) | CloudFlare analytics on get.everclaw.xyz |
-| Active users (inference sessions) | Morpheus proxy logs |
+| Active users (inference sessions) | [REDACTED] proxy logs |
 | MOR staking growth | On-chain data |
 | Content published (posts, threads, blogs) | Internal tracking |
 | Community growth (Discord/Telegram members) | Platform APIs |
@@ -934,7 +934,7 @@ Agents will be created one at a time, tested, and connected to Signal before mov
 | 4 | `community-manager` | Engage and retain users who discover via content |
 | 5 | `lead-tracker` | Track and qualify inbound interest |
 | 6 | `onboarding-agent` | Guide users through setup (VM + hardware) |
-| 7 | `inference-support` | Technical support for Morpheus connection |
+| 7 | `inference-support` | Technical support for [REDACTED] connection |
 | 8 | `sales-closer` | Convert trial users to hardware buyers |
 
 ---
@@ -961,7 +961,7 @@ For each new agent, follow these steps:
 | Dependency | SOP | Notes |
 |------------|-----|-------|
 | Agent deployment infra | SOP-001 | Agent creation patterns, workspace layout |
-| Inference access | SOP-002 | Agents use Morpheus P2P for inference |
+| Inference access | SOP-002 | Agents use [REDACTED] P2P for inference |
 | Agent-to-agent comms | SOP-003 | Future: XMTP for decentralized inter-agent messaging |
 
 ---
@@ -974,5 +974,5 @@ For each new agent, follow these steps:
 
 ### History
 
-- **Mar 17, 2026** — SOP-004 created. 8 agents defined. Build order prioritized. Draft-and-approve workflow. All agents on GLM-5 (Morpheus).
+- **Mar 17, 2026** — SOP-004 created. 8 agents defined. Build order prioritized. Draft-and-approve workflow. All agents on GLM-5 ([REDACTED]).
 - **Mar 17, 2026** — All 8 agents deployed and bound to Signal groups. Total system agents: 22. content-writer tested and confirmed responsive. SOP-004 fully operational.

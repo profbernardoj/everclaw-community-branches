@@ -15,7 +15,7 @@ Agent routes to MiniMax M2.5 for creative tasks where its strong generative capa
 ### 3. Web-Augmented Research
 > "Research [topic] with current information"
 
-Agent uses MiniMax-M2.5:web variant (via Morpheus Gateway) to combine model intelligence with live web search for up-to-date analysis.
+Agent uses MiniMax-M2.5:web variant (via [REDACTED] Gateway) to combine model intelligence with live web search for up-to-date analysis.
 
 ### 4. Model Comparison
 > "Compare MiniMax to GLM-5 on this task"

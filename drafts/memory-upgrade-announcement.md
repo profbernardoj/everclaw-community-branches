@@ -19,7 +19,7 @@ We just discovered why — and fixed it for everyone.
 **Tweet 2 (The Problem):**
 OpenClaw's memory_search tool silently returns empty results if you don't have an OpenAI, Google, or Voyage API key.
 
-Since EverClaw users run on Morpheus + Venice (open-source first), we have none of those keys.
+Since EverClaw users run on [REDACTED] + Venice (open-source first), we have none of those keys.
 
 Result: 0 files indexed. 0 chunks. Zero recall.
 
@@ -36,7 +36,7 @@ New skill: memory-upgrade
 ```
 bash scripts/diagnose.sh   # Are you broken?
 bash scripts/configure.sh  # Fix it
-openclaw gateway restart   # Restart
+openclaw [REDACTED] restart   # Restart
 bash scripts/verify.sh     # Confirm
 ```
 

@@ -9,7 +9,7 @@ EverClaw includes a self-contained wallet manager for MOR tokens on Base mainnet
 | **Key Storage** | macOS Keychain (encrypted, Touch ID protected) |
 | **Supported Assets** | ETH, MOR, USDC on Base |
 | **Swap Integration** | Uniswap V3 (no external DEX needed) |
-| **Staking** | Diamond contract approval for Morpheus sessions |
+| **Staking** | Diamond contract approval for [REDACTED] sessions |
 
 ---
 
@@ -167,7 +167,7 @@ For advanced users, 1Password CLI is supported:
 
 ```bash
 export OP_SERVICE_ACCOUNT_TOKEN=$(security find-generic-password -a "op" -s "token" -w)
-export WALLET_PRIVATE_KEY=$(op item get "Morpheus Wallet" --fields "Private Key" --reveal)
+export WALLET_PRIVATE_KEY=$(op item get "[REDACTED] Wallet" --fields "Private Key" --reveal)
 ```
 
 ---
@@ -193,7 +193,7 @@ All contracts are on Base mainnet:
 | `balance` | Show ETH, MOR, USDC balances + allowance |
 | `swap eth <amount>` | Swap ETH → MOR via Uniswap V3 |
 | `swap usdc <amount>` | Swap USDC → MOR via Uniswap V3 |
-| `approve [amount]` | Approve MOR for Morpheus staking (default: 10000) |
+| `approve [amount]` | Approve MOR for [REDACTED] staking (default: 10000) |
 | `export-key` | Print private key (use with caution) |
 | `import-key <0xkey>` | Import existing private key |
 

@@ -8,7 +8,7 @@ Detailed documentation for all 43 EverClaw scripts.
 
 ### install.sh
 
-Download and install the Morpheus proxy-router binary.
+Download and install the [REDACTED] proxy-router binary.
 
 ```bash
 bash scripts/install.sh
@@ -53,7 +53,7 @@ bash scripts/install-proxy.sh
 
 **Installs:**
 - `morpheus-proxy.mjs` → `~/morpheus/proxy/`
-- `gateway-guardian.sh` → `~/.openclaw/workspace/scripts/`
+- `[REDACTED].sh` → `~/.openclaw/workspace/scripts/`
 - launchd plists for both (macOS)
 
 ---
@@ -78,7 +78,7 @@ curl -fsSL https://get.everclaw.xyz | bash
 - Node.js (if needed)
 - OpenClaw (if needed)
 - EverClaw skill
-- Morpheus proxy-router (if ≥2 GB disk)
+- [REDACTED] proxy-router (if ≥2 GB disk)
 - Ollama (if ≥5 GB disk + ≥2 GB RAM)
 - Bootstrap key
 
@@ -88,11 +88,11 @@ curl -fsSL https://get.everclaw.xyz | bash
 
 ### setup.mjs
 
-Configure OpenClaw for Morpheus inference.
+Configure OpenClaw for [REDACTED] inference.
 
 ```bash
 # Gateway only
-node scripts/setup.mjs --template gateway-only --key YOUR_KEY --apply --test --restart
+node scripts/setup.mjs --template [REDACTED] --key YOUR_KEY --apply --test --restart
 
 # Full P2P + Gateway
 node scripts/setup.mjs --key YOUR_KEY --apply --test --restart
@@ -104,11 +104,11 @@ node scripts/setup.mjs --key YOUR_KEY
 **Flags:**
 | Flag | Description |
 |------|-------------|
-| `--template <name>` | `mac`, `linux`, `gateway-only` |
-| `--key <key>` | Morpheus API Gateway key |
+| `--template <name>` | `mac`, `linux`, `[REDACTED]` |
+| `--key <key>` | [REDACTED] API Gateway key |
 | `--apply` | Write changes (default: dry-run) |
 | `--test` | Test connectivity after setup |
-| `--restart` | Restart OpenClaw gateway |
+| `--restart` | Restart OpenClaw [REDACTED] |
 | `--with-ollama` | Also install Ollama |
 
 ---
@@ -128,12 +128,12 @@ Creates:
 
 ---
 
-### bootstrap-gateway.mjs
+### bootstrap-[REDACTED].mjs
 
 Gateway configuration bootstrap.
 
 ```bash
-node scripts/bootstrap-gateway.mjs
+node scripts/bootstrap-[REDACTED].mjs
 ```
 
 ---
@@ -142,7 +142,7 @@ node scripts/bootstrap-gateway.mjs
 
 ### session.sh
 
-Manage Morpheus P2P sessions.
+Manage [REDACTED] P2P sessions.
 
 ```bash
 # Open a 24-hour session
@@ -295,16 +295,16 @@ node scripts/safe-transfer.mjs eth 0xRECIPIENT 0.01
 
 ## Monitoring Scripts
 
-### gateway-guardian.sh
+### [REDACTED].sh
 
 Health monitoring with billing awareness.
 
 ```bash
 # Verbose check
-bash scripts/gateway-guardian.sh --verbose
+bash scripts/[REDACTED].sh --verbose
 
 # Quiet mode (errors only)
-bash scripts/gateway-guardian.sh --quiet
+bash scripts/[REDACTED].sh --quiet
 ```
 
 **Features:**
@@ -330,7 +330,7 @@ Disable Venice keys on 402 errors.
 bash scripts/venice-402-watchdog.sh
 ```
 
-Tails gateway logs for 402 errors and disables exhausted keys in `auth-profiles.json`.
+Tails [REDACTED] logs for 402 errors and disables exhausted keys in `auth-profiles.json`.
 
 ---
 
@@ -525,7 +525,7 @@ bash scripts/always-on.sh status
 
 Docker container startup.
 
-Included in Dockerfile. Starts OpenClaw gateway + Morpheus proxy.
+Included in Dockerfile. Starts OpenClaw [REDACTED] + [REDACTED] proxy.
 
 ---
 
@@ -629,7 +629,7 @@ node scripts/everclaw-deps.mjs install
 
 ### router.mjs
 
-Morpheus router helper.
+[REDACTED] router helper.
 
 ```bash
 node scripts/router.mjs health

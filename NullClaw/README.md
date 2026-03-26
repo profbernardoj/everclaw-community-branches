@@ -1,13 +1,13 @@
 # null-everclaw — EverClaw for NullClaw
 
-Decentralized Morpheus inference for your [NullClaw](https://github.com/null-claw) agent.
+Decentralized [REDACTED] inference for your [NullClaw](https://github.com/null-claw) agent.
 
 **Zero overhead integration:** NullClaw's 678 KB Zig binary, ~1 MB RAM, and <2 ms startup stay untouched. The EverClaw proxy runs as a separate Node.js sidecar and registers as a standard OpenAI-compatible provider in NullClaw's pluggable vtable system.
 
 ## Architecture
 
 ```
-NullClaw (Zig, 678 KB) → EverClaw Proxy (Node.js, port 8083) → Morpheus P2P → AI Model
+NullClaw (Zig, 678 KB) → EverClaw Proxy (Node.js, port 8083) → [REDACTED] P2P → AI Model
 ```
 
 NullClaw supports 22+ providers via its vtable architecture. The EverClaw proxy registers as a `custom` provider — NullClaw's binary stays pure Zig with zero additional dependencies.
@@ -30,7 +30,7 @@ nullclaw daemon    # or nullclaw service restart
 
 ```bash
 nullclaw doctor
-nullclaw agent -m "Hello from Morpheus"
+nullclaw agent -m "Hello from [REDACTED]"
 ```
 
 ## Available Models
@@ -90,7 +90,7 @@ See `examples/flake-overlay.nix` for adding the proxy as a Nix service.
 ### Docker
 ```bash
 # NullClaw in Docker, proxy on host
-docker run --add-host=host.docker.internal:host-gateway nullclaw \
+docker run --add-host=host.docker.internal:host-[REDACTED] nullclaw \
   --env MORPHEUS_API_BASE=http://host.docker.internal:8083/v1
 ```
 
@@ -130,7 +130,7 @@ When you install the EverClaw proxy via `setup.sh`, you get these features autom
 - **Three-Shift Task Planning** — Morning/Afternoon/Night shift system proposes prioritized task plans with approval workflow. Nothing executes without your say-so.
 - **Gateway Guardian v5** — Self-healing watchdog with direct curl inference probes, billing-aware escalation, DIEM credit monitoring, and 4-stage restart escalation. No more Signal spam from failed health checks.
 - **Smart Session Archiver** — Automatically archives old sessions when size exceeds threshold, preventing browser slowdowns.
-- **Model Router** — Open-source first: routes all tiers to Morpheus by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
+- **Model Router** — Open-source first: routes all tiers to [REDACTED] by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
 - **Multi-Key Auth Rotation** — Configure multiple API keys; auto-rotates when credits drain.
 
 See the main [EverClaw README](../README.md) for full documentation.

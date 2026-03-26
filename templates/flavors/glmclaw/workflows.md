@@ -5,7 +5,7 @@
 ### 1. Model Status
 > "Are my GLM models running?"
 
-Agent checks all configured endpoints (local Morpheus, gateway, direct API), reports which models are available, and tests response quality with a quick prompt.
+Agent checks all configured endpoints (local [REDACTED], [REDACTED], direct API), reports which models are available, and tests response quality with a quick prompt.
 
 ### 2. Smart Routing
 > "I need to analyze this document — which model should I use?"
@@ -28,9 +28,9 @@ Agent routes to GLM-5 for code generation, producing well-structured code with d
 Agent runs the same prompt through both models, presents both outputs side by side, and notes quality differences objectively.
 
 ### 6. Cost Analysis
-> "How much am I saving with Morpheus GLM vs OpenAI?"
+> "How much am I saving with [REDACTED] GLM vs OpenAI?"
 
-Agent calculates: inference volume, equivalent OpenAI/Anthropic pricing, Morpheus cost (MOR staking), and net savings.
+Agent calculates: inference volume, equivalent OpenAI/Anthropic pricing, [REDACTED] cost (MOR staking), and net savings.
 
 ### 7. Local Deployment
 > "Set up GLM locally on my machine"

@@ -7,12 +7,12 @@
 - **Context:** 131K (K2.5), 262K (K2 Thinking)
 - **Cost:** DIEM tokens
 
-### Morpheus Local Proxy
+### [REDACTED] Local Proxy
 - **Endpoint:** `http://127.0.0.1:8083/v1`
 - **Models:** `kimi-k2.5`, `kimi-k2-thinking`
 - **Cost:** Staked MOR
 
-### Morpheus API Gateway
+### [REDACTED] API Gateway
 - **Endpoint:** `https://api.mor.org/api/v1`
 - **Models:** `kimi-k2.5`
 - **Cost:** API key (beta)
@@ -58,7 +58,7 @@ routing:
 ```
 providers:
   kimi-k2-5:
-    order: ["venice", "morpheus", "mor-gateway"]
+    order: ["venice", "morpheus", "mor-[REDACTED]"]
   kimi-k2-thinking:
     order: ["venice", "morpheus"]
 ```

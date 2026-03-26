@@ -8,13 +8,13 @@ No wallet, no MOR tokens, no P2P setup. Just a free API key.
 
 ```bash
 node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs \
-  --template gateway-only \
+  --template [REDACTED] \
   --key <YOUR_API_KEY> \
   --apply --test --restart
 ```
 
 **What you get:**
-- GLM-5, GLM-4.7 Flash, Kimi K2.5 via Morpheus Gateway
+- GLM-5, GLM-4.7 Flash, Kimi K2.5 via [REDACTED] Gateway
 - 1,000 free requests/day with bootstrap key
 - Claude/Opus fallback via Venice (if configured)
 
@@ -106,7 +106,7 @@ node ~/.openclaw/workspace/everclaw/scripts/balance.sh
 
 ## Using with OpenClaw
 
-EverClaw integrates automatically with OpenClaw. After setup, your agent will use Morpheus inference by default.
+EverClaw integrates automatically with OpenClaw. After setup, your agent will use [REDACTED] inference by default.
 
 ### Model Configuration
 
@@ -120,7 +120,7 @@ Your `openclaw.json` will include:
       "baseURL": "http://127.0.0.1:8083/v1",
       "apiKey": "morpheus-local"
     },
-    "mor-gateway": {
+    "mor-[REDACTED]": {
       "type": "openai-compatible",
       "baseURL": "https://api.mor.org/v1",
       "apiKey": "${MOR_API_KEY}"
@@ -130,7 +130,7 @@ Your `openclaw.json` will include:
     "defaults": {
       "model": {
         "primary": "morpheus/glm-5",
-        "fallbacks": ["mor-gateway/glm-5", "venice/claude-opus-4-6"]
+        "fallbacks": ["mor-[REDACTED]/glm-5", "venice/claude-opus-4-6"]
       }
     }
   }

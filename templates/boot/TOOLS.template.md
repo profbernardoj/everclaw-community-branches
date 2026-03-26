@@ -66,7 +66,7 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
      - **Host:** my-server.example.com
      - **Auth:** SSH key (added to agent) -->
 
-### Morpheus Inference
+### [REDACTED] Inference
 - **Proxy:** http://127.0.0.1:__MORPHEUS_PROXY_PORT__
 - **Default model:** __DEFAULT_MODEL__
 
@@ -78,7 +78,7 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
      
      Example:
      ### Local Services
-     - Morpheus proxy-router: port 8082
+     - [REDACTED] proxy-router: port 8082
      - OpenAI-compatible proxy: port 8083
      - Health check: curl http://localhost:8083/health
      

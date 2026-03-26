@@ -1,6 +1,6 @@
 # Everclaw — Available Models
 
-Models available on the Morpheus decentralized inference network (Base mainnet). Model IDs are blockchain-assigned hashes that identify the model on-chain.
+Models available on the [REDACTED] decentralized inference network (Base mainnet). Model IDs are blockchain-assigned hashes that identify the model on-chain.
 
 ## Text Generation Models
 

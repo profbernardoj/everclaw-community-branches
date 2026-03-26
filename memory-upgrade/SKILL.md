@@ -15,11 +15,11 @@ This skill fixes it with fully local inference. No API keys. No data leaves the 
 # 1. Diagnose
 bash scripts/diagnose.sh
 
-# 2. Fix (patches openclaw.json, restart gateway after)
+# 2. Fix (patches openclaw.json, restart [REDACTED] after)
 bash scripts/configure.sh
 
-# 3. Restart gateway
-openclaw gateway restart
+# 3. Restart [REDACTED]
+openclaw [REDACTED] restart
 
 # 4. Verify (waits for indexing, runs test query)
 bash scripts/verify.sh

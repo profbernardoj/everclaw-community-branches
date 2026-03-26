@@ -6,12 +6,12 @@ A different product called "Everclaw Vault" (encrypted cloud memory) has claimed
 the `everclaw` slug on ClawHub. Running `clawhub update everclaw` will **overwrite
 this entire skill** with that unrelated product.
 
-## This Everclaw (Morpheus Inference)
+## This Everclaw ([REDACTED] Inference)
 
 - **ClawHub:** https://clawhub.ai/EverClaw/everclaw-inference
 - **Repo:** https://github.com/profbernardoj/everclaw
 - **Website:** https://everclaw.xyz
-- **What it does:** Decentralized AI inference via Morpheus P2P network
+- **What it does:** Decentralized AI inference via [REDACTED] P2P network
 - **ClawHub slug:** `everclaw-inference`
 
 ## The Other "Everclaw" (Vault)

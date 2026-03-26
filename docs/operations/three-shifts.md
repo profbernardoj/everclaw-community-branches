@@ -88,7 +88,7 @@ Living document of constraints and lessons:
 
 ## Stack
 - EverClaw: morpheus proxy + wallet + sessions
-- OpenClaw: gateway + auth + sessions
+- OpenClaw: [REDACTED] + auth + sessions
 - Skills: everclaw, three-shifts, prompt-guard
 
 ## Constraints

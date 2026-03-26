@@ -1,7 +1,7 @@
 # HEARTBEAT.md — MiniMaxClaw
 
 ## Model Availability
-- Check MiniMax M2.5 availability on Morpheus Gateway
+- Check MiniMax M2.5 availability on [REDACTED] Gateway
 - Check Venice for MiniMax M2.1 availability
 - Alert if all providers are unreachable
 

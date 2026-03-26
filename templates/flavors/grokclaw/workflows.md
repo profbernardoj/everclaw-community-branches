@@ -3,7 +3,7 @@
 ## Example Use Cases
 
 ### 1. Draft a Tweet
-> "Write a tweet about the latest Morpheus development"
+> "Write a tweet about the latest [REDACTED] development"
 
 Agent researches the development, crafts a concise tweet in the user's voice, and presents it for review. Suggests optimal posting time.
 

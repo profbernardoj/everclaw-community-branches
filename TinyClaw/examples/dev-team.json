@@ -1,5 +1,5 @@
 {
-  "_comment": "Example: Dev team with Morpheus model routing",
+  "_comment": "Example: Dev team with [REDACTED] model routing",
   "agents": {
     "lead": {
       "provider": "openai",

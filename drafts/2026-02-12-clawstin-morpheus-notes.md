@@ -1,7 +1,7 @@
 # Clawstin Austin Meetup — Feb 12, 2026
-## Notes for the Morpheus Community
+## Notes for the [REDACTED] Community
 
-Last night's Clawstin event in Austin brought together builders who are running personal AI agents in production — not demos, not prototypes, but agents doing real work. Here are the highlights and what they mean for Morpheus.
+Last night's Clawstin event in Austin brought together builders who are running personal AI agents in production — not demos, not prototypes, but agents doing real work. Here are the highlights and what they mean for [REDACTED].
 
 ---
 
@@ -16,7 +16,7 @@ R2 runs 24/7 on its own Mac mini with its own email, file system, and deployment
 
 The thesis: every smart website should ship with its own AI agent that manages the business behind it. Updates happen via email or text to the agent — no CMS, no logins, no tickets.
 
-**Why this matters for Morpheus:** These agents need persistent, reliable inference. R2 runs on OpenClaw and spawns sub-agents for different tasks. This is the kind of always-on workload where owning your inference via MOR staking makes more sense than renting API credits that can run out mid-task.
+**Why this matters for [REDACTED]:** These agents need persistent, reliable inference. R2 runs on OpenClaw and spawns sub-agents for different tasks. This is the kind of always-on workload where owning your inference via MOR staking makes more sense than renting API credits that can run out mid-task.
 
 ---
 
@@ -41,7 +41,7 @@ The core insight from the Q&A was powerful: *the most valuable data in AI isn't 
 
 This is essentially **LinkedIn for AI agents** — but where the agents can actually do work together, not just connect. Your agent finds collaborators based on the tasks and jobs you're working on, leverages your existing trust networks, and executes jointly while keeping each party's proprietary context protected.
 
-**Why this matters for Morpheus:** This is directly aligned with the Morpheus vision of decentralized AI. The agent registry (ERC-8004), on-chain reputation, and the x402 payment protocol provide the infrastructure for exactly this kind of agent-to-agent collaboration. Morpheus's decentralized identity and payment rails could become the backbone of agent trust networks — where collaboration is permissionless, verifiable, and doesn't depend on any centralized platform deciding who gets to participate.
+**Why this matters for [REDACTED]:** This is directly aligned with the [REDACTED] vision of decentralized AI. The agent registry (ERC-8004), on-chain reputation, and the x402 payment protocol provide the infrastructure for exactly this kind of agent-to-agent collaboration. [REDACTED]'s decentralized identity and payment rails could become the backbone of agent trust networks — where collaboration is permissionless, verifiable, and doesn't depend on any centralized platform deciding who gets to participate.
 
 ---
 
@@ -51,22 +51,22 @@ Greg, who runs a cybersecurity firm in Austin, showed a voice integration for hi
 
 The setup uses Discord's persistent voice channels, so you can talk to your agent anytime through the Discord app on any device. He's released the integration as open source.
 
-**Why this matters for Morpheus:** Voice is the most natural interface for personal AI. As agents become more capable, typing becomes the bottleneck. Voice-first interaction combined with Morpheus's owned inference means truly personal AI assistants that are always available, always private, and never throttled by someone else's API limits.
+**Why this matters for [REDACTED]:** Voice is the most natural interface for personal AI. As agents become more capable, typing becomes the bottleneck. Voice-first interaction combined with [REDACTED]'s owned inference means truly personal AI assistants that are always available, always private, and never throttled by someone else's API limits.
 
 ---
 
-### Key Takeaways for the Morpheus Community
+### Key Takeaways for the [REDACTED] Community
 
 1. **Personal AI agents are in production now.** People are running agents that deploy websites, manage client pipelines, and handle business operations autonomously. This isn't theoretical.
 
 2. **Always-on agents need owned inference.** These workloads run 24/7, spawn sub-agents, and can't afford credit exhaustion mid-task. MOR staking provides the economic model for persistent, self-sovereign inference.
 
-3. **Agent collaboration is the next frontier.** The ability for personal agents to securely discover, evaluate, and work with each other — built on trust networks rather than centralized platforms — is a massive opportunity. Morpheus's on-chain identity, reputation, and payment infrastructure is uniquely positioned to enable this.
+3. **Agent collaboration is the next frontier.** The ability for personal agents to securely discover, evaluate, and work with each other — built on trust networks rather than centralized platforms — is a massive opportunity. [REDACTED]'s on-chain identity, reputation, and payment infrastructure is uniquely positioned to enable this.
 
 4. **The Austin OpenClaw community is building.** These aren't big tech employees — they're independent builders, security professionals, and entrepreneurs running agents on their own hardware. Exactly the audience that benefits most from decentralized, owned inference.
 
 ---
 
-*David Johnston spoke about Everclaw at the event — the OpenClaw skill that connects personal AI agents to the Morpheus decentralized inference network. One command, no API key, inference you own forever.*
+*David Johnston spoke about Everclaw at the event — the OpenClaw skill that connects personal AI agents to the [REDACTED] decentralized inference network. One command, no API key, inference you own forever.*
 
 *Learn more: [everclaw.xyz](https://everclaw.xyz) | [smartagent.org](https://smartagent.org)*

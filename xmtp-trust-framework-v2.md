@@ -86,7 +86,7 @@ Unknown Agent ──HANDSHAKE──► Comms Guard
     {
       "address": "0x528DC1C6A154A88730cE6314C4AcB6f7628F3Cf4",
       "inboxId": "72abdd2fa6e16f87d3269468f66e3913c35ee6b802ae4ca87fe4e1d93092b1c4",
-      "name": "MorpheusAI",
+      "name": "[REDACTED]",
       "owner": "David Johnston",
       "trustLevel": 8,
       "contextProfile": "business",
@@ -95,7 +95,7 @@ Unknown Agent ──HANDSHAKE──► Comms Guard
       "approvedBy": "user",
       "introducedBy": null,
       "erc8004Registered": false,
-      "notes": "Primary Morpheus inference agent"
+      "notes": "Primary [REDACTED] inference agent"
     },
     {
       "address": "0xUnknown...",
@@ -372,7 +372,7 @@ User downgrades Agent B from trust 8 → trust 3:
   "timestamp": "2026-03-14T22:15:00Z",
   "direction": "outbound",
   "peer": "0x528D...3Cf4",
-  "peerName": "MorpheusAI",
+  "peerName": "[REDACTED]",
   "trustLevel": 8,
   "action": "SENT",
   "contentHash": "sha256:abc123...",
@@ -452,7 +452,7 @@ Every message processed by Comms Guard is logged:
   "timestamp": "2026-03-14T22:15:00.123Z",
   "direction": "outbound",
   "peerAddress": "0x528DC1...",
-  "peerName": "MorpheusAI",
+  "peerName": "[REDACTED]",
   "peerTrustLevel": 8,
   "peerContextProfile": "business",
   "action": "SENT | BLOCKED | REDACTED",
@@ -475,8 +475,8 @@ Every message processed by Comms Guard is logged:
 ### User Queries
 
 ```
-"Show me everything I told MorpheusAI this week"
-→ Filter audit log: peerName=MorpheusAI, direction=outbound, timestamps
+"Show me everything I told [REDACTED] this week"
+→ Filter audit log: peerName=[REDACTED], direction=outbound, timestamps
 
 "What did Agent X try to send me that was blocked?"
 → Filter audit log: peerAddress=X, action=BLOCKED, direction=inbound

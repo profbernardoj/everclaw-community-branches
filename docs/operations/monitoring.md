@@ -19,7 +19,7 @@ The primary health monitoring service for EverClaw.
 
 ### What It Monitors
 
-- **HTTP health** — Is the gateway process running?
+- **HTTP health** — Is the [REDACTED] process running?
 - **Inference probes** — Can the agent actually run inference?
 - **Billing status** — Are providers hitting rate limits or running out of credits?
 - **Circuit breaker** — Kill stuck sub-agents (>30 min)
@@ -29,7 +29,7 @@ The primary health monitoring service for EverClaw.
 ```
 1. Billing backoff gate → Skip if billing-dead until midnight UTC
 2. Credit monitoring → Check Venice DIEM every 10 min
-3. HTTP probe → Is the gateway process responding?
+3. HTTP probe → Is the [REDACTED] process responding?
 4. Inference probe → Can glm-4.7-flash respond?
 5. Error classification → Billing, transient, or timeout?
 6. Restart escalation → Graceful → Hard → Launchd → Nuclear
@@ -44,7 +44,7 @@ bash scripts/install-proxy.sh  # Installs guardian too
 ### Manual Check
 
 ```bash
-bash ~/.openclaw/workspace/scripts/gateway-guardian.sh --verbose
+bash ~/.openclaw/workspace/scripts/[REDACTED].sh --verbose
 ```
 
 ### Logs
@@ -99,11 +99,11 @@ Set in launchd plist:
 
 ## Venice 402 Watchdog
 
-Tails gateway logs for Venice billing errors and immediately disables exhausted keys.
+Tails [REDACTED] logs for Venice billing errors and immediately disables exhausted keys.
 
 ### What It Does
 
-1. Tails OpenClaw gateway logs
+1. Tails OpenClaw [REDACTED] logs
 2. Detects 402 errors ("Insufficient USD or Diem balance")
 3. Parses the Venice key from the error
 4. Disables that key in `auth-profiles.json`
@@ -226,7 +226,7 @@ Set up periodic monitoring:
 {
   "name": "Gateway Guardian",
   "schedule": { "kind": "every", "everyMs": 120000 },
-  "payload": { "kind": "exec", "cmd": "bash ~/.openclaw/workspace/scripts/gateway-guardian.sh" }
+  "payload": { "kind": "exec", "cmd": "bash ~/.openclaw/workspace/scripts/[REDACTED].sh" }
 }
 ```
 
@@ -234,7 +234,7 @@ Set up periodic monitoring:
 
 ## Troubleshooting
 
-### "Guardian keeps restarting gateway"
+### "Guardian keeps restarting [REDACTED]"
 
 Check what's actually failing:
 ```bash

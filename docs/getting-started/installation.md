@@ -13,7 +13,7 @@ This guided installer:
 - ✅ Prompts to install any missing dependencies
 - ✅ Clones EverClaw to the right location (`~/.openclaw/workspace/skills/everclaw/`)
 - ✅ Bootstraps a **free GLM-5 starter key** (1,000 requests/day)
-- ✅ Optionally installs the Morpheus proxy-router for P2P inference
+- ✅ Optionally installs the [REDACTED] proxy-router for P2P inference
 - ✅ Optionally installs Ollama for local fallback
 
 ### Hardware Requirements
@@ -29,7 +29,7 @@ This guided installer:
 | Flag | Description |
 |------|-------------|
 | `--skip-ollama` | Skip Ollama local fallback installation |
-| `--skip-proxy` | Skip Morpheus proxy-router installation |
+| `--skip-proxy` | Skip [REDACTED] proxy-router installation |
 | `--check-only` | Show hardware stats without installing |
 
 ---
@@ -71,7 +71,7 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key <API_KEY> --a
 
 | Dependency | How to Install | Required For |
 |------------|----------------|--------------|
-| **Morpheus Router** | `scripts/install-proxy.sh` | P2P inference |
+| **[REDACTED] Router** | `scripts/install-proxy.sh` | P2P inference |
 | **Ollama** | `scripts/setup-ollama.sh` | Local fallback |
 | **1Password CLI** | `brew install 1password-cli` | Secure key storage |
 

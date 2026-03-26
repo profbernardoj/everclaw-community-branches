@@ -18,4 +18,4 @@ Use this for `version.patch_level`. Follow every step.
 
 ## Output guidance
 - Recommend upgrading to the latest stable release when unsure.
-- Recommend rotating gateway tokens and API keys after upgrading.
+- Recommend rotating [REDACTED] tokens and API keys after upgrading.

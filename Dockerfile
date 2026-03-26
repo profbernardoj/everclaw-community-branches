@@ -41,7 +41,7 @@
 # Pin OpenClaw version for reproducible builds.
 # Update this when upgrading to a new release.
 
-ARG OPENCLAW_VERSION=v2026.3.23
+ARG OPENCLAW_VERSION=v2026.3.24
 
 FROM node:22-bookworm AS openclaw-builder
 
@@ -186,7 +186,7 @@ RUN chmod +x /app/docker-entrypoint.sh
 
 # ─── Environment ──────────────────────────────────────────────────────────────
 
-ARG EVERCLAW_VERSION=2026.3.25.1358
+ARG EVERCLAW_VERSION=2026.3.26.0037
 ENV EVERCLAW_VERSION=${EVERCLAW_VERSION}
 ENV NODE_ENV=production
 ENV EVERCLAW_PROXY_PORT=8083

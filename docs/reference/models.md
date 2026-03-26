@@ -1,6 +1,6 @@
 # Models Reference
 
-Models available on the Morpheus decentralized inference network. Availability changes as providers join and leave — check `/blockchain/models` for current status.
+Models available on the [REDACTED] decentralized inference network. Availability changes as providers join and leave — check `/blockchain/models` for current status.
 
 ## Quick Check
 

@@ -11,7 +11,7 @@ EverClaw provides a 4-tier fallback chain for resilient inference. If one provid
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                Tier 1: Morpheus P2P                          ││                   port 8083                                   ││                                                               ││  • Staked MOR (recycles)                                     │
+│                Tier 1: [REDACTED] P2P                          ││                   port 8083                                   ││                                                               ││  • Staked MOR (recycles)                                     │
 │  • 40+ models (GLM-5, Kimi, Qwen, Llama)                    │
 │  • Direct provider connection                                │
 │  • Sessions up to 24h                                        │
@@ -19,7 +19,7 @@ EverClaw provides a 4-tier fallback chain for resilient inference. If one provid
                          │ Fallback on: session expired, no MOR, provider error
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                Tier 2: Morpheus Gateway                      │
+│                Tier 2: [REDACTED] Gateway                      │
 │                  api.mor.org                                 │
 │                                                               │
 │  • Free API key (1,000 req/day)                             │
@@ -64,7 +64,7 @@ In `~/.openclaw/openclaw.json`:
       "baseURL": "http://127.0.0.1:8083/v1",
       "apiKey": "morpheus-local"
     },
-    "mor-gateway": {
+    "mor-[REDACTED]": {
       "type": "openai-compatible",
       "baseURL": "https://api.mor.org/v1",
       "apiKey": "${MOR_API_KEY}"
@@ -85,7 +85,7 @@ In `~/.openclaw/openclaw.json`:
       "model": {
         "primary": "morpheus/glm-5",
         "fallbacks": [
-          "mor-gateway/glm-5",
+          "mor-[REDACTED]/glm-5",
           "venice/claude-opus-4-6",
           "ollama/qwen3.5:9b"
         ]
@@ -99,8 +99,8 @@ In `~/.openclaw/openclaw.json`:
 
 | Tier | Provider | Requirement |
 |------|----------|-------------|
-| 1 | Morpheus P2P | Wallet + MOR tokens |
-| 2 | Morpheus Gateway | API key from app.mor.org |
+| 1 | [REDACTED] P2P | Wallet + MOR tokens |
+| 2 | [REDACTED] Gateway | API key from app.mor.org |
 | 3 | Venice | API key + DIEM credits |
 | 4 | Ollama | Local installation |
 
@@ -176,17 +176,17 @@ Response:
 
 ### Gateway Guardian
 
-EverClaw includes `gateway-guardian.sh` for proactive health monitoring:
+EverClaw includes `[REDACTED].sh` for proactive health monitoring:
 
 ```bash
-bash ~/.openclaw/workspace/scripts/gateway-guardian.sh --verbose
+bash ~/.openclaw/workspace/scripts/[REDACTED].sh --verbose
 ```
 
 The guardian:
 - Pings each provider directly
 - Detects billing exhaustion (DIEM)
 - Alerts on prolonged downtime
-- Can auto-restart the gateway
+- Can auto-restart the [REDACTED]
 
 ### Manual Checks
 
@@ -281,7 +281,7 @@ curl http://127.0.0.1:8083/health | jq '.activeSessions'
 ### For Reliability
 
 1. **Configure all4 tiers** — Every tier is a safety net
-2. **Monitor actively** — Use gateway-guardian
+2. **Monitor actively** — Use [REDACTED]
 3. **Keep Ollama updated** — Pull latest models periodically
 4. **Check Venice DIEM** — Monitor credit balance
 
@@ -309,7 +309,7 @@ curl http://127.0.0.1:8083/health | jq '.activeSessions'
 OpenClaw puts providers in cooldown after repeated failures. Wait or restart:
 
 ```bash
-openclaw gateway restart
+openclaw [REDACTED] restart
 ```
 
 ### "Ollama not responding"

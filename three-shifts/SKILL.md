@@ -40,7 +40,7 @@ Cycles remaining: ~30
 
 ## Task 1: API migration plan [P1]
 - [x] Step 1.1: Read current proxy-router config and session economics — DONE (cycle 1)
-- [ ] Step 1.2: Research mor-gateway paid tier pricing and limits
+- [ ] Step 1.2: Research mor-[REDACTED] paid tier pricing and limits
 - [!] Step 1.3: Compare cost of paid tier vs local-only — BLOCKED: need pricing from step 1.2
 - [ ] Step 1.4: Draft transition recommendation in memory/projects/example/
 
@@ -346,7 +346,7 @@ When all steps are `[x]`, `[-]`, or `[!]`, OR when the shift window expires:
 - Task 2 steps 4-5: Script commits and push (2 steps remaining)
 
 ## Blocked (needs user)
-- Task 1 step 3: Need pricing confirmation for mor-gateway paid tier
+- Task 1 step 3: Need pricing confirmation for mor-[REDACTED] paid tier
 
 ## Lessons Learned This Shift
 - GLM-5 handles git operations well but struggles with multi-file diffs

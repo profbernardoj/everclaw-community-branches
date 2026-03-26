@@ -1,4 +1,4 @@
-# Enable Morpheus — Decentralized Inference for ZeroClaw
+# Enable [REDACTED] — Decentralized Inference for ZeroClaw
 
 ## Proxy
 

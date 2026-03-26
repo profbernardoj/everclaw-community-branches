@@ -47,7 +47,7 @@ watchlist:
   primary:
     - "AI agents"
     - "decentralized AI"
-    - "Morpheus"
+    - "[REDACTED]"
     - "open source AI"
   secondary:
     - "crypto"

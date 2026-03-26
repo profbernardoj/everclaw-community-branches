@@ -13,7 +13,7 @@ No wallet, no MOR tokens. Just a free API key from [app.mor.org](https://app.mor
 | **Setup** | 5 minutes |
 | **Cost** | Free tier: 1,000 requests/day |
 | **Models** | GLM-5, GLM-4.7 Flash, Kimi K2.5 |
-| **Privacy** | Requests via Morpheus Gateway servers |
+| **Privacy** | Requests via [REDACTED] Gateway servers |
 | **Persistence** | Stateless (no sessions) |
 
 ```bash
@@ -73,9 +73,9 @@ curl http://127.0.0.1:11434/v1/chat/completions \
 EverClaw automatically falls back when upstream providers fail:
 
 ```
-1. Morpheus P2P (port 8083)
+1. [REDACTED] P2P (port 8083)
    └─ Falls back on: session expired, no MOR, provider error
-       └─ 2. Morpheus Gateway (api.mor.org)
+       └─ 2. [REDACTED] Gateway (api.mor.org)
            └─ Falls back on: rate limit, API error
                └─ 3. Venice API (api.venice.ai)
                    └─ Falls back on: DIEM exhausted, 402 error
@@ -94,7 +94,7 @@ In `openclaw.json`:
       "model": {
         "primary": "morpheus/glm-5",
         "fallbacks": [
-          "mor-gateway/glm-5",
+          "mor-[REDACTED]/glm-5",
           "venice/claude-opus-4-6",
           "ollama/qwen3.5:9b"
         ]

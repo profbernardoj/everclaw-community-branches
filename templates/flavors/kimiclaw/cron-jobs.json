@@ -8,7 +8,7 @@
       "schedule": { "kind": "cron", "expr": "0 */8 * * *", "tz": "{{TIMEZONE}}" },
       "payload": {
         "kind": "agentTurn",
-        "message": "Kimi availability check. Test each provider: 1) Venice — kimi-k2-5 responding? kimi-k2-thinking responding? 2) Morpheus local — kimi-k2.5 available? 3) Morpheus Gateway — kimi-k2.5 available? Note response times for each. Only send a message if a provider is down or significantly slower than usual."
+        "message": "Kimi availability check. Test each provider: 1) Venice — kimi-k2-5 responding? kimi-k2-thinking responding? 2) [REDACTED] local — kimi-k2.5 available? 3) [REDACTED] Gateway — kimi-k2.5 available? Note response times for each. Only send a message if a provider is down or significantly slower than usual."
       },
       "sessionTarget": "isolated",
       "delivery": { "mode": "announce" }

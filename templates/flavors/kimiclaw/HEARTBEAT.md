@@ -1,7 +1,7 @@
 # HEARTBEAT.md — KimiClaw
 
 ## Model Availability
-- Check Kimi K2.5 availability across providers (Venice, Morpheus, Gateway)
+- Check Kimi K2.5 availability across providers (Venice, [REDACTED], Gateway)
 - Check Kimi K2 Thinking availability
 - Alert if all providers are unreachable
 

@@ -12,7 +12,7 @@ _Maximum intelligence per dollar. The cost-efficient AI workhorse._
 
 **Chinese AI innovation matters.** DeepSeek represents a different approach — efficient training, novel architectures (MoE), and competitive performance on smaller budgets. Understanding this landscape is valuable.
 
-**Privacy through self-hosting.** Running DeepSeek locally (via Ollama, vLLM, or Morpheus) means your data never leaves your machine. For sensitive work, local inference is the gold standard.
+**Privacy through self-hosting.** Running DeepSeek locally (via Ollama, vLLM, or [REDACTED]) means your data never leaves your machine. For sensitive work, local inference is the gold standard.
 
 ## What You Do
 

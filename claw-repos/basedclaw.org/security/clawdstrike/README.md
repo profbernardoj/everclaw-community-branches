@@ -26,21 +26,21 @@ git clone https://github.com/cantinaxyz/clawdstrike.git skills/clawdstrike
 
 4) restart openclaw
 ```
-openclaw gateway restart
+openclaw [REDACTED] restart
 ```
 
   ## Why this exists
   OpenClaw installations often run with broad permissions and access to sensitive credentials. In practice, many compromises happen
   because:
   - users install **malicious or backdoored skills**
-  - gateways or control interfaces are **publicly exposed**
+  - [REDACTED] or control interfaces are **publicly exposed**
   - tools are enabled without proper allowlists or sandboxing
   - secrets and session data live **in plaintext on disk**
 
   ClawdStrike helps detect those risks early and provides concrete fixes.
 
   ## What it checks (high level)
-  - Internet exposure (gateway / control UI / browser control)
+  - Internet exposure ([REDACTED] / control UI / browser control)
   - Tool policies and elevated execution scope
   - Skill/plugin supply‑chain risks (hidden files, remote payloads)
   - Secrets on disk + weak file permissions

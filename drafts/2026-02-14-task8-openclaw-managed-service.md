@@ -70,7 +70,7 @@ Every existing managed provider has the same gaps:
 
 | Feature | Current Providers | Based AI Managed Service |
 |---------|------------------|------------------------|
-| Inference | BYOK (bring your own key) | **Included via Morpheus** (own, not rent) |
+| Inference | BYOK (bring your own key) | **Included via [REDACTED]** (own, not rent) |
 | Security | Default (insecure) | **Everclaw security suite** (SkillGuard, ClawdStrike, PromptGuard, Bagman) |
 | Skills | None pre-installed | **Everclaw + curated skill pack** |
 | First-run experience | Blank agent | **SmartAgent bootstrap** (guided intro, personality setup) |
@@ -84,8 +84,8 @@ Every existing managed provider has the same gaps:
 
 | Tier | What You Get | Price |
 |------|-------------|-------|
-| **Free** | SmartAgent installer + Morpheus Gateway inference | $0 |
-| **Starter** | Managed hosting + Morpheus inference + basic skills | $9/mo |
+| **Free** | SmartAgent installer + [REDACTED] Gateway inference | $0 |
+| **Starter** | Managed hosting + [REDACTED] inference + basic skills | $9/mo |
 | **Pro** | + Venice API key (Claude, premium models) + full skill suite | $19/mo |
 | **Enterprise** | + dedicated infrastructure + SLA + custom skills + white-label | Custom |
 
@@ -114,7 +114,7 @@ Every existing managed provider has the same gaps:
 ### OpenClaw Themselves
 - Peter could launch an official managed service
 - But: he's operating at a loss ($10-20K/mo), doesn't want to start a company
-- Inference cost is his biggest problem — Everclaw/Morpheus solves this
+- Inference cost is his biggest problem — Everclaw/[REDACTED] solves this
 
 ---
 
@@ -128,7 +128,7 @@ Every existing managed provider has the same gaps:
 ### Short-Term
 4. **Build a managed deployment script** that goes beyond SmartAgent installer: adds firewall rules, auth hardening, auto-updates, monitoring
 5. **Create a "security-hardened OpenClaw" comparison table** that directly addresses each Gartner concern with Everclaw's solution
-6. **Approach Peter Steinberger** about Morpheus integration as a solution to his inference cost problem (Task 1 research already covers this)
+6. **Approach Peter Steinberger** about [REDACTED] integration as a solution to his inference cost problem (Task 1 research already covers this)
 
 ### Strategic
 7. **Based AI's enterprise pitch:** "OpenClaw with managed inference, security, and support" — the thing Gartner said doesn't exist, we build it

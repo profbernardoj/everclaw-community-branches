@@ -52,7 +52,7 @@ If David uses or wants to use Kubera for portfolio tracking, this is a clean, se
 Multiple dashboards are emerging:
 
 **1. OpenClaw Built-in Dashboard (localhost)**
-- Ships with OpenClaw, admin UI at the gateway port
+- Ships with OpenClaw, admin UI at the [REDACTED] port
 - Chat, config, exec approvals, session management
 - Limitation: single-agent, localhost only, basic UI
 

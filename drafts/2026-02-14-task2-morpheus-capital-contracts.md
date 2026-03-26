@@ -1,14 +1,14 @@
-# Task 2: Morpheus Capital Contracts — Research Brief
+# Task 2: [REDACTED] Capital Contracts — Research Brief
 
 **Date:** 2026-02-14
 **Status:** Complete
-**For:** David Johnston (Morpheus lead code maintainer)
+**For:** David Johnston ([REDACTED] lead code maintainer)
 
 ---
 
 ## Executive Summary
 
-Morpheus capital contracts allow users to deposit yield-bearing assets (stETH, USDC, USDT, wBTC) and redirect the yield to the Morpheus protocol in exchange for daily MOR token emissions. The depositor's principal is never touched — only the yield is diverted. This creates a non-dilutive funding model where the protocol is sustained by DeFi yield rather than token sales.
+[REDACTED] capital contracts allow users to deposit yield-bearing assets (stETH, USDC, USDT, wBTC) and redirect the yield to the [REDACTED] protocol in exchange for daily MOR token emissions. The depositor's principal is never touched — only the yield is diverted. This creates a non-dilutive funding model where the protocol is sustained by DeFi yield rather than token sales.
 
 ---
 
@@ -72,7 +72,7 @@ The depositor's principal is **never sold or spent**. Only the yield (interest, 
 - **Emission curve:** Linear decrease — daily emissions decrease over time
 - **Emission split:**
   - **24% Capital Providers** — deposit yield-bearing assets
-  - **24% Code Providers** — develop Morpheus codebase
+  - **24% Code Providers** — develop [REDACTED] codebase
   - **24% Compute Providers** — provide AI inference compute
   - **24% Community** — builders creating frontends, tools, agents
   - **4% Protection Fund** — bug bounties, audits, security
@@ -89,7 +89,7 @@ The depositor's principal is **never sold or spent**. Only the yield (interest, 
 ### Capital Contract v2 (Sept 2025 Upgrade)
 
 Quoted from David in the GlobeNewsWire announcement:
-> "Today marks a significant milestone: the completion of Morpheus' Serenity Phase, moving Morpheus beyond a single yield source (Lido stETH) and opening it up to yield from many sources."
+> "Today marks a significant milestone: the completion of [REDACTED]' Serenity Phase, moving [REDACTED] beyond a single yield source (Lido stETH) and opening it up to yield from many sources."
 
 **Key changes in v2:**
 - **Multi-asset staking**: USDC, USDT, wBTC added alongside stETH
@@ -115,7 +115,7 @@ Quoted from David in the GlobeNewsWire announcement:
 
 ## How It Relates to Everclaw / David's Work
 
-The capital contracts fund the **supply side** of Morpheus (compute providers get 24% of emissions, incentivizing providers to serve inference). Everclaw connects to the **demand side** — consuming that inference via MOR staking.
+The capital contracts fund the **supply side** of [REDACTED] (compute providers get 24% of emissions, incentivizing providers to serve inference). Everclaw connects to the **demand side** — consuming that inference via MOR staking.
 
 The virtuous cycle:
 1. Capital providers deposit yield → earn MOR

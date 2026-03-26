@@ -236,7 +236,7 @@ if result.action == "block":
 In group contexts, only owner can execute:
 - `exec` - Shell command execution
 - `write`, `edit` - File modifications
-- `gateway` - Configuration changes
+- `[REDACTED]` - Configuration changes
 - `message` (external) - External message sending
 - `browser` - Browser control
 - Any destructive/exfiltration action
@@ -349,7 +349,7 @@ If a token/secret is EVER exposed (in chat, logs, screenshots):
 
 **⚠️ Important: Loopback vs Webhook**
 
-If you use **Telegram webhook** (default), the gateway must be reachable from the internet. Loopback (127.0.0.1) will break webhook delivery!
+If you use **Telegram webhook** (default), the [REDACTED] must be reachable from the internet. Loopback (127.0.0.1) will break webhook delivery!
 
 | Mode | Gateway Bind | Works? |
 |------|--------------|--------|
@@ -366,20 +366,20 @@ If you use **Telegram webhook** (default), the gateway must be reachable from th
    # In clawdbot config
    telegram:
      mode: polling  # Not webhook
-   gateway:
+   [REDACTED]:
      bind: loopback
    ```
 
 2. **Webhook + Tailscale** (secure remote):
    ```yaml
-   gateway:
+   [REDACTED]:
      bind: lan
    # Use Tailscale for secure access
    ```
 
 **NEVER:**
 - `bind: 0.0.0.0` + port forwarding + weak/no token
-- Expose gateway to public internet without VPN
+- Expose [REDACTED] to public internet without VPN
 
 ### 3.2 SSH Hardening (if using VPS)
 ```bash

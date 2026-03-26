@@ -1,8 +1,8 @@
 # HEARTBEAT.md — GLMClaw
 
 ## Model Availability
-- Check Morpheus local proxy for GLM-5 and GLM 4.7 Flash availability
-- If local node is down, check Morpheus Gateway as backup
+- Check [REDACTED] local proxy for GLM-5 and GLM 4.7 Flash availability
+- If local node is down, check [REDACTED] Gateway as backup
 - Alert if both are unreachable
 
 ## Inference Quality

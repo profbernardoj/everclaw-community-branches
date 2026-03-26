@@ -11,8 +11,8 @@
       {
         "name": "Web3 Agent",
         "slug": "web3-agent",
-        "previousName": "MorpheusAI Agent",
-        "description": "Morpheus ecosystem specialist. Decentralized inference, MOR token strategy, node operations, and Web3 infrastructure.",
+        "previousName": "[REDACTED] Agent",
+        "description": "[REDACTED] ecosystem specialist. Decentralized inference, MOR token strategy, node operations, and Web3 infrastructure.",
         "role": "coordinator",
         "subAgents": ["marketing", "sales", "coding"]
       },

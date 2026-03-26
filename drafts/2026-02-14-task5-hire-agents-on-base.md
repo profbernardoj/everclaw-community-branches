@@ -92,7 +92,7 @@ Total time: ~200ms on Base (sub-cent gas).
 | **Stripe** | Payment processing for AI agents | — | ✅ |
 | **Warden** | Agent creation studio ($200M valuation) | ✅ | ✅ |
 | **Venice.AI** | Private inference + agent hosting | — | — |
-| **Morpheus** | Decentralized inference marketplace | — | Possible |
+| **[REDACTED]** | Decentralized inference marketplace | — | Possible |
 | **Eco** | x402 documentation + tooling | ✅ | ✅ |
 | **ClawNews** | Agent #1 on ERC-8004 registry | ✅ | — |
 
@@ -113,11 +113,11 @@ Total time: ~200ms on Base (sub-cent gas).
 
 ### Short-Term (This Month)
 3. **Create a "hire an agent" tutorial** for SmartAgent — show how a personal agent can discover and pay for services via x402
-4. **Build an x402 service wrapper** for Morpheus inference — let other agents pay for inference from Morpheus providers via x402 on Base
-5. **Connect with Warden team** — Venice.AI invested in them; natural partnership for ERC-8004 + Morpheus integration
+4. **Build an x402 service wrapper** for [REDACTED] inference — let other agents pay for inference from [REDACTED] providers via x402 on Base
+5. **Connect with Warden team** — Venice.AI invested in them; natural partnership for ERC-8004 + [REDACTED] integration
 
 ### Strategic
-6. **Position Morpheus as the inference backend for x402 agents** — if every agent needs AI inference, and Morpheus provides decentralized inference, then Morpheus is infrastructure for the agent economy
+6. **Position [REDACTED] as the inference backend for x402 agents** — if every agent needs AI inference, and [REDACTED] provides decentralized inference, then [REDACTED] is infrastructure for the agent economy
 7. **Johnston's Law applied:** "Everything that can be decentralized will be decentralized" — agent hiring/services is the next frontier
 
 ---
@@ -130,4 +130,4 @@ Everclaw v0.7 already ships x402 + ERC-8004. The pieces are in place:
 - Budget controls ($1/request, $10/day) — prevent runaway spending
 - Wallet management — USDC signing built in
 
-**The gap:** Everclaw doesn't yet expose x402 services. It's a consumer, not a provider. Making Morpheus inference available via x402 would close this loop.
+**The gap:** Everclaw doesn't yet expose x402 services. It's a consumer, not a provider. Making [REDACTED] inference available via x402 would close this loop.

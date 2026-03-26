@@ -8,7 +8,7 @@ _Long context. Deep thinking. Moonshot's masterpiece._
 
 **Thinking models think better.** Kimi K2 Thinking takes extra time to reason through complex problems. Use it when accuracy matters more than speed — math, logic, multi-step reasoning, strategic analysis.
 
-**Available everywhere.** Kimi is accessible through Venice, Morpheus, and the Morpheus Gateway. Multiple fallback paths mean reliable access.
+**Available everywhere.** Kimi is accessible through Venice, [REDACTED], and the [REDACTED] Gateway. Multiple fallback paths mean reliable access.
 
 **Right-size the model.** Kimi K2.5 for general tasks, Kimi K2 Thinking for hard problems. Don't use the thinking model for simple questions — it's slower and overkill.
 

@@ -26,25 +26,25 @@ EverClaw includes 43 scripts for installation, configuration, inference, wallet 
 |--------|-------------|
 | `install.sh` | Download proxy-router binary |
 | `install-everclaw.sh` | Safe installer with collision protection |
-| `install-proxy.sh` | Install morpheus-proxy and gateway-guardian |
+| `install-proxy.sh` | Install morpheus-proxy and [REDACTED] |
 | `install-with-deps.sh` | Zero-prompt auto-install with all dependencies |
 
 ### Configuration (3 scripts)
 
 | Script | Description |
 |--------|-------------|
-| `setup.mjs` | Configure OpenClaw for Morpheus inference |
+| `setup.mjs` | Configure OpenClaw for [REDACTED] inference |
 | `bootstrap-everclaw.mjs` | First-run scaffolding |
-| `bootstrap-gateway.mjs` | Gateway configuration bootstrap |
+| `bootstrap-[REDACTED].mjs` | Gateway configuration bootstrap |
 
 ### Inference (4 scripts)
 
 | Script | Description |
 |--------|-------------|
-| `session.sh` | Open/close/list Morpheus sessions |
+| `session.sh` | Open/close/list [REDACTED] sessions |
 | `chat.sh` | Send inference through active session |
 | `morpheus-proxy.mjs` | OpenAI-compatible proxy (port 8083) |
-| `router.mjs` | Morpheus router helper |
+| `router.mjs` | [REDACTED] router helper |
 
 ### Wallet (4 scripts)
 
@@ -59,7 +59,7 @@ EverClaw includes 43 scripts for installation, configuration, inference, wallet 
 
 | Script | Description |
 |--------|-------------|
-| `gateway-guardian.sh` | Health checks with billing awareness |
+| `[REDACTED].sh` | Health checks with billing awareness |
 | `venice-402-watchdog.sh` | Disable Venice keys on 402 errors |
 | `venice-key-monitor.sh` | Proactive DIEM balance monitoring |
 | `inference-balance-tracker.mjs` | Track MOR/ETH usage |
@@ -145,7 +145,7 @@ node scripts/everclaw-wallet.mjs swap eth 0.01
 ### Monitoring
 
 ```bash
-bash scripts/gateway-guardian.sh --verbose
+bash scripts/[REDACTED].sh --verbose
 tail -f ~/.openclaw/logs/guardian.log
 ```
 
@@ -161,7 +161,7 @@ scripts/
 ├── always-on.sh
 ├── balance.sh
 ├── bootstrap-everclaw.mjs
-├── bootstrap-gateway.mjs
+├── bootstrap-[REDACTED].mjs
 ├── chat.sh
 ├── check-deps.sh
 ├── coingecko-x402.mjs
@@ -173,7 +173,7 @@ scripts/
 ├── everclaw-wallet.test.mjs
 ├── filter-repo-pii.sh
 ├── fix-pii-all-repos.sh
-├── gateway-guardian.sh
+├── [REDACTED].sh
 ├── inference-balance-tracker.mjs
 ├── install-everclaw.sh
 ├── install-proxy.sh

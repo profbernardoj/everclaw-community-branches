@@ -1,7 +1,7 @@
 ---
 name: everclaw
-version: 2026.3.25.1358
-description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the Morpheus decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to Morpheus by default — Claude only kicks in as an escape hatch when needed. Includes Morpheus API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth rotation v2 with proactive DIEM balance monitoring and reactive 402 watchdog, Gateway Guardian v5 with direct curl inference probes (eliminates Signal spam), proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, three-shift cyclic execution engine (v2 with 15-minute execution loops), 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, ERC-8004 agent registry reader for discovering trustless agents on Base, and hardware-aware local Ollama fallback with auto model selection (Qwen3.5 family, 1.5B–72B based on available RAM/GPU).
+version: 2026.3.26.0037
+description: Open-source first AI inference — GLM-5 as default, Claude as fallback only. Own your inference forever via the [REDACTED] decentralized network. Stake MOR tokens, access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with persistent inference by recycling staked MOR. Open-source first model router routes all tiers to [REDACTED] by default — Claude only kicks in as an escape hatch when needed. Includes [REDACTED] API Gateway bootstrap for zero-config startup, OpenAI-compatible proxy with auto-session management, automatic retry with fresh sessions, OpenAI-compatible error classification to prevent cooldown cascades, multi-key auth rotation v2 with proactive DIEM balance monitoring and reactive 402 watchdog, Gateway Guardian v5 with direct curl inference probes (eliminates Signal spam), proactive Venice DIEM credit monitoring, circuit breaker for stuck sub-agents, nuclear self-healing restart, always-on proxy-router with launchd auto-restart, smart session archiver, three-shift cyclic execution engine (v2 with 15-minute execution loops), 24/7 always-on power configuration for macOS, bundled security skills, zero-dependency wallet management via macOS Keychain, x402 payment client for agent-to-agent USDC payments, ERC-8004 agent registry reader for discovering trustless agents on Base, and hardware-aware local Ollama fallback with auto model selection (Qwen3.5 family, 1.5B–72B based on available RAM/GPU).
 homepage: https://everclaw.com
 metadata:
   openclaw:
@@ -11,7 +11,7 @@ metadata:
       env:
         - name: WALLET_PRIVATE_KEY
           optional: true
-          description: "Morpheus wallet private key — injected at runtime from 1Password or macOS Keychain. NEVER stored on disk."
+          description: "[REDACTED] wallet private key — injected at runtime from 1Password or macOS Keychain. NEVER stored on disk."
         - name: ETH_NODE_ADDRESS
           optional: true
           default: "https://base-mainnet.public.blastapi.io"
@@ -24,32 +24,32 @@ metadata:
         storage: "macOS Keychain or 1Password (never on disk)"
         required: false
         description: "Required only for local P2P inference (MOR staking). Not needed for API Gateway mode."
-      - name: "Morpheus API Gateway Key"
+      - name: "[REDACTED] API Gateway Key"
         storage: "openclaw.json providers config"
         required: false
         description: "Free API key from app.mor.org. Community bootstrap key included for initial setup."
     network:
       outbound:
         - host: "api.mor.org"
-          purpose: "Morpheus API Gateway — model inference and session management"
+          purpose: "[REDACTED] API Gateway — model inference and session management"
         - host: "base-mainnet.public.blastapi.io"
           purpose: "Base L1 RPC — blockchain transactions (session open/close, MOR staking)"
         - host: "provider.mor.org"
-          purpose: "Morpheus P2P network — direct inference via staked sessions"
+          purpose: "[REDACTED] P2P network — direct inference via staked sessions"
         - host: "api.venice.ai"
           purpose: "Venice API — primary inference provider (when configured)"
       local:
         - port: 8082
-          purpose: "Morpheus proxy-router (Go binary) — blockchain session management"
+          purpose: "[REDACTED] proxy-router (Go binary) — blockchain session management"
         - port: 8083
-          purpose: "Morpheus-to-OpenAI proxy (Node.js) — translates OpenAI API to proxy-router"
+          purpose: "[REDACTED] proxy (Node.js) — translates OpenAI API to proxy-router"
     persistence:
       services:
         - name: "com.morpheus.router"
-          purpose: "Proxy-router for Morpheus P2P inference"
+          purpose: "Proxy-router for [REDACTED] P2P inference"
           mechanism: "launchd KeepAlive (macOS)"
         - name: "com.morpheus.proxy"
-          purpose: "OpenAI-compatible proxy translating to Morpheus"
+          purpose: "OpenAI-compatible proxy translating to [REDACTED]"
           mechanism: "launchd KeepAlive (macOS)"
         - name: "ai.openclaw.guardian"
           purpose: "Gateway health watchdog with billing-aware escalation"
@@ -68,12 +68,12 @@ metadata:
 
 ## 🤖 Agent Setup Instructions
 
-**If your human asks you to set up Everclaw / Morpheus inference, follow these steps exactly.**
+**If your human asks you to set up Everclaw / [REDACTED] inference, follow these steps exactly.**
 
 ### Quick Setup (Gateway Only — easiest)
 
 ```bash
-node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --template gateway-only --key <API_KEY> --apply --test --restart
+node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --template [REDACTED] --key <API_KEY> --apply --test --restart
 ```
 
 ### Full Setup (Local P2P + Gateway)
@@ -83,28 +83,28 @@ node ~/.openclaw/workspace/skills/everclaw/scripts/setup.mjs --key <API_KEY> --a
 ```
 
 ### What setup.mjs does:
-1. Detects OS → picks the right config template (mac/linux/gateway-only)
-2. Deep-merges Morpheus providers into existing `openclaw.json` (preserves all other config)
-3. Substitutes the API key into the `mor-gateway` provider
-4. Enforces minimum `timeoutSeconds: 300` for Morpheus Gateway compatibility (upgrades low values, preserves user values ≥180s)
+1. Detects OS → picks the right config template (mac/linux/[REDACTED])
+2. Deep-merges [REDACTED] providers into existing `openclaw.json` (preserves all other config)
+3. Substitutes the API key into the `mor-[REDACTED]` provider
+4. Enforces minimum `timeoutSeconds: 300` for [REDACTED] Gateway compatibility (upgrades low values, preserves user values ≥180s)
 5. Updates `auth-profiles.json` with the new provider credentials
-6. Tests gateway connectivity (with `--test`)
-7. Restarts OpenClaw gateway (with `--restart`)
+6. Tests [REDACTED] connectivity (with `--test`)
+7. Restarts OpenClaw [REDACTED] (with `--restart`)
 
 ### Flags:
 | Flag | What it does |
 |------|-------------|
-| `--template <name>` | Override OS auto-detection (`mac`, `linux`, `gateway-only`) |
-| `--key <key>` | Morpheus API Gateway key (free from app.mor.org) |
+| `--template <name>` | Override OS auto-detection (`mac`, `linux`, `[REDACTED]`) |
+| `--key <key>` | [REDACTED] API Gateway key (free from app.mor.org) |
 | `--apply` | Write changes (default is dry-run) |
-| `--test` | Ping gateway after setup |
-| `--restart` | Restart OpenClaw gateway after apply |
+| `--test` | Ping [REDACTED] after setup |
+| `--restart` | Restart OpenClaw [REDACTED] after apply |
 | `--with-ollama` | Also setup local Ollama inference as final fallback |
 | `--ollama-model <model>` | Override auto-detected Ollama model (e.g. `qwen3.5:27b`) |
 
 ### 🏠 Local Inference Fallback (Ollama)
 
-EverClaw can set up a fully offline local inference fallback using Ollama. When all cloud/network providers (Morpheus Gateway, P2P, Venice) are unreachable, your agent keeps working.
+EverClaw can set up a fully offline local inference fallback using Ollama. When all cloud/network providers ([REDACTED] Gateway, P2P, Venice) are unreachable, your agent keeps working.
 
 **How it works:** The script detects your hardware (RAM, GPU), selects the best Qwen3.5 model that fits, installs Ollama, pulls the model, and configures OpenClaw to use it as the last fallback.
 
@@ -150,7 +150,7 @@ bash scripts/setup-ollama.sh --uninstall
 
 ### ⚠️ Critical Guardrails
 
-- **NEVER use `everclaw/` as a model prefix.** Everclaw is a skill, not a provider. Use `morpheus/` or `mor-gateway/`.
+- **NEVER use `everclaw/` as a model prefix.** Everclaw is a skill, not a provider. Use `morpheus/` or `mor-[REDACTED]/`.
 - **Always dry-run first** (omit `--apply`) to preview changes before writing.
 - **Don't edit openclaw.json by hand** when setup.mjs can do it — the merge logic handles edge cases.
 - **API keys:** Get a free key at https://app.mor.org — don't use the community bootstrap key for production.
@@ -165,9 +165,9 @@ bash scripts/setup-ollama.sh --uninstall
 
 # ♾️ Everclaw — AI Inference You Own, Forever Powering Your OpenClaw Agents
 
-*Powered by [Morpheus AI](https://mor.org)*
+*Powered by [[REDACTED] AI](https://mor.org)*
 
-Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. Access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with inference you own. Everclaw connects your OpenClaw agent to the Morpheus P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
+Open-source first. GLM-5 handles everything — Claude is the escape hatch, not the default. Access GLM-5, GLM-4.7 Flash, Kimi K2.5, and 30+ models with inference you own. Everclaw connects your OpenClaw agent to the [REDACTED] P2P network — stake MOR tokens, open sessions, and recycle your stake for persistent, self-sovereign access to AI.
 
 > 📦 **ClawHub:** `clawhub install everclaw-inference` — [clawhub.ai/EverClaw/everclaw-inference](https://clawhub.ai/EverClaw/everclaw-inference)
 >
@@ -205,7 +205,7 @@ This will:
 2. Prompt to install any missing ones
 3. Clone EverClaw to `~/.openclaw/workspace/skills/everclaw`
 4. Bootstrap a free GLM-5 starter key (1,000 requests/day)
-5. Optionally install the Morpheus proxy-router for P2P inference
+5. Optionally install the [REDACTED] proxy-router for P2P inference
 
 ### New to OpenClaw?
 
@@ -224,7 +224,7 @@ curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/scripts/inst
 ## How It Works
 
 1. **Get MOR tokens** on Base — swap from ETH/USDC via Uniswap or Aerodrome (see below)
-2. You run a **proxy-router** (Morpheus Lumerin Node) locally as a consumer
+2. You run a **proxy-router** ([REDACTED] Lumerin Node) locally as a consumer
 3. The router connects to Base mainnet and discovers model providers
 4. You **stake MOR tokens** to open a session with a provider (MOR is locked, not spent)
 5. You send inference requests to `http://localhost:8082/v1/chat/completions`
@@ -233,7 +233,7 @@ curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/scripts/inst
 
 ## Agent Integration (Recommended Path)
 
-**If you are an AI agent (OpenClaw, Claude, etc.), use the OpenAI-compatible proxy for all Morpheus inference. Do NOT use the bash scripts (session.sh, chat.sh) -- the proxy handles sessions, auth, and model routing automatically.**
+**If you are an AI agent (OpenClaw, Claude, etc.), use the OpenAI-compatible proxy for all [REDACTED] inference. Do NOT use the bash scripts (session.sh, chat.sh) -- the proxy handles sessions, auth, and model routing automatically.**
 
 ### Send Inference
 
@@ -285,7 +285,7 @@ Don't have anything on Base yet? Buy ETH on Coinbase, withdraw to Base, then swa
 ## Architecture
 
 ```
-Agent → proxy-router (localhost:8082) → Morpheus P2P Network → Provider → Model
+Agent → proxy-router (localhost:8082) → [REDACTED] P2P Network → Provider → Model
                 ↓
          Base Mainnet (MOR staking, session management)
 ```
@@ -327,7 +327,7 @@ git clone https://github.com/EverClaw/EverClaw.git ~/.openclaw/workspace/skills/
 
 To update: `cd ~/.openclaw/workspace/skills/everclaw && git pull`
 
-### Install the Morpheus Router
+### Install the [REDACTED] Router
 
 After cloning, install the proxy-router:
 
@@ -339,7 +339,7 @@ This downloads the latest proxy-router release for your OS/arch, extracts it to 
 
 ### Manual Installation
 
-1. Go to [Morpheus-Lumerin-Node releases](https://github.com/MorpheusAIs/Morpheus-Lumerin-Node/releases)
+1. Go to [[REDACTED] releases](https://github.com/[REDACTED]/[REDACTED]/releases)
 2. Download the release for your platform (e.g., `mor-launch-darwin-arm64.zip`)
 3. Extract to `~/morpheus/`
 4. On macOS: `xattr -cr ~/morpheus/`
@@ -658,7 +658,7 @@ See `references/troubleshooting.md` for a complete guide. Quick hits:
 | `api adapter not found` | Add the model to `models-config.json` |
 | `ERC20: transfer amount exceeds balance` | Close old sessions to free staked MOR |
 | Sessions gone after restart | Normal — re-open sessions after restart |
-| MorpheusUI conflicts | Don't run MorpheusUI and headless router simultaneously |
+| [REDACTED] conflicts | Don't run [REDACTED] and headless router simultaneously |
 
 ---
 
@@ -737,7 +737,7 @@ Executes onchain swaps via Uniswap V3 on Base. No external tools required — us
 node skills/everclaw/scripts/everclaw-wallet.mjs approve
 ```
 
-Approves the Morpheus Diamond contract to use your MOR for session staking.
+Approves the [REDACTED] Diamond contract to use your MOR for session staking.
 
 ### Security Model
 
@@ -756,7 +756,7 @@ Approves the Morpheus Diamond contract to use your MOR for session staking.
 | `balance` | Show ETH, MOR, USDC balances |
 | `swap eth <amount>` | Swap ETH → MOR via Uniswap V3 |
 | `swap usdc <amount>` | Swap USDC → MOR via Uniswap V3 |
-| `approve [amount]` | Approve MOR for Morpheus staking |
+| `approve [amount]` | Approve MOR for [REDACTED] staking |
 | `export-key` | Print private key (use with caution) |
 | `import-key <0xkey>` | Import existing private key |
 
@@ -764,12 +764,12 @@ Approves the Morpheus Diamond contract to use your MOR for session staking.
 
 ## 12. OpenAI-Compatible Proxy (v0.2)
 
-The Morpheus proxy-router requires custom auth (Basic auth via `.cookie`) and custom HTTP headers (`session_id`, `model_id`) that standard OpenAI clients don't support. Everclaw includes a lightweight proxy that bridges this gap.
+The [REDACTED] proxy-router requires custom auth (Basic auth via `.cookie`) and custom HTTP headers (`session_id`, `model_id`) that standard OpenAI clients don't support. Everclaw includes a lightweight proxy that bridges this gap.
 
 ### What It Does
 
 ```
-OpenClaw/any client → morpheus-proxy (port 8083) → proxy-router (port 8082) → Morpheus P2P → Provider
+OpenClaw/any client → morpheus-proxy (port 8083) → proxy-router (port 8082) → [REDACTED] P2P → Provider
 ```
 
 - Accepts standard OpenAI `/v1/chat/completions` requests
@@ -786,7 +786,7 @@ bash skills/everclaw/scripts/install-proxy.sh
 
 This installs:
 - `morpheus-proxy.mjs` → `~/morpheus/proxy/`
-- `gateway-guardian.sh` → `~/.openclaw/workspace/scripts/`
+- `[REDACTED].sh` → `~/.openclaw/workspace/scripts/`
 - launchd plists for both (macOS, auto-start on boot)
 
 ### Configuration
@@ -852,7 +852,7 @@ v0.5 adds three critical improvements to the proxy that prevent prolonged outage
 
 #### Problem: Cooldown Cascades
 
-When a primary provider (e.g., Venice) returns a billing error, OpenClaw's failover engine marks that provider as "in cooldown." If the Morpheus proxy also returns errors that OpenClaw misclassifies as billing errors, **both providers enter cooldown** and the agent goes completely offline — sometimes for 6+ hours.
+When a primary provider (e.g., Venice) returns a billing error, OpenClaw's failover engine marks that provider as "in cooldown." If the [REDACTED] proxy also returns errors that OpenClaw misclassifies as billing errors, **both providers enter cooldown** and the agent goes completely offline — sometimes for 6+ hours.
 
 #### Fix 1: OpenAI-Compatible Error Classification
 
@@ -861,7 +861,7 @@ The proxy now returns errors in the exact format OpenAI uses, with proper `type`
 ```json
 {
   "error": {
-    "message": "Morpheus session unavailable: ...",
+    "message": "[REDACTED] session unavailable: ...",
     "type": "server_error",
     "code": "morpheus_session_error",
     "param": null
@@ -869,7 +869,7 @@ The proxy now returns errors in the exact format OpenAI uses, with proper `type`
 }
 ```
 
-**Key distinction:** All Morpheus infrastructure errors are typed as `"server_error"` — never `"billing"` or `"rate_limit_error"`. This ensures OpenClaw treats them as transient failures and retries appropriately, instead of putting the provider into extended cooldown.
+**Key distinction:** All [REDACTED] infrastructure errors are typed as `"server_error"` — never `"billing"` or `"rate_limit_error"`. This ensures OpenClaw treats them as transient failures and retries appropriately, instead of putting the provider into extended cooldown.
 
 Error codes returned by the proxy:
 
@@ -912,7 +912,7 @@ Configure OpenClaw with multiple fallback models across providers:
 }
 ```
 
-This way, if the primary model has billing issues, OpenClaw tries other models on the same provider (which may have separate rate limits) before falling back to Morpheus. The cascade is:
+This way, if the primary model has billing issues, OpenClaw tries other models on the same provider (which may have separate rate limits) before falling back to [REDACTED]. The cascade is:
 
 1. **venice/claude-opus-4-6** (primary) → billing error
 2. **venice/claude-opus-45** (fallback 1) → tries a different model on Venice
@@ -923,9 +923,9 @@ This way, if the primary model has billing issues, OpenClaw tries other models o
 
 ## 13. OpenClaw Integration (v0.2)
 
-Configure OpenClaw to use Morpheus as a **fallback provider** so your agent keeps running when primary API credits run out.
+Configure OpenClaw to use [REDACTED] as a **fallback provider** so your agent keeps running when primary API credits run out.
 
-### Step 1: Add Morpheus Provider
+### Step 1: Add [REDACTED] Provider
 
 Add to your `openclaw.json` via config patch or manual edit:
 
@@ -940,7 +940,7 @@ Add to your `openclaw.json` via config patch or manual edit:
         "models": [
           {
             "id": "kimi-k2.5",
-            "name": "Kimi K2.5 (via Morpheus)",
+            "name": "Kimi K2.5 (via [REDACTED])",
             "reasoning": true,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -949,7 +949,7 @@ Add to your `openclaw.json` via config patch or manual edit:
           },
           {
             "id": "kimi-k2-thinking",
-            "name": "Kimi K2 Thinking (via Morpheus)",
+            "name": "Kimi K2 Thinking (via [REDACTED])",
             "reasoning": true,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -958,7 +958,7 @@ Add to your `openclaw.json` via config patch or manual edit:
           },
           {
             "id": "glm-4.7-flash",
-            "name": "GLM 4.7 Flash (via Morpheus)",
+            "name": "GLM 4.7 Flash (via [REDACTED])",
             "reasoning": false,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -991,9 +991,9 @@ Configure a multi-tier fallback chain (recommended since v0.5):
       "models": {
         "venice/claude-opus-45": { "alias": "Claude Opus 4.5" },
         "venice/kimi-k2-5": { "alias": "Kimi K2.5" },
-        "morpheus/kimi-k2.5": { "alias": "Kimi K2.5 (Morpheus)" },
-        "morpheus/kimi-k2-thinking": { "alias": "Kimi K2 Thinking (Morpheus)" },
-        "morpheus/glm-4.7-flash": { "alias": "GLM 4.7 Flash (Morpheus)" }
+        "morpheus/kimi-k2.5": { "alias": "Kimi K2.5 ([REDACTED])" },
+        "morpheus/kimi-k2-thinking": { "alias": "Kimi K2 Thinking ([REDACTED])" },
+        "morpheus/glm-4.7-flash": { "alias": "GLM 4.7 Flash ([REDACTED])" }
       }
     }
   }
@@ -1086,7 +1086,7 @@ OpenClaw's auth engine handles rotation automatically:
 1. **Session stickiness:** A key is pinned per session to keep provider caches warm. It won't flip-flop mid-conversation.
 2. **Billing disable:** When a key returns a billing/credit error, that *profile* is disabled with exponential backoff (starts at 5 hours). Other profiles for the same provider remain active.
 3. **Rotation on failure:** After disabling a profile, OpenClaw immediately tries the next key in `auth.order`. Same model, same provider — just fresh credits.
-4. **Model fallback:** Only after ALL profiles for Venice are disabled does OpenClaw move to the next model in the fallback chain (e.g., Morpheus).
+4. **Model fallback:** Only after ALL profiles for Venice are disabled does OpenClaw move to the next model in the fallback chain (e.g., [REDACTED]).
 5. **Auto-recovery:** Disabled profiles auto-recover after backoff expires. If credits refill (e.g., daily reset), the profile becomes available again.
 
 #### Venice DIEM Credits
@@ -1100,7 +1100,7 @@ Venice uses "DIEM" as its internal credit unit (1 DIEM ≈ $1 USD). Each API key
 | Kimi K2.5 | 0.75 DIEM/M tokens | 3.75 DIEM/M tokens | ~50-100 |
 | GLM 4.7 Flash | 0.125 DIEM/M tokens | 0.5 DIEM/M tokens | ~500+ |
 
-**Tip:** With multiple keys, the agent can stay on Claude Opus across key rotations. Without multi-key, it would fall to cheaper models or Morpheus after one key's credits run out.
+**Tip:** With multiple keys, the agent can stay on Claude Opus across key rotations. Without multi-key, it would fall to cheaper models or [REDACTED] after one key's credits run out.
 
 ### Failover Behavior (v0.9.1)
 
@@ -1108,8 +1108,8 @@ The complete failover chain with multi-key rotation:
 
 1. **Key rotation within Venice** — Key 1 credits exhausted → billing disable on *that profile only* → immediately rotates to Key 2 → Key 3 → etc. Same model, fresh credits.
 2. **Model fallback** — Only after ALL Venice keys are disabled → tries `venice/claude-opus-45` (all keys again) → `venice/kimi-k2-5` (all keys) → `morpheus/kimi-k2.5`
-3. **Morpheus fallback** — The proxy auto-opens a 7-day Morpheus session (if none exists). Inference routes through the Morpheus P2P network.
-4. **Gateway Guardian v4** — If all providers enter cooldown despite multi-key rotation → classifies error (billing vs transient) → billing: backs off + notifies owner (restart is useless for empty credits) → transient: restarts gateway (clears cooldowns) → nuclear reinstall if needed. Proactively monitors Venice DIEM balance.
+3. **[REDACTED] fallback** — The proxy auto-opens a 7-day [REDACTED] session (if none exists). Inference routes through the [REDACTED] P2P network.
+4. **Gateway Guardian v4** — If all providers enter cooldown despite multi-key rotation → classifies error (billing vs transient) → billing: backs off + notifies owner (restart is useless for empty credits) → transient: restarts [REDACTED] (clears cooldowns) → nuclear reinstall if needed. Proactively monitors Venice DIEM balance.
 5. **Auto-recovery** — When credits refill (daily reset) or backoff expires, OpenClaw switches back to Venice automatically.
 
 **Example with 6 keys (246 DIEM total):**
@@ -1117,10 +1117,10 @@ The complete failover chain with multi-key rotation:
 ```
 venice:key1 (98 DIEM) → venice:key2 (50 DIEM) → venice:key3 (40 DIEM) →
 venice:key4 (26 DIEM) → venice:key5 (20 DIEM) → venice:key6 (12 DIEM) →
-morpheus/kimi-k2.5 (owned, staked MOR) → mor-gateway/kimi-k2.5 (community gateway)
+morpheus/kimi-k2.5 (owned, staked MOR) → mor-[REDACTED]/kimi-k2.5 (community [REDACTED])
 ```
 
-**v0.5 improvement:** The Morpheus proxy returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the Morpheus provider into extended cooldown due to transient infrastructure issues. If a Morpheus session expires mid-request, the proxy automatically opens a fresh session and retries once.
+**v0.5 improvement:** The [REDACTED] proxy returns `"server_error"` type errors (not billing errors), so OpenClaw won't put the [REDACTED] provider into extended cooldown due to transient infrastructure issues. If a [REDACTED] session expires mid-request, the proxy automatically opens a fresh session and retries once.
 
 ### Venice Key Health Monitor (v2.0)
 
@@ -1188,7 +1188,7 @@ The watchdog catches the first two patterns (the most common Venice billing erro
 
 ## 14. Gateway Guardian v5 (v2026.2.21)
 
-A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and its ability to run inference. Runs every 2 minutes via launchd.
+A self-healing, billing-aware watchdog that monitors the OpenClaw [REDACTED] and its ability to run inference. Runs every 2 minutes via launchd.
 
 ### Evolution
 
@@ -1202,9 +1202,9 @@ A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and it
 
 ### What v5 Fixes Over v4
 
-**Root cause:** `openclaw agent` injected the full 71K workspace system prompt into every health probe. This caused mor-gateway/glm-5 to timeout at 60s (takes ~37s just for the prompt). Worse, failures were delivered to Signal as normal agent replies — spamming the user with error messages.
+**Root cause:** `openclaw agent` injected the full 71K workspace system prompt into every health probe. This caused mor-[REDACTED]/glm-5 to timeout at 60s (takes ~37s just for the prompt). Worse, failures were delivered to Signal as normal agent replies — spamming the user with error messages.
 
-**Fix:** Direct curl to gateway's LiteLLM proxy with a tiny prompt (~50 chars). Uses glm-4.7-flash (fast, lightweight) instead of glm-5. No agent session = no Signal delivery on failure. Errors stay in logs only.
+**Fix:** Direct curl to [REDACTED]'s LiteLLM proxy with a tiny prompt (~50 chars). Uses glm-4.7-flash (fast, lightweight) instead of glm-5. No agent session = no Signal delivery on failure. Errors stay in logs only.
 
 ### What v4 Fixed Over v3
 
@@ -1220,7 +1220,7 @@ A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and it
 1. **Billing backoff gate** — If in billing-dead state, check if midnight UTC has passed. If yes, re-probe. If no, skip this run (30-min intervals).
 2. **Credit monitoring** — Every 10 min, makes a cheap Kimi K2.5 call to Venice and reads the `x-venice-balance-diem` response header. Warns below 15 DIEM.
 3. **Circuit breaker** — Kills sub-agents stuck >30 min with repeated timeouts.
-4. **HTTP probe** — Is the gateway process running?
+4. **HTTP probe** — Is the [REDACTED] process running?
 5. **Inference probe** — Can the agent run inference through the full stack?
 6. **Error classification** — Parses probe output:
    - `billing` → 402, Insufficient DIEM/USD/balance → **don't restart**, enter billing backoff, notify owner
@@ -1228,7 +1228,7 @@ A self-healing, billing-aware watchdog that monitors the OpenClaw gateway and it
    - `timeout` → probe timed out → restart
    - `unknown` → restart (safe default)
 7. **Four-stage restart escalation** (for non-billing errors only):
-   - `openclaw gateway restart` (graceful — resets cooldown state)
+   - `openclaw [REDACTED] restart` (graceful — resets cooldown state)
    - Hard kill (excludes own PID) → launchd KeepAlive
    - `launchctl kickstart -k`
    - **🔴 NUCLEAR:** `curl -fsSL https://clawd.bot/install.sh | bash`
@@ -1254,8 +1254,8 @@ Pair with reduced billing backoff in `openclaw.json` to minimize downtime:
 Included in `install-proxy.sh`, or manually:
 
 ```bash
-cp skills/everclaw/scripts/gateway-guardian.sh ~/.openclaw/workspace/scripts/
-chmod +x ~/.openclaw/workspace/scripts/gateway-guardian.sh
+cp skills/everclaw/scripts/[REDACTED].sh ~/.openclaw/workspace/scripts/
+chmod +x ~/.openclaw/workspace/scripts/[REDACTED].sh
 
 # Install launchd plist (macOS)
 # See templates/ai.openclaw.guardian.plist
@@ -1266,7 +1266,7 @@ chmod +x ~/.openclaw/workspace/scripts/gateway-guardian.sh
 ### Manual Test
 
 ```bash
-bash ~/.openclaw/workspace/scripts/gateway-guardian.sh --verbose
+bash ~/.openclaw/workspace/scripts/[REDACTED].sh --verbose
 ```
 
 ### Logs
@@ -1571,7 +1571,7 @@ Agent registration files (resolved from `tokenURI`) follow the ERC-8004 standard
 }
 ```
 
-The reader handles all URI types: `data:` URIs (base64-encoded JSON stored on-chain), `ipfs://` URIs (via public IPFS gateway), and `https://` URIs.
+The reader handles all URI types: `data:` URIs (base64-encoded JSON stored on-chain), `ipfs://` URIs (via public IPFS [REDACTED]), and `https://` URIs.
 
 ### Contract Addresses (Base Mainnet)
 
@@ -1627,7 +1627,7 @@ if (agent.x402Support && apiEndpoint) {
 | Send prompt | `bash skills/everclaw/scripts/chat.sh <model> "prompt"` |
 | Check balance | `bash skills/everclaw/scripts/balance.sh` |
 | Proxy health | `curl http://127.0.0.1:8083/health` |
-| Guardian test | `bash scripts/gateway-guardian.sh --verbose` |
+| Guardian test | `bash scripts/[REDACTED].sh --verbose` |
 | Guardian logs | `tail -f ~/.openclaw/logs/guardian.log` |
 | **Venice key health** | `bash skills/everclaw/scripts/venice-key-monitor.sh --status` |
 | **Venice key balances** | `bash skills/everclaw/scripts/venice-key-monitor.sh --verbose` |
@@ -1681,7 +1681,7 @@ Full docs: `security/skillguard/SKILL.md`
 
 ### 🔒 ClawdStrike — Config & Exposure Audits
 
-Security audit and threat model for OpenClaw gateway hosts. Verifies configuration, network exposure, installed skills/plugins, and filesystem hygiene. Produces an OK/VULNERABLE report with evidence and remediation steps.
+Security audit and threat model for OpenClaw [REDACTED] hosts. Verifies configuration, network exposure, installed skills/plugins, and filesystem hygiene. Produces an OK/VULNERABLE report with evidence and remediation steps.
 
 ```bash
 # Run a full audit
@@ -1800,7 +1800,7 @@ A lightweight, local prompt classifier that routes requests to the cheapest capa
 | **STANDARD** | `morpheus/kimi-k2.5` | `venice/kimi-k2-5` | Research, drafting, summaries, most sub-agent tasks |
 | **HEAVY** | `venice/claude-opus-4-6` | `venice/claude-opus-45` | Complex reasoning, architecture, formal proofs, strategy |
 
-All LIGHT and STANDARD tier models run through Morpheus (inference you own via staked MOR). Only HEAVY tier uses Venice (premium).
+All LIGHT and STANDARD tier models run through [REDACTED] (inference you own via staked MOR). Only HEAVY tier uses Venice (premium).
 
 ### How Scoring Works
 
@@ -1871,7 +1871,7 @@ Set the `model` field on cron job payloads to route to cheaper models:
 {
   "payload": {
     "kind": "agentTurn",
-    "model": "morpheus/kimi-k2.5",   // STANDARD tier — owned via Morpheus
+    "model": "morpheus/kimi-k2.5",   // STANDARD tier — owned via [REDACTED]
     "message": "Compile a morning briefing...",
     "timeoutSeconds": 300
   }
@@ -1906,7 +1906,7 @@ sessions_spawn({ task: "Design the x402 payment integration..." });
 
 ### Cost Impact
 
-With the router in place, only complex reasoning tasks in the main session use premium models. All background work (cron jobs, sub-agents, heartbeats) runs on Morpheus inference you own:
+With the router in place, only complex reasoning tasks in the main session use premium models. All background work (cron jobs, sub-agents, heartbeats) runs on [REDACTED] inference you own:
 
 | Before | After |
 |--------|-------|
@@ -1916,43 +1916,43 @@ With the router in place, only complex reasoning tasks in the main session use p
 
 ---
 
-## 19. Morpheus API Gateway Bootstrap (v0.8)
+## 19. [REDACTED] API Gateway Bootstrap (v0.8)
 
-The Morpheus API Gateway (`api.mor.org`) provides community-powered, OpenAI-compatible inference — no node, no staking, no wallet required. Everclaw v0.8 includes a bootstrap script that configures this as an OpenClaw provider, giving new users **instant access to AI from the first launch**.
+The [REDACTED] API Gateway (`api.mor.org`) provides community-powered, OpenAI-compatible inference — no node, no staking, no wallet required. Everclaw v0.8 includes a bootstrap script that configures this as an OpenClaw provider, giving new users **instant access to AI from the first launch**.
 
 ### Why This Matters
 
-New OpenClaw users face a cold-start problem: they need an API key (Claude, OpenAI, etc.) before their agent can do anything. Everclaw v0.8 solves this by bundling a community API key for the Morpheus inference marketplace, which is currently in open beta.
+New OpenClaw users face a cold-start problem: they need an API key (Claude, OpenAI, etc.) before their agent can do anything. Everclaw v0.8 solves this by bundling a community API key for the [REDACTED] inference marketplace, which is currently in open beta.
 
 **The bootstrap flow:**
 1. New user installs OpenClaw + Everclaw
-2. Run `node scripts/bootstrap-gateway.mjs` — agent gets inference immediately
+2. Run `node scripts/bootstrap-[REDACTED].mjs` — agent gets inference immediately
 3. Agent's first task: guide user to get their own key at `app.mor.org`
-4. User upgrades to their own key → can then progress to full Morpheus node + MOR staking
+4. User upgrades to their own key → can then progress to full [REDACTED] node + MOR staking
 
 ### Quick Start
 
 ```bash
-# One command — tests the gateway and patches OpenClaw config
-node skills/everclaw/scripts/bootstrap-gateway.mjs
+# One command — tests the [REDACTED] and patches OpenClaw config
+node skills/everclaw/scripts/bootstrap-[REDACTED].mjs
 
 # Or with your own API key from app.mor.org
-node skills/everclaw/scripts/bootstrap-gateway.mjs --key sk-YOUR_KEY_HERE
+node skills/everclaw/scripts/bootstrap-[REDACTED].mjs --key sk-YOUR_KEY_HERE
 
-# Test the gateway connection
-node skills/everclaw/scripts/bootstrap-gateway.mjs --test
+# Test the [REDACTED] connection
+node skills/everclaw/scripts/bootstrap-[REDACTED].mjs --test
 
-# Check current gateway status
-node skills/everclaw/scripts/bootstrap-gateway.mjs --status
+# Check current [REDACTED] status
+node skills/everclaw/scripts/bootstrap-[REDACTED].mjs --status
 ```
 
 ### What It Does
 
 The bootstrap script:
 
-1. **Tests** the Morpheus API Gateway connection with a live inference call
-2. **Patches** `openclaw.json` to add `mor-gateway` as a new provider
-3. **Adds** `mor-gateway/kimi-k2.5` to the fallback chain
+1. **Tests** the [REDACTED] API Gateway connection with a live inference call
+2. **Patches** `openclaw.json` to add `mor-[REDACTED]` as a new provider
+3. **Adds** `mor-[REDACTED]/kimi-k2.5` to the fallback chain
 4. **Reports** available models and next steps
 
 ### API Gateway Details
@@ -1964,11 +1964,11 @@ The bootstrap script:
 | Auth | Bearer token (`sk-...`) |
 | Open beta | Until March 1, 2026 |
 | Models | 34 (LLMs, TTS, STT, embeddings) |
-| Provider name | `mor-gateway` |
+| Provider name | `mor-[REDACTED]` |
 
 ### Available Models (via Gateway)
 
-The gateway exposes all models on the Morpheus inference marketplace:
+The [REDACTED] exposes all models on the [REDACTED] inference marketplace:
 
 | Model | Type | Notes |
 |-------|------|-------|
@@ -1990,14 +1990,14 @@ All models also have `:web` variants with web search capability.
 {
   "models": {
     "providers": {
-      "mor-gateway": {
+      "mor-[REDACTED]": {
         "baseUrl": "https://api.mor.org/api/v1",
         "apiKey": "sk-...",
         "api": "openai-completions",
         "models": [
-          { "id": "kimi-k2.5", "name": "Kimi K2.5 (via Morpheus Gateway)", "reasoning": false },
-          { "id": "glm-4.7-flash", "name": "GLM 4.7 Flash (via Morpheus Gateway)", "reasoning": false },
-          { "id": "llama-3.3-70b", "name": "Llama 3.3 70B (via Morpheus Gateway)", "reasoning": false }
+          { "id": "kimi-k2.5", "name": "Kimi K2.5 (via [REDACTED] Gateway)", "reasoning": false },
+          { "id": "glm-4.7-flash", "name": "GLM 4.7 Flash (via [REDACTED] Gateway)", "reasoning": false },
+          { "id": "llama-3.3-70b", "name": "Llama 3.3 70B (via [REDACTED] Gateway)", "reasoning": false }
         ]
       }
     }
@@ -2005,7 +2005,7 @@ All models also have `:web` variants with web search capability.
 }
 ```
 
-**Important:** All gateway models must have `"reasoning": false` — the upstream litellm rejects the `reasoning_effort` parameter.
+**Important:** All [REDACTED] models must have `"reasoning": false` — the upstream litellm rejects the `reasoning_effort` parameter.
 
 ### Community Bootstrap Key
 
@@ -2016,7 +2016,7 @@ The bootstrap script includes a community API key (base64-obfuscated) for the Sm
 2. Create an account and sign in
 3. Click "Create API Key"
 4. **Enable "session automation"** in account settings (required for API access)
-5. Run: `node scripts/bootstrap-gateway.mjs --key YOUR_KEY`
+5. Run: `node scripts/bootstrap-[REDACTED].mjs --key YOUR_KEY`
 
 ### Gateway vs Local Proxy vs P2P Node
 
@@ -2029,21 +2029,21 @@ The bootstrap script includes a community API key (base64-obfuscated) for the Sm
 | Decentralized | Gateway → providers | Direct P2P | Direct P2P |
 | Best for | New users, quick start | Daily use, reliability | Full sovereignty |
 
-The recommended progression: **Gateway → Local Proxy → P2P Node** as users gain confidence with the Morpheus ecosystem.
+The recommended progression: **Gateway → Local Proxy → P2P Node** as users gain confidence with the [REDACTED] ecosystem.
 
 ### Fallback Chain with Gateway
 
-With the gateway added, the recommended fallback chain becomes:
+With the [REDACTED] added, the recommended fallback chain becomes:
 
 ```
 venice/claude-opus-4-6      # Primary (premium)
   → venice/claude-opus-45   # Venice fallback
   → venice/kimi-k2-5        # Venice open tier
   → morpheus/kimi-k2.5      # Local proxy (MOR staking)
-  → mor-gateway/kimi-k2.5   # API Gateway (open beta)
+  → mor-[REDACTED]/kimi-k2.5   # API Gateway (open beta)
 ```
 
-For new users without Venice or a local proxy, the gateway is the **first and only** provider — making it the critical bootstrap path.
+For new users without Venice or a local proxy, the [REDACTED] is the **first and only** provider — making it the critical bootstrap path.
 
 ---
 
@@ -2124,7 +2124,7 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
 ```
 
 **Headless Raspberry Pi:**
-No sleep by default. Ensure `systemd` services are enabled for OpenClaw and Morpheus.
+No sleep by default. Ensure `systemd` services are enabled for OpenClaw and [REDACTED].
 
 ### Troubleshooting
 

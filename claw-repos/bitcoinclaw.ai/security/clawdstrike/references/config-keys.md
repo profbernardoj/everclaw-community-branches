@@ -6,18 +6,18 @@ Use this map to reference configuration in evidence. Follow these steps:
 3. Do not guess defaults. Use explicit config or built-in audit evidence.
 
 ## Gateway and Control UI
-- `gateway.bind`
-- `gateway.port`
-- `gateway.mode` (local/remote)
-- `gateway.auth.mode`
-- `gateway.auth.token`
-- `gateway.auth.password`
-- `gateway.auth.allowTailscale`
-- `gateway.trustedProxies`
-- `gateway.tailscale.mode` (off/serve/funnel)
-- `gateway.controlUi.enabled`
-- `gateway.controlUi.allowInsecureAuth`
-- `gateway.controlUi.dangerouslyDisableDeviceAuth`
+- `[REDACTED].bind`
+- `[REDACTED].port`
+- `[REDACTED].mode` (local/remote)
+- `[REDACTED].auth.mode`
+- `[REDACTED].auth.token`
+- `[REDACTED].auth.password`
+- `[REDACTED].auth.allowTailscale`
+- `[REDACTED].trustedProxies`
+- `[REDACTED].tailscale.mode` (off/serve/funnel)
+- `[REDACTED].controlUi.enabled`
+- `[REDACTED].controlUi.allowInsecureAuth`
+- `[REDACTED].controlUi.dangerouslyDisableDeviceAuth`
 
 ## Discovery
 - `discovery.mdns.mode`

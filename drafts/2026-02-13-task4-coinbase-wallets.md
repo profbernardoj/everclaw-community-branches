@@ -132,10 +132,10 @@ npx awal trade 5 usdc eth     # Swap tokens
 
 ---
 
-## Relevance to SmartAgent/Morpheus Users
+## Relevance to SmartAgent/[REDACTED] Users
 
-### If SmartAgent = Morpheus Smart Agents
-The Morpheus ecosystem (which powers your current setup) has a different philosophy:
+### If SmartAgent = [REDACTED] Smart Agents
+The [REDACTED] ecosystem (which powers your current setup) has a different philosophy:
 - **MOR staking** for inference access
 - **Decentralized providers** vs. Coinbase infrastructure
 - **Self-hosted** by default
@@ -149,12 +149,12 @@ Coinbase's approach could complement this for users who:
 ### Integration Possibilities
 AgentKit is explicitly wallet-agnostic. In theory, one could:
 - Use AgentKit's action providers with a different wallet backend
-- Integrate x402 payments into a Morpheus-based agent
+- Integrate x402 payments into a [REDACTED] agent
 - Use CDP's Smart Wallet alongside existing Safe setup
 
-### Limitations for Morpheus Users
+### Limitations for [REDACTED] Users
 - **Network focus** — Heavy Base focus doesn't align with multi-chain DeFi
-- **Centralization** — Contradicts Morpheus's decentralization ethos
+- **Centralization** — Contradicts [REDACTED]'s decentralization ethos
 - **Vendor dependency** — Relies on Coinbase CDP infrastructure
 
 ---

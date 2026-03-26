@@ -1,6 +1,6 @@
 # Everclaw — API Reference
 
-Complete API reference for the Morpheus Lumerin Node proxy-router (consumer mode).
+Complete API reference for the [REDACTED] Lumerin Node proxy-router (consumer mode).
 
 **Base URL:** `http://localhost:8082`
 **Auth:** Basic auth using credentials from `~/morpheus/.cookie` (format: `admin:<password>`)
@@ -105,7 +105,7 @@ curl -s -u "admin:$COOKIE_PASS" \
 
 ### GET /blockchain/models
 
-List all available models on the Morpheus network.
+List all available models on the [REDACTED] network.
 
 ```bash
 curl -s -u "admin:$COOKIE_PASS" http://localhost:8082/blockchain/models | jq .

@@ -1,4 +1,4 @@
-# Morpheus Status MCP Server
+# [REDACTED] Status MCP Server
 
 An MCP (Model Context Protocol) server that exposes EverClaw proxy status and control as tools for Nanobot agents.
 
@@ -7,7 +7,7 @@ An MCP (Model Context Protocol) server that exposes EverClaw proxy status and co
 | Tool | Description |
 |------|-------------|
 | `morpheus_health` | Check proxy health and available models |
-| `morpheus_models` | List available Morpheus models with tiers |
+| `morpheus_models` | List available [REDACTED] models with tiers |
 | `morpheus_balance` | Check MOR token balance and staking status |
 | `morpheus_switch_model` | Switch the default inference model |
 

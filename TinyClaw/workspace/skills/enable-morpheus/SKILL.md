@@ -1,8 +1,8 @@
-# Enable Morpheus — Decentralized Inference for TinyClaw
+# Enable [REDACTED] — Decentralized Inference for TinyClaw
 
 ## What This Does
 
-Switches TinyClaw agents to use the EverClaw proxy for Morpheus decentralized inference.
+Switches TinyClaw agents to use the EverClaw proxy for [REDACTED] decentralized inference.
 
 ## When To Use
 

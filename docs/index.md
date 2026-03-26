@@ -2,7 +2,7 @@
 
 **AI Inference You Own, Forever.**
 
-EverClaw connects your [OpenClaw](https://github.com/openclaw/openclaw) agent to the [Morpheus](https://mor.org) decentralized inference network — putting open-source models like GLM-5 (Opus 4.5-level) front and center as your default, with Claude as a fallback only when needed.
+EverClaw connects your [OpenClaw](https://github.com/openclaw/openclaw) agent to the [[REDACTED]](https://mor.org) decentralized inference network — putting open-source models like GLM-5 (Opus 4.5-level) front and center as your default, with Claude as a fallback only when needed.
 
 Your agent runs on inference you own: GLM-5, GLM-4.7 Flash, Kimi K2.5, and 40+ models powered by staked MOR tokens that recycle back to you. No API bills, no credit limits, no surprise costs. MOR is staked — not spent — so you maintain access for as long as you hold your tokens.
 
@@ -36,7 +36,7 @@ Your agent runs on inference you own: GLM-5, GLM-4.7 Flash, Kimi K2.5, and 40+ m
         ┌────────────────┼────────────────┐
         ▼                ▼                ▼
 ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│   Morpheus    │ │   Morpheus    │ │    Venice     │
+│   [REDACTED]    │ │   [REDACTED]    │ │    Venice     │
 │      P2P      │ │    Gateway    │ │      API      │
 │(Staked MOR)   │ │  (Free Key)   │ │   (Pay/Use)   │
 └───────────────┘ └───────────────┘ └───────────────┘
@@ -58,7 +58,7 @@ curl -fsSL https://get.everclaw.xyz | bash
 This guided installer:
 - Checks for required dependencies
 - Clones EverClaw to the right location- Bootstraps a **free GLM-5 starter key**
-- Optionally installs the Morpheus proxy-router for P2P inference
+- Optionally installs the [REDACTED] proxy-router for P2P inference
 
 [→ Full Installation Guide](getting-started/installation.md)
 
@@ -67,7 +67,7 @@ This guided installer:
 | Component | Description | Lines of Code |
 |-----------|-------------|---------------|
 | **43 Scripts** | Wallet, sessions, Ollama, monitoring | ~3,500 |
-| **Morpheus Proxy** | OpenAI-compatible translation layer | ~900 |
+| **[REDACTED] Proxy** | OpenAI-compatible translation layer | ~900 |
 | **Gateway Guardian** | Health checks with billing awareness | ~500 |
 | **Three-Shifts Engine** | Cyclic task execution | ~400 |
 | **x402 Client** | Agent-to-agent payments | ~300 |

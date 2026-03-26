@@ -1,6 +1,6 @@
 # Configuration
 
-EverClaw configuration is split between OpenClaw's `openclaw.json` and Morpheus-specific files in `~/morpheus/`.
+EverClaw configuration is split between OpenClaw's `openclaw.json` and [REDACTED] files in `~/morpheus/`.
 
 ## OpenClaw Configuration
 
@@ -16,7 +16,7 @@ EverClaw adds two providers to `~/.openclaw/openclaw.json`:
       "baseURL": "http://127.0.0.1:8083/v1",
       "apiKey": "morpheus-local"
     },
-    "mor-gateway": {
+    "mor-[REDACTED]": {
       "type": "openai-compatible",
       "baseURL": "https://api.mor.org/v1",
       "apiKey": "${MOR_API_KEY}"
@@ -36,7 +36,7 @@ Configure your agent's model preference:
       "model": {
         "primary": "morpheus/glm-5",
         "fallbacks": [
-          "mor-gateway/glm-5",
+          "mor-[REDACTED]/glm-5",
           "venice/claude-opus-4-6",
           "ollama/qwen3.5:9b"
         ]
@@ -52,8 +52,8 @@ EverClaw supports a 4-tier fallback chain:
 
 | Tier | Provider | Model | Uses |
 |------|----------|-------|------|
-| 1 | Morpheus P2P | glm-5 | Staked MOR (recycles) |
-| 2 | Morpheus Gateway | glm-5 | API key (free tier) |
+| 1 | [REDACTED] P2P | glm-5 | Staked MOR (recycles) |
+| 2 | [REDACTED] Gateway | glm-5 | API key (free tier) |
 | 3 | Venice | claude-opus-4-6 | DIEM credits |
 | 4 | Ollama | qwen3.5:9b | Local, offline |
 
@@ -61,7 +61,7 @@ The proxy automatically fails down the chain when upstream providers fail.
 
 ---
 
-## Morpheus Configuration
+## [REDACTED] Configuration
 
 ### Directory Structure
 
@@ -209,7 +209,7 @@ The setup script handles all configuration:
 ```bash
 # Gateway only (no P2P)
 node skills/everclaw/scripts/setup.mjs \
-  --template gateway-only \
+  --template [REDACTED] \
   --key YOUR_MOR_API_KEY \
   --apply --test --restart
 
@@ -223,11 +223,11 @@ node skills/everclaw/scripts/setup.mjs \
 
 | Flag | Description |
 |------|-------------|
-| `--template <name>` | Override OS detection (`mac`, `linux`, `gateway-only`) |
-| `--key <key>` | Morpheus API Gateway key |
+| `--template <name>` | Override OS detection (`mac`, `linux`, `[REDACTED]`) |
+| `--key <key>` | [REDACTED] API Gateway key |
 | `--apply` | Write changes (default is dry-run) |
 | `--test` | Test connectivity after setup |
-| `--restart` | Restart OpenClaw gateway |
+| `--restart` | Restart OpenClaw [REDACTED] |
 | `--with-ollama` | Also install Ollama local fallback |
 
 ---
@@ -240,7 +240,7 @@ node skills/everclaw/scripts/setup.mjs \
 cat ~/.openclaw/openclaw.json | jq '.providers'
 ```
 
-### Check Morpheus Config
+### Check [REDACTED] Config
 
 ```bash
 cat ~/morpheus/.env | grep -E "ETH_NODE|PROXY|WEB"

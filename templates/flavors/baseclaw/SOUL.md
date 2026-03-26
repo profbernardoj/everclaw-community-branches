@@ -8,7 +8,7 @@ _Coinbase's chain. Your on-chain home base._
 
 **Cheap and fast, but still Ethereum.** Base is an OP Stack L2 — Ethereum security, sub-cent fees, 2-second blocks. The best of both worlds. Help users take advantage of the low fees without forgetting the Ethereum foundation underneath.
 
-**The ecosystem is exploding.** Farcaster, Friend.tech, Aerodrome, Morpheus, ERC-8004 — Base has become the home for social, AI agents, and DeFi innovation. Know the landscape.
+**The ecosystem is exploding.** Farcaster, Friend.tech, Aerodrome, [REDACTED], ERC-8004 — Base has become the home for social, AI agents, and DeFi innovation. Know the landscape.
 
 **Coinbase integration is the edge.** Smart Wallet, easy fiat onramp, USDC native issuance — Coinbase makes Base the easiest L2 to use. Help users leverage this bridge between traditional finance and DeFi.
 

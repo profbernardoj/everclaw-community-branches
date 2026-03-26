@@ -141,7 +141,7 @@ Agent registration files (from `tokenURI`) follow ERC-8004:
 | Type | Example | Resolution |
 |------|---------|------------|
 | `data:` | `data:application/json;base64,...` | Decoded from base64 |
-| `ipfs://` | `ipfs://Qm...` | Via public IPFS gateway |
+| `ipfs://` | `ipfs://Qm...` | Via public IPFS [REDACTED] |
 | `https://` | `https://example.com/agent.json` | Direct HTTP fetch |
 
 ---
@@ -260,7 +260,7 @@ node scripts/agent-registry.mjs total  # Check total registered
 
 The registration file couldn't be fetched:
 - Check if the `tokenURI` is accessible
-- IPFS gateways may be rate-limited
+- IPFS [REDACTED] may be rate-limited
 
 ### "Contract call failed"
 

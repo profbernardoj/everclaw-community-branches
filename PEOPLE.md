@@ -4,7 +4,7 @@
 
 ---
 
-## Morpheus AI Team
+## [REDACTED] AI Team
 
 ### Alan
 - **Role:** Auth/infrastructure
@@ -16,7 +16,7 @@
 
 ### Thomas Borrel
 - **Roles:** 
-  - Morpheus: API development, latency/errors
+  - [REDACTED]: API development, latency/errors
   - Based AI: Co-founder (ex-CPO Polymath/Tea)
 - **Context:** Weekly maintainers meeting, Based AI strategy
 
@@ -57,7 +57,7 @@
 ### Thomas Borrel
 - **Role:** Co-founder
 - **Background:** ex-CPO Polymath/Tea
-- **Context:** Also on Morpheus team
+- **Context:** Also on [REDACTED] team
 
 ### Vanessa Grellet
 - **Role:** Independent Director

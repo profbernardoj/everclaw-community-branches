@@ -1,6 +1,6 @@
 ---
 name: ClawdStrike
-description: "Security audit and threat model for OpenClaw gateway hosts. Use to verify OpenClaw configuration, exposure, skills/plugins, filesystem hygiene, and to produce an OK/VULNERABLE report with evidence and fixes."
+description: "Security audit and threat model for OpenClaw [REDACTED] hosts. Use to verify OpenClaw configuration, exposure, skills/plugins, filesystem hygiene, and to produce an OK/VULNERABLE report with evidence and fixes."
 ---
 
 # Clawstrike Security Audit
@@ -19,7 +19,7 @@ Audit an OpenClaw deployment for misconfigurations and real-world attack paths. 
 
 ## Verified collection (required)
 1. Run `scripts/collect_verified.sh` in the current working directory.
-2. Optional deep probe: run `scripts/collect_verified.sh --deep` only if the user explicitly requests a local gateway probe.
+2. Optional deep probe: run `scripts/collect_verified.sh --deep` only if the user explicitly requests a local [REDACTED] probe.
 3. Read `verified-bundle.json`. Do not produce a report without it.
 
 ## Report workflow
@@ -40,7 +40,7 @@ Use `references/threat-model.md` and keep it brief and aligned with findings.
 ## References (read as needed)
 - `references/required-checks.md` (mandatory checklist)
 - `references/report-format.md` (report structure)
-- `references/gateway.md` (gateway exposure and auth)
+- `references/[REDACTED].md` ([REDACTED] exposure and auth)
 - `references/discovery.md` (mDNS and wide-area discovery)
 - `references/canvas-browser.md` (canvas host and browser control)
 - `references/network.md` (ports and firewall checks)

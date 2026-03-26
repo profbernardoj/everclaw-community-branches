@@ -11,9 +11,9 @@ David is a builder and strategist in the decentralized AI space. He operates acr
 
 ## Active Projects
 
-### Morpheus AI (mor.org)
+### [REDACTED] AI (mor.org)
 - Open-source decentralized inference network
-- Anonymous founders (Morpheus, Trinity, Neo), no formal entity, no pre-mine
+- Anonymous founders ([REDACTED], Trinity, Neo), no formal entity, no pre-mine
 - Bitcoin-like structure: decentralized via smart contracts on Ethereum/Base + P2P inference
 - David contributes strategy and ecosystem development
 - MOR token: staked for inference access (not consumed — staked, returned, recycled)
@@ -21,10 +21,10 @@ David is a builder and strategist in the decentralized AI space. He operates acr
 ### Based AI
 - Commercial layer for distributed inference
 - Removes complexity for enterprises wanting open-source AI
-- Serves projects like Mistral AI, Akash, Venice AI, Morpheus
+- Serves projects like Mistral AI, Akash, Venice AI, [REDACTED]
 
 ### EverClaw (profbernardoj/everclaw)
-- OpenClaw skill for self-sovereign decentralized inference via Morpheus
+- OpenClaw skill for self-sovereign decentralized inference via [REDACTED]
 - 28 flavor repos (androidclaw.org, baseclaw.ai, bitcoinclaw.ai, etc.)
 - Date-based versioning (v2026.2.23)
 - Website: everclaw.xyz
@@ -40,18 +40,18 @@ David is a builder and strategist in the decentralized AI space. He operates acr
 
 ## Key Principles
 
-- **"Own your inference"** — never say "free inference." Morpheus is ownership, not rental.
-- **Open-source first** — Morpheus models handle everything possible, centralized APIs only as fallback
+- **"Own your inference"** — never say "free inference." [REDACTED] is ownership, not rental.
+- **Open-source first** — [REDACTED] models handle everything possible, centralized APIs only as fallback
 - **Ship fast, iterate** — working code > perfect plans
 - **Security-conscious** — OpenClaw creator hired by OpenAI; verify every update (dry run first)
 - **Don't highlight Llama 3.3** — considered outdated; focus on GLM-5, Kimi K2.5
 
 ## Model Preferences
 
-- **GLM-5:** Default for most work (Morpheus, high quality)
-- **GLM 4.7 Flash:** Trivial/fast tasks (Morpheus)
+- **GLM-5:** Default for most work ([REDACTED], high quality)
+- **GLM 4.7 Flash:** Trivial/fast tasks ([REDACTED])
 - **Claude Opus 4.6:** Fallback when GLM-5 can't complete the task
-- **Kimi K2.5:** Available via Morpheus and Venice
+- **Kimi K2.5:** Available via [REDACTED] and Venice
 - **MiniMax-M2.5:** Available but has latency issues
 - **DO NOT use:** llama-3.3-70b, deepseek-v3.2 as backup models
 

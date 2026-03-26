@@ -1,12 +1,12 @@
 # Contracts Reference
 
-Smart contract addresses on Base mainnet for Morpheus and related protocols.
+Smart contract addresses on Base mainnet for [REDACTED] and related protocols.
 
 ---
 
-## Morpheus Protocol
+## [REDACTED] Protocol
 
-All Morpheus contracts are on Base mainnet (chain ID: 8453).
+All [REDACTED] contracts are on Base mainnet (chain ID: 8453).
 
 | Contract | Address | Purpose |
 |----------|---------|---------|

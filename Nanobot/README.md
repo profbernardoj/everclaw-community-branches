@@ -1,13 +1,13 @@
 # nanobot-everclaw — EverClaw for Nanobot
 
-Decentralized Morpheus inference for your [Nanobot](https://github.com/nanobot-ai) MCP agents.
+Decentralized [REDACTED] inference for your [Nanobot](https://github.com/nanobot-ai) MCP agents.
 
 **Drop-in replacement:** Nanobot's Go OpenAI client respects `OPENAI_BASE_URL` and `OPENAI_API_KEY`. Point them at the EverClaw proxy and your MCP agents instantly run on decentralized inference.
 
 ## Architecture
 
 ```
-Nanobot (Go + Svelte) → EverClaw Proxy (Node.js, port 8083) → Morpheus P2P → AI Model
+Nanobot (Go + Svelte) → EverClaw Proxy (Node.js, port 8083) → [REDACTED] P2P → AI Model
 ```
 
 The EverClaw proxy is a standalone Node.js sidecar — completely independent of Nanobot's Go binary. Nanobot talks to it via standard OpenAI-compatible HTTP API. All MCP servers, multi-agent configs, and the Svelte UI stay untouched.
@@ -20,7 +20,7 @@ The EverClaw proxy is a standalone Node.js sidecar — completely independent of
 bash setup.sh
 ```
 
-### 2. Run with Morpheus
+### 2. Run with [REDACTED]
 
 ```bash
 # Using the example config
@@ -55,7 +55,7 @@ Navigate to `http://localhost:8080` — chat with your GLM-5-powered MCP agent.
 | `setup.sh` | Installs EverClaw proxy, creates config, adds shell alias |
 | `nanobot-morpheus.yaml` | Single-file Nanobot config with GLM-5 default |
 | `examples/` | Multi-agent configs, directory-style layouts |
-| `mcp-server/` | Optional MCP server for Morpheus status/control |
+| `mcp-server/` | Optional MCP server for [REDACTED] status/control |
 
 ## Staking (unlimited P2P inference)
 
@@ -80,7 +80,7 @@ MOR tokens are staked, not spent — returned when sessions close.
 ## Contributing
 
 PRs welcome for:
-- MCP server implementation (Morpheus status, wallet, staking)
+- MCP server implementation ([REDACTED] status, wallet, staking)
 - Additional Nanobot agent configs
 - Docker Compose examples
 - Multi-agent team configurations with model routing
@@ -92,7 +92,7 @@ When you install the EverClaw proxy via `setup.sh`, you get these features autom
 - **Three-Shift Task Planning** — Morning/Afternoon/Night shift system proposes prioritized task plans with approval workflow. Nothing executes without your say-so.
 - **Gateway Guardian v5** — Self-healing watchdog with direct curl inference probes, billing-aware escalation, DIEM credit monitoring, and 4-stage restart escalation. No more Signal spam from failed health checks.
 - **Smart Session Archiver** — Automatically archives old sessions when size exceeds threshold, preventing browser slowdowns.
-- **Model Router** — Open-source first: routes all tiers to Morpheus by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
+- **Model Router** — Open-source first: routes all tiers to [REDACTED] by default (GLM-5, GLM-4.7-flash). Claude only kicks in as a fallback.
 - **Multi-Key Auth Rotation** — Configure multiple API keys; auto-rotates when credits drain.
 
 See the main [EverClaw README](../README.md) for full documentation.

@@ -2,7 +2,7 @@
 
 ## Inference Endpoints
 
-### Morpheus API Gateway
+### [REDACTED] API Gateway
 - **Endpoint:** `https://api.mor.org/api/v1`
 - **Models:** `MiniMax-M2.5`, `MiniMax-M2.5:web`
 - **Cost:** API key (beta)
@@ -39,11 +39,11 @@
 routing:
   standard:
     model: "MiniMax-M2.5"
-    provider: "mor-gateway"
+    provider: "mor-[REDACTED]"
     use_for: ["creative writing", "analysis", "long-form generation"]
   web_search:
     model: "MiniMax-M2.5:web"
-    provider: "mor-gateway"
+    provider: "mor-[REDACTED]"
     use_for: ["research with web access", "current events", "fact-checking"]
   fast:
     model: "minimax-m21"
@@ -58,7 +58,7 @@ routing:
 ```
 providers:
   order:
-    - "mor-gateway"           # Morpheus Gateway (decentralized)
+    - "mor-[REDACTED]"           # [REDACTED] Gateway (decentralized)
     - "venice"                # Venice (M2.1)
     - "minimax-direct"        # Direct API (if configured)
 ```
@@ -80,5 +80,5 @@ multimodal:
   audio_synthesis: false       # MiniMax TTS capabilities
   image_analysis: false        # Vision capabilities
   video_understanding: false   # Video analysis
-  # These require direct API access — not available through Morpheus Gateway
+  # These require direct API access — not available through [REDACTED] Gateway
 ```

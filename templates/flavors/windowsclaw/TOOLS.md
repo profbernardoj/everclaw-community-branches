@@ -96,7 +96,7 @@ paths:
 tasks:
   - name: "OpenClaw Gateway"
     trigger: "at_logon"
-    action: "start OpenClaw gateway service"
+    action: "start OpenClaw [REDACTED] service"
   - name: "WSL2 Startup"
     trigger: "at_logon"
     action: "wsl -d Ubuntu-24.04 -- service cron start"
