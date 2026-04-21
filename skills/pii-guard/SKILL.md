@@ -1,3 +1,15 @@
+---
+name: pii-guard
+description: "Prevent personal identifiable information (PII) from being sent to external services. Use when performing git push, sending emails, posting to social media, publishing to ClawHub, or any outbound action that transmits user data externally. Scans content against protected patterns and blocks transmission when PII is detected."
+user-invocable: false
+triggers:
+  - "pii scan"
+  - "check for personal data"
+  - "block sensitive information"
+  - "privacy check"
+  - "scan for pii"
+---
+
 # PII Guard — Personal Data Leak Prevention
 
 ## Purpose

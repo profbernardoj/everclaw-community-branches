@@ -1,3 +1,15 @@
+---
+name: night-shift
+description: "Generate actionable overnight tasks based on the day's projects and objectives. Use when planning autonomous agent work for the 10 PM to 6 AM window, scheduling unattended research, content creation, code documentation, or prep tasks that require human approval before execution."
+user-invocable: true
+triggers:
+  - "night shift"
+  - "overnight tasks"
+  - "evening plan"
+  - "after hours work"
+  - "night plan"
+---
+
 # Night Shift Skill
 
 **Purpose:** Generate actionable overnight tasks based on the day's projects and objectives.
