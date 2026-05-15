@@ -13,12 +13,12 @@
 
 services:
   everclaw:
-    image: ghcr.io/everclaw/everclaw:2026.5.11.1938
+    image: ghcr.io/everclaw/everclaw:2026.5.15.1418
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        EVERCLAW_VERSION: "2026.5.11.1938"
+        EVERCLAW_VERSION: "2026.5.15.1418"
     container_name: everclaw
     restart: unless-stopped
     ports:

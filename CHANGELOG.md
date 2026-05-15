@@ -2,6 +2,44 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.5.15.1418] - 2026-05-15
+
+### Changed — OpenClaw Pin v2026.5.7 → v2026.5.12
+
+- **Dockerfile:** OpenClaw build target updated from `v2026.5.7` to `v2026.5.12`
+- **docker-compose.yml:** Image tag and build arg updated
+
+### Upstream Highlights (OpenClaw v2026.5.7 → v2026.5.12)
+
+#### New Features
+- **Per-sender tool policies:** Operators can restrict dangerous tools by requester identity across all tool surfaces
+- **Per-agent message restrictions:** Sandboxed agents can restrict message sends to current conversation only
+- **Cron get:** Direct `cron.get` and `openclaw cron get` for inspecting stored jobs by id
+- **ACP session lineage:** Clients can render subagent graphs without private Gateway side channels
+- **Exec command highlighting:** Parser-derived command highlighting in approval prompts
+- **Agent ping-pong:** `maxPingPongTurns` raised to 20 (default still 5)
+- **Fal image editing:** GPT Image 2 and Nano Banana 2 reference-image edit routing
+- **iMessage:** Channel status filtering and BlueBubbles-to-imsg cutover docs
+- **Control UI recovery:** HTML recovery panel for blank dashboard pages
+- **Fly Machines:** Container environment detection from runtime env vars
+
+#### Build & Dependencies
+- **pnpm 11:** Workspace package management upgraded to pnpm 11.1.0
+- **TypeScript 6.0.3:** Stricter compiler checks for implicit returns, overrides, unused code
+- **Hard-pinned deps:** Non-peer direct dependency specs hard-pinned for reproducible installs
+- **OpenAI SDK 6.37.0**, Anthropic SDK 0.95.1, Google GenAI 2.0.1, Kysely 0.29.0
+- **Peekaboo 3.0.0** macOS bridge update
+
+#### Fixes
+- **Gateway HTTP:** Honor max_completion_tokens and max_tokens on inbound /v1/chat/completions
+- **Compaction scope:** Background exec/process session references preserved across compaction
+- **Doctor migrations:** Safe legacy migrations committed even with unrelated validation issues
+- **Codex OAuth:** Route preservation during doctor --fix (reverts v2026.5.5 regression)
+- **Cron model repair:** Bad `payload.model` values (null/blank/"default") cleaned up by doctor
+- **Plugin SDK cleanup:** Provider-specific helpers moved back to provider-owned modules
+
+(Reference: https://github.com/openclaw/openclaw/releases/tag/v2026.5.12)
+
 ## [2026.5.11.1938] - 2026-05-11
 
 ### Changed — OpenClaw Pin v2026.4.29 → v2026.5.7
