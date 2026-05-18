@@ -2,6 +2,34 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.5.18] - 2026-05-18
+
+### Fixed — Monorepo URL Migration
+
+- **28 URL references** updated from `EverClaw/EverClaw` to `profbernardoj/morpheus-skill` (canonical repo) across 12 files
+- **4 path corrections** in root `SKILL.md`: `main/scripts/` → `main/packages/core/scripts/` (old path returned 404)
+- **Install one-liner** now resolves correctly: `curl -fsSL https://get.everclaw.xyz | bash`
+- **CI:** `test-installer.yml` paths already correct (uses `packages/core/scripts/`)
+- **Cloudflare redirect** at `get.everclaw.xyz` updated to point to canonical repo (separate change)
+- **New doc:** `packages/core/docs/docs/operations/URL-MIGRATION.md` — canonical URL patterns & migration record
+
+### Files Modified
+
+- `SKILL.md` (root) — 7 fixes (repo + path + URLs)
+- `packages/core/SKILL.md` — 6 fixes
+- `packages/core/CLAWHUB_WARNING.md` — 2 fixes
+- `packages/core/scripts/install-everclaw.sh` — 3 fixes (comment, REPO_URL, API URL)
+- `packages/core/scripts/install-with-deps.sh` — 1 fix (git clone URL)
+- `packages/core/scripts/everclaw-deps.mjs` — 1 fix (dependency metadata)
+- `packages/core/docs/docs/getting-started/installation.md` — 1 fix
+- `packages/core/docs/docs/index.md` — 2 fixes
+- `packages/core/docs/docs/scripts/reference.md` — 1 fix
+- `packages/core/docs/docs/docker-flavors.md` — 1 fix
+- `packages/core/docs/docs/operations/troubleshooting.md` — 1 fix
+- `flavors/buddybots.org/buddy-bots-install.sh` — 1 fix
+- `smartagent/install.sh` — 1 fix
+- `skills/xmtp-comms-guard/PUBLISH-CHECKLIST.md` — 1 fix
+
 ## [2026.5.15.1418] - 2026-05-15
 
 ### Changed — OpenClaw Pin v2026.5.7 → v2026.5.12

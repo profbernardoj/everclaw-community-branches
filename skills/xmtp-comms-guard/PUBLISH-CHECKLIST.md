@@ -8,4 +8,4 @@
 - [ ] PII review — no personal data in any committed file
 - [ ] External security review (NCC Group or equivalent) — pipeline + threat model
 - [ ] ClawHub publish: `clawhub publish . --slug xmtp-comms-guard --version 6.0.0`
-- [ ] GitHub PR to EverClaw/EverClaw
+- [ ] GitHub PR to profbernardoj/morpheus-skill

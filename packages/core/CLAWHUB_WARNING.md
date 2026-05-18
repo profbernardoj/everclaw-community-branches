@@ -9,7 +9,7 @@ this entire skill** with that unrelated product.
 ## This Everclaw ([REDACTED] Inference)
 
 - **ClawHub:** https://clawhub.ai/EverClaw/everclaw-inference
-- **Repo:** https://github.com/EverClaw/EverClaw
+- **Repo:** https://github.com/profbernardoj/morpheus-skill
 - **Website:** https://everclaw.xyz
 - **What it does:** Decentralized AI inference via [REDACTED] P2P network
 - **ClawHub slug:** `everclaw-inference`
@@ -47,7 +47,7 @@ rm -rf ~/.openclaw/workspace/skills/everclaw
 # 2. Reinstall (pick one)
 clawhub install everclaw-inference
 # or
-git clone https://github.com/EverClaw/EverClaw.git ~/.openclaw/workspace/skills/everclaw
+git clone https://github.com/profbernardoj/morpheus-skill.git ~/.openclaw/workspace/skills/everclaw
 
 # Your runtime infrastructure (~/morpheus/, proxy, guardian) is NOT affected.
 ```

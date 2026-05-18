@@ -49,7 +49,7 @@ customizes the agent persona (SOUL.md, IDENTITY.md), user template
 | ... | 24 more flavors |
 
 Full list: check `templates/flavors/` in the repo, or pull the
-[GitHub Actions build](https://github.com/EverClaw/EverClaw/actions)
+[GitHub Actions build](https://github.com/profbernardoj/morpheus-skill/actions)
 to see all images.
 
 ## How It Works

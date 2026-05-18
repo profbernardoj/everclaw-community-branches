@@ -78,8 +78,8 @@ This guided installer:
 
 Current version: **2026.3.19**
 
-[View Changelog](https://github.com/EverClaw/EverClaw/blob/main/CHANGELOG.md)
+[View Changelog](https://github.com/profbernardoj/morpheus-skill/blob/main/CHANGELOG.md)
 
 ---
 
-*EverClaw is open-source software released under the MIT License. [View on GitHub](https://github.com/EverClaw/EverClaw).*
+*EverClaw is open-source software released under the MIT License. [View on GitHub](https://github.com/profbernardoj/morpheus-skill).*

@@ -19,7 +19,7 @@ set -euo pipefail
 # ─── Configuration ───────────────────────────────────────────────────────────
 BUDDYBOTS_VERSION="0.1.0"
 NODE_MIN_VERSION="22"
-EVERCLAW_REPO="https://github.com/EverClaw/EverClaw.git"
+EVERCLAW_REPO="https://github.com/profbernardoj/morpheus-skill.git"
 WORKSPACE="${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}"
 SKILL_DIR="$WORKSPACE/skills/everclaw"
 BUDDYBOTS_DIR="$WORKSPACE/skills/buddy-bots"

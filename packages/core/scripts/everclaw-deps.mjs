@@ -69,7 +69,7 @@ Dependencies are declared in SKILL.md frontmatter:
         required: false
         description: "Cyclic task execution"
     github:
-      - repo: EverClaw/EverClaw
+      - repo: profbernardoj/morpheus-skill
         path: skills/pii-guard
         description: "PII leak prevention"
   ---

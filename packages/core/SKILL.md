@@ -60,7 +60,7 @@ metadata:
         - "~/.openclaw/logs/ — guardian logs"
     install:
       method: "git clone (recommended) or clawhub install everclaw-inference"
-      note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/EverClaw/EverClaw."
+      note: "curl | bash installer available but users should review scripts before executing. All scripts are open source at github.com/profbernardoj/morpheus-skill."
     tags: ["inference", "everclaw", "morpheus", "mor", "decentralized", "ai", "blockchain", "base", "persistent", "fallback", "guardian", "security", "three-shifts", "task-planning"]
 ---
 
@@ -198,13 +198,13 @@ Before installing EverClaw, ensure you have the following:
 Run this to verify your environment:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/packages/core/scripts/install-with-deps.sh | bash -s -- --check-only
+curl -fsSL https://raw.githubusercontent.com/profbernardoj/morpheus-skill/main/packages/core/scripts/install-with-deps.sh | bash -s -- --check-only
 ```
 
 ### One-Line Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/packages/core/scripts/install-with-deps.sh | bash
+curl -fsSL https://raw.githubusercontent.com/profbernardoj/morpheus-skill/main/packages/core/scripts/install-with-deps.sh | bash
 ```
 
 This will:
@@ -223,7 +223,7 @@ If you don't have OpenClaw installed yet:
 curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git
 
 # Then install EverClaw
-curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/packages/core/scripts/install-with-deps.sh | bash
+curl -fsSL https://raw.githubusercontent.com/profbernardoj/morpheus-skill/main/packages/core/scripts/install-with-deps.sh | bash
 ```
 
 ---
@@ -317,7 +317,7 @@ The safe installer handles fresh installs, updates, and ClawHub collision detect
 
 ```bash
 # Fresh install
-curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/packages/core/scripts/install-everclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/profbernardoj/morpheus-skill/main/packages/core/scripts/install-everclaw.sh | bash
 
 # Or if you already have the skill:
 bash skills/everclaw/scripts/install-everclaw.sh
@@ -329,7 +329,7 @@ bash skills/everclaw/scripts/install-everclaw.sh --check
 ### Option C: Manual Git Clone
 
 ```bash
-git clone https://github.com/EverClaw/EverClaw.git ~/.openclaw/workspace/skills/everclaw
+git clone https://github.com/profbernardoj/morpheus-skill.git ~/.openclaw/workspace/skills/everclaw
 ```
 
 To update: `cd ~/.openclaw/workspace/skills/everclaw && git pull`

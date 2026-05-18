@@ -47,7 +47,7 @@ clawhub install everclaw-inference
 ## Manual Clone
 
 ```bash
-git clone https://github.com/EverClaw/EverClaw.git ~/.openclaw/workspace/skills/everclaw
+git clone https://github.com/profbernardoj/morpheus-skill.git ~/.openclaw/workspace/skills/everclaw
 ```
 
 After cloning, run the setup script:

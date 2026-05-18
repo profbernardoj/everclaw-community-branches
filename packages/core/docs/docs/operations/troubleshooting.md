@@ -255,7 +255,7 @@ cat ~/.openclaw/state/cooldown.json
 
 If you've tried everything and still have issues:
 
-1. Check the [GitHub Issues](https://github.com/EverClaw/EverClaw/issues)
+1. Check the [GitHub Issues](https://github.com/profbernardoj/morpheus-skill/issues)
 2. Run diagnostic and include output: `bash scripts/diagnose.sh --verbose > diagnostic.txt`
 3. Include router logs: `tail -100 ~/morpheus/data/logs/router-stdout.log`
 4. Include proxy logs: `tail -100 ~/morpheus/proxy/proxy.log`

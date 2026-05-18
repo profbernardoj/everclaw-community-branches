@@ -30,7 +30,7 @@ Safe installer with ClawHub collision protection.
 
 ```bash
 # Fresh install
-curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/scripts/install-everclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/profbernardoj/morpheus-skill/main/packages/core/scripts/install-everclaw.sh | bash
 
 # Check for updates
 bash scripts/install-everclaw.sh --check

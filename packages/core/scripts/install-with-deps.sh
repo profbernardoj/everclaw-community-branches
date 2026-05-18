@@ -633,7 +633,7 @@ else
   mkdir -p "$HOME/.openclaw/workspace/skills"
   cd "$HOME/.openclaw/workspace/skills"
 
-  git clone --quiet https://github.com/EverClaw/EverClaw.git everclaw || {
+  git clone --quiet https://github.com/profbernardoj/morpheus-skill.git everclaw || {
     log_err "Failed to clone EverClaw repository"
     log "Check your internet connection and try again."
     exit 1

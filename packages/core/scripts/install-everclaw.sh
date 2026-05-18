@@ -8,14 +8,14 @@
 #   - Post-install: router, proxy, guardian setup
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/EverClaw/EverClaw/main/packages/core/scripts/install-everclaw.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/profbernardoj/morpheus-skill/main/packages/core/scripts/install-everclaw.sh | bash
 #   # or
 #   bash skills/everclaw/scripts/install-everclaw.sh
 
 set -euo pipefail
 
 # ─── Configuration ───────────────────────────────────────────────────────────
-REPO_URL="https://github.com/EverClaw/EverClaw.git"
+REPO_URL="https://github.com/profbernardoj/morpheus-skill.git"
 SKILL_DIR="${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}/skills/everclaw"
 SKILL_NAME="everclaw"
 
@@ -207,7 +207,7 @@ check_version() {
       local_version=$(grep "^version:" "$SKILL_DIR/SKILL.md" | head -1 | awk '{print $2}')
     fi
     
-    remote_version=$(curl -s "https://api.github.com/repos/EverClaw/EverClaw/releases/latest" 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin).get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
+    remote_version=$(curl -s "https://api.github.com/repos/profbernardoj/morpheus-skill/releases/latest" 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin).get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
     
     echo "Local:  v${local_version}"
     echo "Latest: ${remote_version}"
