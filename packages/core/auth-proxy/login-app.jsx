@@ -60,7 +60,6 @@ async function sendTokenToProxy(accessToken) {
 function LoginInner() {
   const { ready, authenticated, getAccessToken } = usePrivy();
   const [sent, setSent] = useState(false);
-  const [loginTriggered, setLoginTriggered] = useState(false);
 
   const { login } = useLogin({
     onComplete: async () => {
@@ -93,16 +92,6 @@ function LoginInner() {
     }
   }, [ready, authenticated, sent, getAccessToken]);
 
-  // Auto-trigger Privy login ONCE when ready and not yet authenticated.
-  // loginTriggered guard prevents re-calling login() on re-renders,
-  // which would reset the Privy modal and kill the OTP code entry step.
-  useEffect(() => {
-    if (ready && !authenticated && !sent && !loginTriggered) {
-      setLoginTriggered(true);
-      login();
-    }
-  }, [ready, authenticated, sent, loginTriggered, login]);
-
   if (!ready) {
     return (
       <div className="loading">
@@ -121,7 +110,6 @@ function LoginInner() {
     );
   }
 
-  // Fallback button in case auto-trigger doesn't fire (e.g., popup blocked)
   return (
     <div style={{ textAlign: 'center' }}>
       <button
@@ -154,16 +142,10 @@ function App() {
       appId={PRIVY_APP_ID}
       {...(PRIVY_CLIENT_ID ? { clientId: PRIVY_CLIENT_ID } : {})}
       config={{
-        loginMethods: ['wallet', 'google', 'email', 'apple'],
-        externalWallets: {
-          ethereum: {
-            connectors: ['metaMask', 'walletConnect', 'coinbaseWallet', 'rainbow', 'injected'],
-          },
-        },
+        loginMethods: ['google', 'email', 'apple'],
         appearance: {
           theme: 'dark',
           accentColor: '#7c3aed',
-          logo: '/auth/logo.png',
         },
       }}
     >

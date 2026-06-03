@@ -36,9 +36,6 @@
  *   SESSION_SECRET           — Secret for signing session cookies (auto-generated if not set)
  *   SESSION_TTL_MS           — Session cookie TTL in ms (default: 86400000 = 24 hours)
  *   PRIVY_CLIENT_ID          — Privy client ID for JS SDK (from Dashboard → Settings → Clients)
- *   VERIFY_OWNER_URL         — Supabase verify-owner function URL (enables dynamic ownership)
- *   VERIFY_OWNER_SECRET      — Shared secret for verify-owner calls
- *   CONTAINER_FQDN           — Container's own FQDN (auto-detected from Host header if not set)
  */
 
 import { createServer } from 'node:http';
@@ -63,16 +60,7 @@ const CONFIG = {
   ownerPrivyId: process.env.OPENCLAW_OWNER_PRIVY_ID || '',
   sessionSecret: process.env.SESSION_SECRET || '',
   sessionTtlMs: parseInt(process.env.SESSION_TTL_MS || '86400000', 10), // 24 hours
-  // Dynamic ownership verification (buffer pool mode)
-  verifyOwnerUrl: process.env.VERIFY_OWNER_URL || '',
-  verifyOwnerSecret: process.env.VERIFY_OWNER_SECRET || '',
-  containerFqdn: process.env.CONTAINER_FQDN || '',
 };
-
-// Dynamic ownership mode: when VERIFY_OWNER_URL is set, ownership is checked
-// via Supabase instead of the static OPENCLAW_OWNER_PRIVY_ID env var.
-// This enables buffer containers to serve any assigned user without restart.
-const DYNAMIC_OWNER_MODE = !!CONFIG.verifyOwnerUrl;
 
 const PRIVY_ISSUER = 'privy.io';
 const COOKIE_NAME = 'everclaw_session';
@@ -121,17 +109,8 @@ function validateConfig() {
   const required = [
     ['PRIVY_APP_ID', CONFIG.privyAppId],
     ['PRIVY_VERIFICATION_KEY', CONFIG.privyVerificationKey],
+    ['OPENCLAW_OWNER_PRIVY_ID', CONFIG.ownerPrivyId],
   ];
-
-  // In static mode, OPENCLAW_OWNER_PRIVY_ID is required.
-  // In dynamic mode, VERIFY_OWNER_URL + VERIFY_OWNER_SECRET are required instead.
-  if (DYNAMIC_OWNER_MODE) {
-    if (!CONFIG.verifyOwnerSecret) {
-      required.push(['VERIFY_OWNER_SECRET', CONFIG.verifyOwnerSecret]);
-    }
-  } else {
-    required.push(['OPENCLAW_OWNER_PRIVY_ID', CONFIG.ownerPrivyId]);
-  }
 
   const missing = required.filter(([, value]) => !value);
   if (missing.length > 0) {
@@ -151,13 +130,7 @@ function validateConfig() {
 
   console.log('✅ Auth proxy configuration validated');
   console.log(`   App ID: ${CONFIG.privyAppId}`);
-  if (DYNAMIC_OWNER_MODE) {
-    console.log(`   Mode:   DYNAMIC (verify-owner via Supabase)`);
-    console.log(`   URL:    ${CONFIG.verifyOwnerUrl}`);
-  } else {
-    console.log(`   Mode:   STATIC (env var owner)`);
-    console.log(`   Owner:  ${CONFIG.ownerPrivyId}`);
-  }
+  console.log(`   Owner:  ${CONFIG.ownerPrivyId}`);
 }
 
 // ─── Session Management ─────────────────────────────────────────────────────
@@ -229,37 +202,25 @@ async function initializeVerificationKey() {
       // PEM-encoded SPKI public key
       verificationKey = await importSPKI(keyMaterial, 'ES256');
     } else {
-      // Raw base64 key body (no PEM headers) — wrap in PEM armor and import
-      // This handles the case where PRIVY_VERIFICATION_KEY is stored as just the
-      // base64 key material (e.g. "MFkwEwYHKoZIzj0C...") without PEM headers.
-      // First try wrapping directly, then try base64-decoding in case it's a
-      // base64-encoded PEM string.
-      const wrappedPem = `-----BEGIN PUBLIC KEY-----\n${keyMaterial}\n-----END PUBLIC KEY-----`;
-      try {
-        verificationKey = await importSPKI(wrappedPem, 'ES256');
-      } catch {
-        // Fall back: maybe it's base64-encoded PEM
-        const decoded = Buffer.from(keyMaterial, 'base64').toString('utf8');
-        if (decoded.includes('-----BEGIN PUBLIC KEY-----')) {
-          verificationKey = await importSPKI(decoded, 'ES256');
-        } else {
-          throw new Error(
-            'Unrecognized key format. Expected PEM (-----BEGIN PUBLIC KEY-----), ' +
-            'JWK ({...}), or raw base64 key body'
-          );
-        }
+      // Assume base64-encoded PEM — decode and import as SPKI
+      const pem = Buffer.from(keyMaterial, 'base64').toString('utf8');
+      if (pem.includes('-----BEGIN PUBLIC KEY-----')) {
+        verificationKey = await importSPKI(pem, 'ES256');
+      } else {
+        throw new Error(
+          'Unrecognized key format. Expected PEM (-----BEGIN PUBLIC KEY-----) or JWK ({...})'
+        );
       }
     }
 
     console.log('✅ Privy verification key loaded');
   } catch (error) {
     console.error('❌ Failed to load Privy verification key:', error.message);
-    console.error('   Key preview (first 60 chars):', CONFIG.privyVerificationKey.slice(0, 60) + '...');
     process.exit(1);
   }
 }
 
-async function verifyPrivyJwt(token, reqHost) {
+async function verifyPrivyJwt(token) {
   try {
     const { payload } = await jwtVerify(token, verificationKey, {
       issuer: PRIVY_ISSUER,
@@ -267,52 +228,10 @@ async function verifyPrivyJwt(token, reqHost) {
       algorithms: ['ES256'],
     });
 
-    // Verify owner identity
-    if (DYNAMIC_OWNER_MODE) {
-      // Dynamic mode: check ownership via Supabase verify-owner function
-      const fqdn = CONFIG.containerFqdn || reqHost || '';
-      if (!fqdn) {
-        console.log('[auth] Dynamic mode: no FQDN available for ownership check');
-        return { valid: false, reason: 'no_fqdn' };
-      }
-
-      try {
-        const verifyResp = await fetch(CONFIG.verifyOwnerUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${CONFIG.verifyOwnerSecret}`,
-          },
-          body: JSON.stringify({
-            fqdn: fqdn.replace(/:\d+$/, ''), // strip port if present
-            privy_user_id: payload.sub,
-          }),
-          signal: AbortSignal.timeout(5000), // 5s timeout
-        });
-
-        if (!verifyResp.ok) {
-          console.log(`[auth] verify-owner returned ${verifyResp.status}`);
-          return { valid: false, reason: 'verify_failed' };
-        }
-
-        const result = await verifyResp.json();
-        if (!result.authorized) {
-          console.log(`[auth] Dynamic owner check: not authorized (sub=${payload.sub}, fqdn=${fqdn})`);
-          return { valid: false, reason: 'owner_mismatch' };
-        }
-
-        console.log(`[auth] Dynamic owner verified: sub=${payload.sub}, fqdn=${fqdn}`);
-      } catch (fetchErr) {
-        console.error(`[auth] verify-owner fetch error: ${fetchErr.message}`);
-        // Fail open or closed? Fail CLOSED for security — deny access if we can't verify
-        return { valid: false, reason: 'verify_unavailable' };
-      }
-    } else {
-      // Static mode: check against env var (original behavior)
-      if (payload.sub !== CONFIG.ownerPrivyId) {
-        console.log(`[auth] Owner mismatch: JWT sub=${payload.sub}, expected=${CONFIG.ownerPrivyId}`);
-        return { valid: false, reason: 'owner_mismatch' };
-      }
+    // Verify owner identity — only the container owner can access
+    if (payload.sub !== CONFIG.ownerPrivyId) {
+      console.log(`[auth] Owner mismatch: JWT sub=${payload.sub}, expected=${CONFIG.ownerPrivyId}`);
+      return { valid: false, reason: 'owner_mismatch' };
     }
 
     return { valid: true, payload };
@@ -438,24 +357,6 @@ async function handleRequest(req, res) {
     return;
   }
 
-  // ── Logo asset (served for Privy modal branding) ──
-  if (pathname === '/auth/logo.png' && req.method === 'GET') {
-    try {
-      const logoPath = join(__dirname, 'assets', 'logo.png');
-      const logoData = await readFile(logoPath);
-      res.writeHead(200, {
-        'Content-Type': 'image/png',
-        'Cache-Control': 'public, max-age=604800, immutable',
-        'X-Content-Type-Options': 'nosniff',
-      });
-      res.end(logoData);
-    } catch {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('Not found');
-    }
-    return;
-  }
-
   // ── Login bundle JS (built at Docker build time, no CDN dependency) ──
   if (pathname === '/auth/login-bundle.js' && req.method === 'GET') {
     res.writeHead(200, {
@@ -487,8 +388,7 @@ async function handleRequest(req, res) {
         return;
       }
 
-      const reqHost = req.headers.host || '';
-      const result = await verifyPrivyJwt(token, reqHost);
+      const result = await verifyPrivyJwt(token);
 
       if (!result.valid) {
         res.writeHead(result.reason === 'owner_mismatch' ? 403 : 401, {
