@@ -20,6 +20,11 @@ on:
 env:
   REGISTRY: ghcr.io
 
+# Cancel in-progress builds when a newer commit is pushed to the same ref.
+concurrency:
+  group: docker-build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ─── Discover Flavors ─────────────────────────────────────────────────────────
   # Only run Docker builds on the monorepo (EverClaw/EverClaw).
@@ -145,7 +150,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           no-cache-filters: openclaw-builder
-          platforms: linux/amd64,linux/arm64
+          # amd64 only: Manifest/Morpheus compute providers run x86_64.
+          # arm64 via QEMU emulation added ~20min per build with no deployment
+          # benefit. Re-add linux/arm64 here if local Apple Silicon images are needed.
+          platforms: linux/amd64
 
       - name: Output image info
         if: github.event_name != 'pull_request'
