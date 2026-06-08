@@ -273,6 +273,18 @@ function validateConfig() {
     process.exit(1);
   }
 
+  // Validate CIG URLs are well-formed at startup (fail fast, not on first inference)
+  if (CIG_ENABLED) {
+    try {
+      new URL(CIG_CONFIG.mintUrl);
+      new URL(CIG_CONFIG.inferenceUrl);
+    } catch (urlErr) {
+      console.error('❌ CIG URL validation failed:', urlErr.message);
+      console.error('   CIG_MINT_URL and CIG_INFERENCE_URL must be valid URLs.');
+      process.exit(1);
+    }
+  }
+
   const missing = required.filter(([, value]) => !value);
   if (missing.length > 0) {
     console.error('❌ Auth proxy: missing required environment variables:');
@@ -650,7 +662,8 @@ async function handleCigProxy(req, res, session) {
           if (bytesRead > MAX_RESPONSE_BYTES) {
             console.error(`[cig] Response exceeded ${MAX_RESPONSE_BYTES} bytes, aborting`);
             reader.cancel().catch(() => {});
-            break;
+            res.destroy(); // Force-close connection on oversized response
+            return;
           }
           res.write(value);
         }
