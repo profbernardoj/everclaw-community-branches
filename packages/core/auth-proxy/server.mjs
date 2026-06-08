@@ -37,12 +37,17 @@
  *   CIG_CONTAINER_FQDN      — This container's public FQDN (e.g. agent.example.com)
  *   CIG_INFERENCE_URL       — cig-inference endpoint URL (overrides OpenClaw model base URL)
  *
+ *   VERIFY_OWNER_URL         — Supabase verify-owner function URL (enables dynamic ownership)
+ *   VERIFY_OWNER_SECRET      — Shared secret for verify-owner calls
+ *   CONTAINER_FQDN           — Container's own FQDN (auto-detected from Host header if not set)
+ *
  * Optional:
  *   AUTH_PROXY_PORT          — Port to listen on (default: 18789)
  *   OPENCLAW_INTERNAL_PORT   — OpenClaw internal port (default: 18790)
  *   SESSION_SECRET           — Secret for signing session cookies (auto-generated if not set)
  *   SESSION_TTL_MS           — Session cookie TTL in ms (default: 86400000 = 24 hours)
  *   PRIVY_CLIENT_ID          — Privy client ID for JS SDK (from Dashboard → Settings → Clients)
+ *   CIG_FAIL_CLOSED          — When 'true', fail with 503 on CIG mint failure (default: false, graceful fallback)
  */
 
 import { createServer } from 'node:http';
@@ -65,9 +70,18 @@ const CONFIG = {
   privyClientId: process.env.PRIVY_CLIENT_ID || '',
   privyVerificationKey: process.env.PRIVY_VERIFICATION_KEY || '',
   ownerPrivyId: process.env.OPENCLAW_OWNER_PRIVY_ID || '',
+  // Dynamic ownership verification (buffer pool mode)
+  verifyOwnerUrl: process.env.VERIFY_OWNER_URL || '',
+  verifyOwnerSecret: process.env.VERIFY_OWNER_SECRET || '',
+  containerFqdn: process.env.CONTAINER_FQDN || '',
   sessionSecret: process.env.SESSION_SECRET || '',
   sessionTtlMs: parseInt(process.env.SESSION_TTL_MS || '86400000', 10), // 24 hours
 };
+
+// Dynamic ownership mode: when VERIFY_OWNER_URL is set, ownership is checked
+// via Supabase instead of the static OPENCLAW_OWNER_PRIVY_ID env var.
+// This enables buffer containers to serve any assigned user without restart.
+const DYNAMIC_OWNER_MODE = !!CONFIG.verifyOwnerUrl;
 
 const PRIVY_ISSUER = 'privy.io';
 const COOKIE_NAME = 'everclaw_session';
@@ -237,11 +251,15 @@ setInterval(() => {
 // ─── Startup Validation ──────────────────────────────────────────────────────
 
 function validateConfig() {
-  const required = [
-    ['PRIVY_APP_ID', CONFIG.privyAppId],
-    ['PRIVY_VERIFICATION_KEY', CONFIG.privyVerificationKey],
-    ['OPENCLAW_OWNER_PRIVY_ID', CONFIG.ownerPrivyId],
-  ];
+  // In static mode, OPENCLAW_OWNER_PRIVY_ID is required.
+  // In dynamic mode, VERIFY_OWNER_URL + VERIFY_OWNER_SECRET are required instead.
+  if (DYNAMIC_OWNER_MODE) {
+    if (!CONFIG.verifyOwnerSecret) {
+      required.push(['VERIFY_OWNER_SECRET', CONFIG.verifyOwnerSecret]);
+    }
+  } else {
+    required.push(['OPENCLAW_OWNER_PRIVY_ID', CONFIG.ownerPrivyId]);
+  }
 
   const missing = required.filter(([, value]) => !value);
   if (missing.length > 0) {
@@ -261,7 +279,13 @@ function validateConfig() {
 
   console.log('✅ Auth proxy configuration validated');
   console.log(`   App ID: ${CONFIG.privyAppId}`);
-  console.log(`   Owner:  ${CONFIG.ownerPrivyId}`);
+  if (DYNAMIC_OWNER_MODE) {
+    console.log(`   Mode:   DYNAMIC (verify-owner via Supabase)`);
+    console.log(`   URL:    ${CONFIG.verifyOwnerUrl}`);
+  } else {
+    console.log(`   Mode:   STATIC (env var owner)`);
+    console.log(`   Owner:  ${CONFIG.ownerPrivyId}`);
+  }
 }
 
 // ─── Session Management ─────────────────────────────────────────────────────
@@ -359,10 +383,52 @@ async function verifyPrivyJwt(token) {
       algorithms: ['ES256'],
     });
 
-    // Verify owner identity — only the container owner can access
-    if (payload.sub !== CONFIG.ownerPrivyId) {
-      console.log(`[auth] Owner mismatch: JWT sub=${payload.sub}, expected=${CONFIG.ownerPrivyId}`);
-      return { valid: false, reason: 'owner_mismatch' };
+    // Verify owner identity
+    if (DYNAMIC_OWNER_MODE) {
+      // Dynamic mode: check ownership via Supabase verify-owner function
+      const fqdn = CONFIG.containerFqdn || reqHost || '';
+      if (!fqdn) {
+        console.log('[auth] Dynamic mode: no FQDN available for ownership check');
+        return { valid: false, reason: 'no_fqdn' };
+      }
+
+      try {
+        const verifyResp = await fetch(CONFIG.verifyOwnerUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CONFIG.verifyOwnerSecret}`,
+          },
+          body: JSON.stringify({
+            fqdn: fqdn.replace(/:\d+$/, ''), // strip port if present
+            privy_user_id: payload.sub,
+          }),
+          signal: AbortSignal.timeout(5000), // 5s timeout
+        });
+
+        if (!verifyResp.ok) {
+          console.log(`[auth] verify-owner returned ${verifyResp.status}`);
+          return { valid: false, reason: 'verify_failed' };
+        }
+
+        const result = await verifyResp.json();
+        if (!result.authorized) {
+          console.log(`[auth] Dynamic owner check: not authorized (sub=${payload.sub}, fqdn=${fqdn})`);
+          return { valid: false, reason: 'owner_mismatch' };
+        }
+
+        console.log(`[auth] Dynamic owner verified: sub=${payload.sub}, fqdn=${fqdn}`);
+      } catch (fetchErr) {
+        console.error(`[auth] verify-owner fetch error: ${fetchErr.message}`);
+        // Fail CLOSED for security — deny access if we can't verify
+        return { valid: false, reason: 'verify_unavailable' };
+      }
+    } else {
+      // Static mode: check against env var (original behavior)
+      if (payload.sub !== CONFIG.ownerPrivyId) {
+        console.log(`[auth] Owner mismatch: JWT sub=${payload.sub}, expected=${CONFIG.ownerPrivyId}`);
+        return { valid: false, reason: 'owner_mismatch' };
+      }
     }
 
     return { valid: true, payload };
