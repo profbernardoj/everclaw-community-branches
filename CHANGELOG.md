@@ -2,6 +2,35 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.6.10.0257] - 2026-06-10
+
+### CIG Internal Routing Fix — Containers can now reach inference
+
+Fixes a critical bug where CIG-mode containers returned empty responses for all
+models ("incomplete terminal response"), making agents non-functional.
+
+#### Fixed
+- **CIG internal loopback routing** — OpenClaw inside the container calls the
+  auth-proxy (`localhost:18789/v1/chat/completions`) for inference, but these
+  server-to-server requests carry no browser session cookie. The auth-proxy was
+  serving the login HTML page instead of routing to CIG, so OpenClaw parsed HTML
+  as an empty LLM response and every model failed. The proxy now detects loopback
+  model-API calls and routes them to CIG before the session-cookie check.
+- **docker-entrypoint CIG mode** — When CIG env vars are set, `mor-gateway`
+  baseUrl is redirected to the auth-proxy port and `MORPHEUS_GATEWAY_API_KEY`
+  injection is skipped. Now requires all four CIG vars (incl. `CIG_CONTAINER_FQDN`)
+  and warns loudly on partial config.
+
+#### Security
+- **Defense-in-depth for the exposed proxy port** — The auth-proxy port is
+  reachable from the internet via Fred ingress, so a loopback-source check alone
+  is insufficient. Internal CIG routing now requires BOTH a loopback source AND a
+  timing-safe match of `Authorization: Bearer <binding_secret>` (the entrypoint
+  sets the `mor-gateway` provider apiKey to the per-container binding secret).
+  Loopback-without-secret is rejected 401; the internal secret is stripped before
+  forwarding. Prevents a spoofed-loopback/SSRF request from draining the owner's
+  CIG budget.
+
 ## [2026.6.8.0050] - 2026-06-08
 
 ### Central Inference Gateway (CIG) — Server-Side Key Management

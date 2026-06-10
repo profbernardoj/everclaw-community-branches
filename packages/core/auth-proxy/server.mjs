@@ -126,6 +126,15 @@ let cigTokenCache = {
 const CIG_TOKEN_TTL_MS = 600_000;  // 10 min (must match mint-cig-token TOKEN_TTL_SECONDS)
 const CIG_REFRESH_MARGIN = 0.2;    // Refresh at 80% of TTL (2 min before expiry)
 
+// Timing-safe string comparison (lengths must already match before calling).
+// Wraps crypto.timingSafeEqual, which requires equal-length buffers.
+function timingSafeEqualStr(a, b) {
+  const ab = Buffer.from(String(a), 'utf8');
+  const bb = Buffer.from(String(b), 'utf8');
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
+
 // Get the container FQDN (always from env — required when CIG is enabled)
 function getContainerFqdn() {
   return CIG_CONFIG.containerFqdn;
@@ -793,6 +802,54 @@ async function handleRequest(req, res) {
     return;
   }
 
+  // ── CIG routing for internal (localhost) model API calls ──
+  // When CIG is enabled, OpenClaw inside the container calls localhost:18789/v1/...
+  // These internal requests don't have session cookies (they're not from a browser).
+  // We bypass session auth for localhost model API calls and route directly to CIG.
+  //
+  // Defense-in-depth (two independent gates, BOTH required):
+  //   1. Loopback source — req.socket.remoteAddress must be 127.0.0.1 / ::1.
+  //   2. Internal secret — Authorization: Bearer <CIG_BINDING_SECRET>. The
+  //      docker-entrypoint sets the mor-gateway provider apiKey to the binding
+  //      secret, so OpenClaw sends it on every call. The auth-proxy port is exposed
+  //      to the internet via Fred ingress, so the loopback check alone is NOT
+  //      sufficient — the secret prevents a spoofed-loopback external request from
+  //      bypassing browser-session auth and draining the owner's CIG budget.
+  if (CIG_ENABLED && isModelApiCall(pathname)) {
+    const remoteAddr = req.socket.remoteAddress || '';
+    const isLocalhost = remoteAddr === '127.0.0.1' || remoteAddr === '::1' || remoteAddr === '::ffff:127.0.0.1';
+
+    // Extract the bearer token OpenClaw sent (provider apiKey = binding secret).
+    const authHeader = req.headers['authorization'] || '';
+    const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    const secretOk = CIG_CONFIG.bindingSecret.length > 0 &&
+      bearer.length === CIG_CONFIG.bindingSecret.length &&
+      timingSafeEqualStr(bearer, CIG_CONFIG.bindingSecret);
+
+    if (isLocalhost && secretOk) {
+      // Internal request from OpenClaw — use a synthetic session with the deployment owner.
+      // The CIG token (minted with binding_secret) validates this container's identity
+      // and resolves the budget owner from the deployment record server-side.
+      const ownerSub = CONFIG.ownerPrivyId || 'internal-cig-caller';
+      const internalSession = { sub: ownerSub };
+      console.log(`[cig] Internal model API call from ${remoteAddr}: ${pathname}`);
+      // Strip the internal secret before forwarding — handleCigProxy sets its own
+      // CIG token in the Authorization header.
+      delete req.headers['authorization'];
+      return handleCigProxy(req, res, internalSession);
+    }
+
+    if (isLocalhost && !secretOk) {
+      // Loopback but missing/wrong internal secret — likely a misconfiguration or
+      // an attacker probing via a spoofed-loopback path. Refuse explicitly.
+      console.warn(`[cig] Internal model API call from ${remoteAddr} rejected: bad/missing internal secret`);
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: 'unauthorized', type: 'auth_error' } }));
+      return;
+    }
+    // Non-loopback model API calls fall through to the normal browser-session path below.
+  }
+
   // ── Check session for all other requests ──
   const cookies = cookie.parse(req.headers.cookie || '');
   const sessionCookie = cookies[COOKIE_NAME];
@@ -825,7 +882,7 @@ async function handleRequest(req, res) {
   // Inject verified user identity for OpenClaw trusted-proxy mode
   req.headers['x-forwarded-user'] = session.sub;
 
-  // ── CIG routing: intercept model API calls ──
+  // ── CIG routing: intercept model API calls from authenticated browser ──
   // When CIG is enabled, requests to /v1/chat/completions and /v1/models
   // are routed through the Central Inference Gateway instead of the
   // in-container Morpheus key. The CIG holds the master key server-side.
