@@ -620,6 +620,18 @@ function isModelApiCall(pathname) {
 }
 
 async function handleCigProxy(req, res, session) {
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+  // Re-validate the (parser-normalized) pathname against the model-API
+  // whitelist BEFORE minting a token — defense-in-depth, and avoids a wasted
+  // mint on a rejected path.
+  if (!isModelApiCall(url.pathname)) {
+    if (!res.headersSent) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: 'not_found', type: 'invalid_request' } }));
+    }
+    return;
+  }
 
   const cigToken = await mintCigToken();
   if (!cigToken) {
@@ -635,10 +647,15 @@ async function handleCigProxy(req, res, session) {
     return;
   }
 
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  // Construct CIG URL safely to prevent SSRF via path traversal
+  // Construct CIG URL safely to prevent SSRF via path traversal.
+  // NOTE: do NOT use `new URL(url.pathname, cigBase)` — a leading-slash path
+  // REPLACES the base's path entirely, dropping the Supabase
+  // `/functions/v1/cig-inference` prefix → 404 "requested path is invalid"
+  // (June 10 incident). Append the normalized pathname to the base PATH instead.
+  // CIG_INFERENCE_URL must not carry a query string (it would be dropped here).
   const cigBase = new URL(CIG_CONFIG.inferenceUrl);
-  const cigUrl = new URL(url.pathname + (url.search || ''), cigBase).toString();
+  const targetPath = cigBase.pathname.replace(/\/+$/, '') + url.pathname;
+  const cigUrl = new URL(targetPath + (url.search || ''), cigBase).toString();
 
   // Collect request body for forwarding.
   const body = await collectBody(req);
