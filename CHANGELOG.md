@@ -2,6 +2,12 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.6.11.1923] - 2026-06-11
+
+### Added
+- **Login page branding (env-driven)** — auth-proxy login page now reads `BRAND_NAME`, `BRAND_ICON`, `BRAND_TAGLINE` env vars (HTML-escaped at serve time). Defaults to EverClaw branding; hosted offerings (e.g. InstallOpenClaw) inject their own via container manifest env.
+- **Auth-proxy subscription gate** — in dynamic ownership mode, active sessions re-verify ownership via the verify-owner endpoint every `OWNER_RECHECK_MS` (default 5 min). A canceled subscription (deployment no longer active) revokes the session immediately on the next check instead of persisting for the full 24h cookie TTL. Explicit denial fails closed; transient network errors keep last known state with a 1-minute retry. WebSocket upgrades consult the cached verdict.
+
 ## [2026.6.10.0257] - 2026-06-10
 
 ### CIG Internal Routing Fix — Containers can now reach inference

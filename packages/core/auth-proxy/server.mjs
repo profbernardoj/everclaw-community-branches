@@ -76,6 +76,14 @@ const CONFIG = {
   containerFqdn: process.env.CONTAINER_FQDN || '',
   sessionSecret: process.env.SESSION_SECRET || '',
   sessionTtlMs: parseInt(process.env.SESSION_TTL_MS || '86400000', 10), // 24 hours
+  // Branding (login page) — env-driven so one image serves EverClaw (default)
+  // and hosted offerings like InstallOpenClaw (injected via container manifest env)
+  brandName: process.env.BRAND_NAME || 'EverClaw',
+  brandIcon: process.env.BRAND_ICON || '🧑‍🚀',
+  brandTagline: process.env.BRAND_TAGLINE || 'Your sovereign AI agent',
+  // Re-verify ownership/subscription for ACTIVE sessions every N ms (dynamic mode).
+  // Without this, a canceled subscriber keeps access until the 24h cookie expires.
+  ownerRecheckMs: parseInt(process.env.OWNER_RECHECK_MS || '300000', 10), // 5 minutes
 };
 
 // Dynamic ownership mode: when VERIFY_OWNER_URL is set, ownership is checked
@@ -499,6 +507,69 @@ async function verifyPrivyJwt(token, reqHost) {
   }
 }
 
+// ─── Subscription Gate (dynamic mode) ───────────────────────────────────────
+// A session cookie lives 24h, but a subscription can be canceled mid-session.
+// stripe-webhook marks the deployment 'stopped' on cancellation, and
+// verify-owner only authorizes ACTIVE deployments — so re-checking ownership
+// periodically turns subscription state into access enforcement.
+//
+// Failure policy:
+//   - Explicit authorized:false  → revoke access (fail closed on real denial)
+//   - Network/5xx errors         → keep last known state (fail open on blips,
+//     bounded by the recheck interval; login path still fails closed)
+
+const ownerRecheckCache = new Map(); // sub → { ok: boolean, checkedAt: ms }
+
+async function recheckOwnership(sub, reqHost) {
+  if (!DYNAMIC_OWNER_MODE) return true;
+
+  const now = Date.now();
+  const cached = ownerRecheckCache.get(sub);
+  if (cached && now - cached.checkedAt < CONFIG.ownerRecheckMs) {
+    return cached.ok;
+  }
+
+  const fqdn = (CONFIG.containerFqdn || reqHost || '').replace(/:\d+$/, '');
+  if (!fqdn) {
+    // Cannot determine identity to check against — keep last known state.
+    return cached ? cached.ok : true;
+  }
+
+  try {
+    const resp = await fetch(CONFIG.verifyOwnerUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CONFIG.verifyOwnerSecret}`,
+      },
+      body: JSON.stringify({ fqdn, privy_user_id: sub }),
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!resp.ok) {
+      // Transient server error — keep last known state, retry sooner (1 min)
+      console.warn(`[gate] verify-owner recheck HTTP ${resp.status} — keeping last state`);
+      const ok = cached ? cached.ok : true;
+      ownerRecheckCache.set(sub, { ok, checkedAt: now - CONFIG.ownerRecheckMs + 60_000 });
+      return ok;
+    }
+
+    const result = await resp.json();
+    const ok = result.authorized === true;
+    ownerRecheckCache.set(sub, { ok, checkedAt: now });
+    if (!ok) {
+      console.log(`[gate] Subscription/ownership revoked for sub=${sub} (deployment no longer active)`);
+    }
+    return ok;
+  } catch (err) {
+    console.warn(`[gate] verify-owner recheck error: ${err.message} — keeping last state`);
+    const ok = cached ? cached.ok : true;
+    ownerRecheckCache.set(sub, { ok, checkedAt: now - CONFIG.ownerRecheckMs + 60_000 });
+    return ok;
+  }
+}
+
+
 // ─── Login Page ─────────────────────────────────────────────────────────────
 
 let loginPageHtml = null;
@@ -512,6 +583,17 @@ async function loadLoginPage() {
     // Inject configuration values at serve time
     html = html.replace(/__PRIVY_APP_ID__/g, CONFIG.privyAppId);
     html = html.replace(/__PRIVY_CLIENT_ID__/g, CONFIG.privyClientId);
+    // Branding (HTML-escape — values come from env but defense-in-depth)
+    const esc = (s) => String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/`/g, '&#96;');
+    html = html.replace(/__BRAND_NAME__/g, esc(CONFIG.brandName));
+    html = html.replace(/__BRAND_ICON__/g, esc(CONFIG.brandIcon));
+    html = html.replace(/__BRAND_TAGLINE__/g, esc(CONFIG.brandTagline));
 
     loginPageHtml = html;
     console.log('✅ Login page loaded');
@@ -914,6 +996,27 @@ async function handleRequest(req, res) {
     return;
   }
 
+  // ── Subscription gate: re-verify ownership for active sessions (dynamic mode) ──
+  // Canceled subscription → deployment marked stopped → verify-owner denies →
+  // session revoked even though the cookie is still cryptographically valid.
+  if (DYNAMIC_OWNER_MODE) {
+    const stillAuthorized = await recheckOwnership(session.sub, req.headers.host || '');
+    if (!stillAuthorized) {
+      // Defensive: loadLoginPage() exits the process on startup failure, so
+      // loginPageHtml is always set today — this guards future refactors.
+      if (!loginPageHtml) await loadLoginPage();
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'Set-Cookie': clearCookie(req),
+      });
+      res.end(loginPageHtml);
+      return;
+    }
+  }
+
   // ── Valid session — proxy to OpenClaw with trusted-proxy identity header ──
   // Strip any client-supplied identity headers to prevent spoofing
   delete req.headers['x-forwarded-user'];
@@ -949,6 +1052,17 @@ function handleUpgrade(req, socket, head) {
     socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
     socket.destroy();
     return;
+  }
+
+  // Subscription gate (cache-only check — no async fetch in upgrade path;
+  // the HTTP request path keeps the cache fresh, WS just consults it)
+  if (DYNAMIC_OWNER_MODE) {
+    const cached = ownerRecheckCache.get(session.sub);
+    if (cached && !cached.ok) {
+      socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+      socket.destroy();
+      return;
+    }
   }
 
   // Strip and inject identity header

@@ -13,12 +13,12 @@
 
 services:
   everclaw:
-    image: ghcr.io/everclaw/everclaw:2026.6.10.0257
+    image: ghcr.io/everclaw/everclaw:2026.6.11.1923
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        EVERCLAW_VERSION: "2026.6.10.0257"   # EverClaw version — never uses 'v' prefix (see Dockerfile policy)
+        EVERCLAW_VERSION: "2026.6.11.1923"   # EverClaw version — never uses 'v' prefix (see Dockerfile policy)
         OPENCLAW_VERSION: "v2026.5.27"       # OpenClaw version — always uses 'v' prefix (see Dockerfile policy)
     container_name: everclaw
     restart: unless-stopped
