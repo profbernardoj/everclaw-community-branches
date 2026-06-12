@@ -89,6 +89,10 @@ const CIG_CONFIG = {
   containerFqdn: process.env.CIG_CONTAINER_FQDN || process.env.CONTAINER_FQDN || '',
 };
 const CIG_ENABLED = !!(CIG_CONFIG.mintUrl && CIG_CONFIG.inferenceUrl && CIG_CONFIG.bindingSecret);
+const CIG_TOKEN_TTL_MS = 10 * 60 * 1000;    // 10 minutes
+const CIG_TOKEN_REFRESH_MS = 60_000;         // Refresh 60s before expiry
+const CIG_FETCH_TIMEOUT_MS = 10_000;         // 10s timeout for CIG HTTP calls
+const CIG_MAX_BODY_BYTES = 1024 * 1024;      // 1 MB max inference request body
 let cigTokenCache = { token: '', expiresAt: 0 };
 
 // ─── Rate Limiter (in-memory, per-IP) ────────────────────────────────────────
@@ -445,51 +449,70 @@ proxy.on('error', (error, req, res) => {
 // the inference request to the external CIG endpoint.
 
 async function mintCigToken() {
-  // Return cached token if still valid (with 60s buffer)
-  if (cigTokenCache.token && Date.now() < cigTokenCache.expiresAt - 60_000) {
+  // Return cached token if still valid (with refresh buffer)
+  if (cigTokenCache.token && Date.now() < cigTokenCache.expiresAt - CIG_TOKEN_REFRESH_MS) {
     return cigTokenCache.token;
   }
 
-  // Resolve FQDN: use env var, or detect from container hostname
-  let fqdn = CIG_CONFIG.containerFqdn;
+  // FQDN is required for per-container binding — fail hard if missing
+  const fqdn = CIG_CONFIG.containerFqdn;
   if (!fqdn) {
-    // Fallback: won't work if CONTAINER_FQDN isn't set
-    console.warn('[cig-proxy] No CONTAINER_FQDN set, CIG token mint may fail');
-    fqdn = 'unknown';
+    throw new Error('CIG_CONTAINER_FQDN or CONTAINER_FQDN environment variable is required');
   }
 
-  const resp = await fetch(CIG_CONFIG.mintUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fqdn,
-      binding_secret: CIG_CONFIG.bindingSecret,
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), CIG_FETCH_TIMEOUT_MS);
+  try {
+    const resp = await fetch(CIG_CONFIG.mintUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fqdn,
+        binding_secret: CIG_CONFIG.bindingSecret,
+      }),
+      signal: controller.signal,
+    });
 
-  if (!resp.ok) {
-    const body = await resp.text().catch(() => '');
-    throw new Error(`CIG mint failed (${resp.status}): ${body}`);
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => '');
+      throw new Error(`CIG mint failed (${resp.status}): ${body}`);
+    }
+
+    const data = await resp.json();
+    if (!data.token) throw new Error('CIG mint returned no token');
+
+    cigTokenCache = {
+      token: data.token,
+      expiresAt: Date.now() + CIG_TOKEN_TTL_MS,
+    };
+
+    console.log(`[cig-proxy] Minted CIG token for ${fqdn}`);
+    return data.token;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  const data = await resp.json();
-  if (!data.token) throw new Error('CIG mint returned no token');
-
-  // Cache with 10-minute TTL (CIG tokens expire in 10 min)
-  cigTokenCache = {
-    token: data.token,
-    expiresAt: Date.now() + 10 * 60 * 1000,
-  };
-
-  console.log(`[cig-proxy] Minted CIG token for ${fqdn}`);
-  return data.token;
 }
 
-async function handleCigProxy(req, res, pathname) {
+async function handleCigProxy(req, res, url) {
   try {
-    // Read the request body
+    // Security: Only allow loopback requests (internal OpenClaw inference)
+    const remote = (req.socket.remoteAddress || '').replace('::ffff:', '');
+    if (!['127.0.0.1', '::1'].includes(remote)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: 'forbidden', type: 'proxy_error' } }));
+      return;
+    }
+
+    // Read the request body with size limit
     const chunks = [];
+    let totalBytes = 0;
     for await (const chunk of req) {
+      totalBytes += chunk.length;
+      if (totalBytes > CIG_MAX_BODY_BYTES) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: { message: 'request_too_large', type: 'proxy_error' } }));
+        return;
+      }
       chunks.push(chunk);
     }
     const bodyBuf = Buffer.concat(chunks);
@@ -497,11 +520,12 @@ async function handleCigProxy(req, res, pathname) {
     // Mint or reuse cached CIG token
     const cigToken = await mintCigToken();
 
-    // Forward to CIG inference endpoint
-    // The CIG inference URL is like: https://xxx.supabase.co/functions/v1/cig-inference
-    // We append the pathname (e.g. /v1/chat/completions)
-    const targetUrl = CIG_CONFIG.inferenceUrl + pathname;
+    // Forward to CIG inference endpoint, preserving pathname + query string
+    const targetUrl = CIG_CONFIG.inferenceUrl + url.pathname + url.search;
 
+    const controller = new AbortController();
+    // Inference can take a while (streaming); use 5-minute timeout
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
     const proxyResp = await fetch(targetUrl, {
       method: 'POST',
       headers: {
@@ -510,6 +534,7 @@ async function handleCigProxy(req, res, pathname) {
         'X-Container-Fqdn': CIG_CONFIG.containerFqdn,
       },
       body: bodyBuf,
+      signal: controller.signal,
     });
 
     // Stream the response back
@@ -532,9 +557,14 @@ async function handleCigProxy(req, res, pathname) {
       const text = await proxyResp.text();
       res.end(text);
     }
+    clearTimeout(timeoutId);
   } catch (err) {
+    clearTimeout(timeoutId);
     console.error('[cig-proxy] Error:', err.message);
-    res.writeHead(502, { 'Content-Type': 'application/json' });
+    const status = err.name === 'AbortError' ? 504 : 502;
+    if (!res.headersSent) {
+      res.writeHead(status, { 'Content-Type': 'application/json' });
+    }
     res.end(JSON.stringify({ error: { message: 'inference_proxy_error', type: 'proxy_error' } }));
   }
 }
@@ -643,7 +673,7 @@ async function handleRequest(req, res) {
   // We mint a CIG token and forward to the external CIG inference endpoint.
   // These are internal requests (no session cookie needed).
   if (CIG_ENABLED && pathname.startsWith('/v1/') && req.method === 'POST') {
-    await handleCigProxy(req, res, pathname);
+    await handleCigProxy(req, res, url);
     return;
   }
 
