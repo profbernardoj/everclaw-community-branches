@@ -2,6 +2,8 @@
 
 Guide for setting up and troubleshooting Signal messaging with EverClaw/OpenClaw.
 
+> **Note:** This guide assumes you are using OpenClaw with signal-cli's HTTP API mode (either native daemon or [bbernhard/signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) container). Direct `signal-cli` CLI usage without the HTTP wrapper has different behavior.
+
 ## Requirements
 
 | Component | Minimum Version | Notes |
@@ -87,14 +89,17 @@ java.lang.NullPointerException: Cannot invoke "...ReceiveCommand$ReceiveParams.t
 
 **Fix:**
 ```bash
-# Kill old daemon
-pkill -9 -f 'signal-cli.*daemon'
-pkill -9 -f 'java.*signal-cli'
+# Kill old daemon gracefully, then force if needed
+pkill -TERM -f 'signal-cli.*daemon' 2>/dev/null || true
+pkill -TERM -f 'java.*signal-cli' 2>/dev/null || true
+sleep 3
+pkill -KILL -f 'signal-cli' 2>/dev/null || true
 
-# Full restart
-launchctl bootout gui/$(id -u)/ai.openclaw.gateway
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/ai.openclaw.gateway.plist
+# Restart gateway
+openclaw gateway restart
 ```
+
+> **Linux users:** If `openclaw gateway restart` isn't available, use your service manager (e.g., `systemctl restart openclaw-gateway`).
 
 ### SSE connection drops repeatedly
 
@@ -127,9 +132,11 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/ai.openclaw.gateway.plis
 
 **Fix:**
 ```bash
-# Find and kill all signal-cli processes
-pkill -f signal-cli
-sleep 2
+# Find and kill all signal-cli processes gracefully
+pkill -TERM -f 'signal-cli' 2>/dev/null || true
+pkill -TERM -f 'java.*signal-cli' 2>/dev/null || true
+sleep 3
+pkill -KILL -f 'signal-cli' 2>/dev/null || true
 
 # Restart gateway (it will spawn a fresh daemon)
 openclaw gateway restart
