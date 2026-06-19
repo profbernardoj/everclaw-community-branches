@@ -42,7 +42,7 @@
  */
 
 import { createServer } from 'node:http';
-import { randomBytes, timingSafeEqual, createHmac } from 'node:crypto';
+import { randomBytes, timingSafeEqual, createHmac, createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -68,7 +68,7 @@ const CONFIG = {
   verifyOwnerSecret: process.env.VERIFY_OWNER_SECRET || '',
   containerFqdn: process.env.CONTAINER_FQDN || '',
   // SSO handoff: dedicated secret for HS256 JWT verification (separate from verify-owner)
-  handoffSigningSecret: process.env.HANDOFF_SIGNING_SECRET || '',
+  handoffSigningSecret: (process.env.HANDOFF_SIGNING_SECRET || '').trim(),
   // Consume-handoff endpoint (Supabase Edge Function) for DB-backed single-use enforcement
   consumeHandoffUrl: process.env.CONSUME_HANDOFF_URL || '',
   // Login-page branding (set by provisioner; lobster is the OpenClaw default)
@@ -695,8 +695,19 @@ async function handleRequest(req, res) {
 
   // ── Health check (no auth) ──
   if (pathname === '/health') {
+    const handoffHash = CONFIG.handoffSigningSecret
+      ? createHash('sha256').update(CONFIG.handoffSigningSecret).digest('hex').slice(0, 16)
+      : 'not_set';
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok', authProxy: true }));
+    res.end(JSON.stringify({
+      status: 'ok',
+      authProxy: true,
+      sso: {
+        enabled: !!CONFIG.handoffSigningSecret,
+        secretHashPrefix: handoffHash,
+        dynamicOwner: DYNAMIC_OWNER_MODE,
+      },
+    }));
     return;
   }
 
