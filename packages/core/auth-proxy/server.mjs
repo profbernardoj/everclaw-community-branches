@@ -68,7 +68,11 @@ const CONFIG = {
   verifyOwnerSecret: process.env.VERIFY_OWNER_SECRET || '',
   containerFqdn: process.env.CONTAINER_FQDN || '',
   // SSO handoff: dedicated secret for HS256 JWT verification (separate from verify-owner)
+  // Fetched from Supabase at startup to avoid env var pipeline mismatches.
+  // The env var is used as initial value; Supabase fetch overrides it in dynamic mode.
   handoffSigningSecret: (process.env.HANDOFF_SIGNING_SECRET || '').trim(),
+  // Supabase endpoint to fetch HANDOFF_SIGNING_SECRET (avoids Manifest env var mismatch)
+  getHandoffSecretUrl: process.env.GET_HANDOFF_SECRET_URL || '',
   // Consume-handoff endpoint (Supabase Edge Function) for DB-backed single-use enforcement
   consumeHandoffUrl: process.env.CONSUME_HANDOFF_URL || '',
   // Login-page branding (set by provisioner; lobster is the OpenClaw default)
@@ -146,7 +150,7 @@ setInterval(() => {
 
 // ─── Startup Validation ──────────────────────────────────────────────────────
 
-function validateConfig() {
+async function validateConfig() {
   const required = [
     ['PRIVY_APP_ID', CONFIG.privyAppId],
     ['PRIVY_VERIFICATION_KEY', CONFIG.privyVerificationKey],
@@ -188,9 +192,42 @@ function validateConfig() {
     console.log(`   Owner:  ${CONFIG.ownerPrivyId}`);
   }
   if (CONFIG.handoffSigningSecret) {
-    console.log(`   SSO:    ENABLED (handoff token bridge)`);
+    console.log(`   SSO:    ENABLED (env var — will verify via Supabase fetch)`);
   } else {
     console.log(`   SSO:    DISABLED (set HANDOFF_SIGNING_SECRET to enable)`);
+  }
+
+  // ── Fetch HANDOFF_SIGNING_SECRET from Supabase ──
+  // In dynamic mode, the env var passed through Manifest may not match Supabase.
+  // Fetch the canonical secret from Supabase to guarantee JWT sign/verify alignment.
+  if (DYNAMIC_OWNER_MODE && CONFIG.verifyOwnerSecret && CONFIG.verifyOwnerUrl) {
+    const handoffUrl = CONFIG.getHandoffSecretUrl ||
+      CONFIG.verifyOwnerUrl.replace('verify-owner', 'get-handoff-secret');
+    try {
+      const resp = await fetch(handoffUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CONFIG.verifyOwnerSecret}`,
+        },
+        body: '{}',
+        signal: AbortSignal.timeout(10000),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.secret && typeof data.secret === 'string') {
+          CONFIG.handoffSigningSecret = data.secret.trim();
+          console.log(`   SSO:    ✓ Secret fetched from Supabase (len=${CONFIG.handoffSigningSecret.length})`);
+        } else {
+          console.warn(`   SSO:    ⚠ Supabase returned empty secret`);
+        }
+      } else {
+        console.warn(`   SSO:    ⚠ Supabase fetch returned ${resp.status}`);
+      }
+    } catch (fetchErr) {
+      console.warn(`   SSO:    ⚠ Supabase fetch failed: ${fetchErr.message}`);
+      console.warn(`   SSO:    Falling back to env var value (len=${CONFIG.handoffSigningSecret.length})`);
+    }
   }
 }
 
@@ -1033,7 +1070,7 @@ async function main() {
   console.log('🔒 OpenClaw Auth Proxy');
   console.log('');
 
-  validateConfig();
+  await validateConfig();
   await initializeVerificationKey();
   await loadLoginPage();
 
