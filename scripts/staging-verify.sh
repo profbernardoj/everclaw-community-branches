@@ -433,7 +433,7 @@ header "TIER 2" "Integration Tests"
 # check will fail (no deployment row in Supabase for staging-test-user).
 # So we accept 302 (success), 403 (FQDN/owner check failed — expected in staging),
 # or 401 with diagnostic info.
-JOSE_DIR="/Users/bernardo/.openclaw/workspace/everclaw/packages/core/auth-proxy"
+JOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)/packages/core/auth-proxy"
 JWT_GEN_FILE=$(mktemp "${HOME}/.everclaw-jwt-gen.XXXXXX.mjs")
 cat > "$JWT_GEN_FILE" << 'JWTEOF'
 import { SignJWT } from 'jose';
