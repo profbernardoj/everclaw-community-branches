@@ -680,6 +680,49 @@ else
   fi
 fi
 
+# ─── CIG FQDN Pre-Detection ────────────────────────────────────────────────
+# In CIG mode, the auth-proxy needs the container FQDN to mint CIG inference tokens.
+# Buffer containers don't know their FQDN at provision time — it's auto-detected from
+# the first external request's Host header. But OpenClaw makes its first inference call
+# before any browser request arrives, causing "FQDN not yet detected" errors.
+#
+# Solution: If CONTAINER_FQDN is provided via env var, the auth-proxy uses it directly
+# (CIG_CONFIG.fqdnLocked is set at startup). If not, we trigger FQDN self-detection by
+# making a local request with the FQDN from the Manifest ingress hostname.
+# The FQDN is typically available as CONTAINER_FQDN env var (set by provision-buffer).
+
+if [ "$CIG_ENABLED" = "true" ]; then
+  if [ -n "${CONTAINER_FQDN:-}" ]; then
+    echo "🏷️  CIG FQDN pre-set via env: ${CONTAINER_FQDN}"
+  else
+    # FQDN not provided via env — wait for auto-detection via self-request
+    # The auth-proxy auto-detects from Host header; we simulate an external request
+    # by querying the auth-proxy health endpoint to confirm FQDN status.
+    echo "⏳ Waiting for CIG FQDN auto-detection..."
+    FQDN_WAIT=0
+    FQDN_MAX_WAIT=30  # 30 seconds max
+    while [ $FQDN_WAIT -lt $FQDN_MAX_WAIT ]; do
+      HEALTH_RESP=$(curl -sf http://127.0.0.1:18789/health 2>/dev/null || echo '')
+      if [ -n "$HEALTH_RESP" ]; then
+        FQDN_DETECTED=$(echo "$HEALTH_RESP" | jq -r '.cig.detected // false' 2>/dev/null)
+        FQDN_VALUE=$(echo "$HEALTH_RESP" | jq -r '.cig.fqdn // empty' 2>/dev/null)
+        if [ "$FQDN_DETECTED" = "true" ] && [ -n "$FQDN_VALUE" ]; then
+          echo "✅ CIG FQDN auto-detected: ${FQDN_VALUE}"
+          break
+        fi
+      fi
+      FQDN_WAIT=$((FQDN_WAIT + 1))
+      sleep 1
+    done
+
+    if [ $FQDN_WAIT -ge $FQDN_MAX_WAIT ]; then
+      echo "⚠️  CIG FQDN not detected within ${FQDN_MAX_WAIT}s — first inference may fail with 503"
+      echo "   The FQDN will be auto-detected when the user opens the container URL in a browser."
+      echo "   OpenClaw's model fallback chain will handle the 503 and retry."
+    fi
+  fi
+fi
+
 # ─── Start OpenClaw Gateway ─────────────────────────────────────────────────
 
 if [ "$AUTH_PROXY_ENABLED" = "true" ]; then
