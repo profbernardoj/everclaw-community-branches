@@ -598,7 +598,9 @@ async function mintCigToken() {
     // FQDN not yet auto-detected — skip CIG for this request.
     // Subsequent requests will have the FQDN after auto-detection.
     console.warn('[cig] Cannot mint token: FQDN not yet detected (will auto-detect from Host header)');
-    throw new Error('FQDN not yet detected — awaiting auto-detection from Host header');
+    const err = new Error('FQDN not yet detected — awaiting auto-detection from Host header');
+    err.code = 'fqdn_not_detected';
+    throw err;
   }
 
   const controller = new AbortController();
@@ -666,7 +668,7 @@ async function handleCigProxy(req, res, url) {
       // FQDN not yet detected — return 503 Retry-After so OpenClaw retries
       // instead of treating it as a hard failure ("assistant turn failed").
       // The FQDN will be auto-detected from the first browser request's Host header.
-      if (mintErr.message.includes('FQDN not yet detected')) {
+      if (mintErr.code === 'fqdn_not_detected' || mintErr.message.includes('FQDN not yet detected')) {
         console.warn('[cig-proxy] Returning 503 (FQDN not yet detected) — OpenClaw should retry');
         res.writeHead(503, {
           'Content-Type': 'application/json',

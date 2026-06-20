@@ -695,31 +695,15 @@ if [ "$CIG_ENABLED" = "true" ]; then
   if [ -n "${CONTAINER_FQDN:-}" ]; then
     echo "🏷️  CIG FQDN pre-set via env: ${CONTAINER_FQDN}"
   else
-    # FQDN not provided via env — wait for auto-detection via self-request
-    # The auth-proxy auto-detects from Host header; we simulate an external request
-    # by querying the auth-proxy health endpoint to confirm FQDN status.
-    echo "⏳ Waiting for CIG FQDN auto-detection..."
-    FQDN_WAIT=0
-    FQDN_MAX_WAIT=30  # 30 seconds max
-    while [ $FQDN_WAIT -lt $FQDN_MAX_WAIT ]; do
-      HEALTH_RESP=$(curl -sf http://127.0.0.1:18789/health 2>/dev/null || echo '')
-      if [ -n "$HEALTH_RESP" ]; then
-        FQDN_DETECTED=$(echo "$HEALTH_RESP" | jq -r '.cig.detected // false' 2>/dev/null)
-        FQDN_VALUE=$(echo "$HEALTH_RESP" | jq -r '.cig.fqdn // empty' 2>/dev/null)
-        if [ "$FQDN_DETECTED" = "true" ] && [ -n "$FQDN_VALUE" ]; then
-          echo "✅ CIG FQDN auto-detected: ${FQDN_VALUE}"
-          break
-        fi
-      fi
-      FQDN_WAIT=$((FQDN_WAIT + 1))
-      sleep 1
-    done
-
-    if [ $FQDN_WAIT -ge $FQDN_MAX_WAIT ]; then
-      echo "⚠️  CIG FQDN not detected within ${FQDN_MAX_WAIT}s — first inference may fail with 503"
-      echo "   The FQDN will be auto-detected when the user opens the container URL in a browser."
-      echo "   OpenClaw's model fallback chain will handle the 503 and retry."
-    fi
+    # FQDN not provided via env — the auth-proxy can only auto-detect the FQDN
+    # from an HTTP request's Host header. We don't know the FQDN yet, so we
+    # can't trigger auto-detection ourselves. Instead, we proceed to start the
+    # gateway. The auth-proxy will return 503 Retry-After on the first inference
+    # call until the user opens the container URL in a browser (which sends the
+    # Host header and triggers auto-detection). OpenClaw's fallback chain will
+    # retry the 503 and succeed once the FQDN is detected.
+    echo "⚠️  CIG FQDN not pre-set — auto-detection will occur on first browser request"
+    echo "   First inference may return 503 (retryable) until user opens the container URL"
   fi
 fi
 
