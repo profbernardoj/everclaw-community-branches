@@ -118,6 +118,7 @@ COPY packages/core/auth-proxy/server.mjs ./
 COPY packages/core/auth-proxy/login.html ./
 COPY packages/core/auth-proxy/login-app.jsx ./
 COPY packages/core/auth-proxy/build-login.mjs ./
+COPY packages/core/auth-proxy/assets/ ./assets/
 
 # Install ALL dependencies (including devDependencies for build step)
 # --ignore-scripts skips native addon compilation (utf-8-validate, bufferutil)
