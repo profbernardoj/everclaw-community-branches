@@ -598,7 +598,9 @@ async function mintCigToken() {
     // FQDN not yet auto-detected — skip CIG for this request.
     // Subsequent requests will have the FQDN after auto-detection.
     console.warn('[cig] Cannot mint token: FQDN not yet detected (will auto-detect from Host header)');
-    throw new Error('FQDN not yet detected — awaiting auto-detection from Host header');
+    const err = new Error('FQDN not yet detected — awaiting auto-detection from Host header');
+    err.code = 'fqdn_not_detected';
+    throw err;
   }
 
   const controller = new AbortController();
@@ -659,7 +661,32 @@ async function handleCigProxy(req, res, url) {
     const bodyBuf = Buffer.concat(chunks);
 
     // Mint or reuse cached CIG token
-    const cigToken = await mintCigToken();
+    let cigToken;
+    try {
+      cigToken = await mintCigToken();
+    } catch (mintErr) {
+      // FQDN not yet detected — return 503 Retry-After so OpenClaw retries
+      // instead of treating it as a hard failure ("assistant turn failed").
+      // The FQDN will be auto-detected from the first browser request's Host header.
+      if (mintErr.code === 'fqdn_not_detected' || mintErr.message.includes('FQDN not yet detected')) {
+        console.warn('[cig-proxy] Returning 503 (FQDN not yet detected) — OpenClaw should retry');
+        res.writeHead(503, {
+          'Content-Type': 'application/json',
+          'Retry-After': '5',
+          'X-Cig-Status': 'fqdn-pending',
+        });
+        res.end(JSON.stringify({
+          error: {
+            message: 'CIG FQDN not yet detected — retry shortly',
+            type: 'proxy_error',
+            code: 'fqdn_pending',
+            retryable: true,
+          },
+        }));
+        return;
+      }
+      throw mintErr; // Re-raise other mint errors (will be caught below)
+    }
 
     // Forward to CIG inference endpoint, preserving pathname + query string
     // Note: CIG_CONFIG.inferenceUrl path (e.g. /functions/v1/cig-inference) is the
@@ -735,6 +762,9 @@ async function handleRequest(req, res) {
     const handoffHash = CONFIG.handoffSigningSecret
       ? createHash('sha256').update(CONFIG.handoffSigningSecret).digest('hex').slice(0, 16)
       : 'not_set';
+    const fqdnStatus = CIG_ENABLED
+      ? { detected: CIG_CONFIG.fqdnLocked, fqdn: CIG_CONFIG.containerFqdn || null }
+      : { enabled: false };
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       status: 'ok',
@@ -744,6 +774,7 @@ async function handleRequest(req, res) {
         secretHashPrefix: handoffHash,
         dynamicOwner: DYNAMIC_OWNER_MODE,
       },
+      cig: fqdnStatus,
     }));
     return;
   }

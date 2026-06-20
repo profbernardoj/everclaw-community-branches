@@ -680,6 +680,33 @@ else
   fi
 fi
 
+# ─── CIG FQDN Pre-Detection ────────────────────────────────────────────────
+# In CIG mode, the auth-proxy needs the container FQDN to mint CIG inference tokens.
+# Buffer containers don't know their FQDN at provision time — it's auto-detected from
+# the first external request's Host header. But OpenClaw makes its first inference call
+# before any browser request arrives, causing "FQDN not yet detected" errors.
+#
+# Solution: If CONTAINER_FQDN is provided via env var, the auth-proxy uses it directly
+# (CIG_CONFIG.fqdnLocked is set at startup). If not, we trigger FQDN self-detection by
+# making a local request with the FQDN from the Manifest ingress hostname.
+# The FQDN is typically available as CONTAINER_FQDN env var (set by provision-buffer).
+
+if [ "$CIG_ENABLED" = "true" ]; then
+  if [ -n "${CONTAINER_FQDN:-}" ]; then
+    echo "🏷️  CIG FQDN pre-set via env: ${CONTAINER_FQDN}"
+  else
+    # FQDN not provided via env — the auth-proxy can only auto-detect the FQDN
+    # from an HTTP request's Host header. We don't know the FQDN yet, so we
+    # can't trigger auto-detection ourselves. Instead, we proceed to start the
+    # gateway. The auth-proxy will return 503 Retry-After on the first inference
+    # call until the user opens the container URL in a browser (which sends the
+    # Host header and triggers auto-detection). OpenClaw's fallback chain will
+    # retry the 503 and succeed once the FQDN is detected.
+    echo "⚠️  CIG FQDN not pre-set — auto-detection will occur on first browser request"
+    echo "   First inference may return 503 (retryable) until user opens the container URL"
+  fi
+fi
+
 # ─── Start OpenClaw Gateway ─────────────────────────────────────────────────
 
 if [ "$AUTH_PROXY_ENABLED" = "true" ]; then
