@@ -50,12 +50,13 @@
 
 # ─── Stage 1: Build OpenClaw ─────────────────────────────────────────────────
 
-# Pinned back to v2026.5.27 — v2026.6.8 broke SSO Session Bridge (auth-proxy trusted-proxy mode).
-# Do NOT re-bump without verifying SSO /auth/handoff flow works end-to-end on the new version.
-# Update banner is suppressed via update.checkOnStart=false in openclaw-default.json.
-ARG OPENCLAW_VERSION=v2026.5.27
+# Bumped to v2026.7.1-2 per David 2026-08-14.
+# v2026.6.8 broke SSO Session Bridge (auth-proxy trusted-proxy mode) but this is for
+# ClawBox single-container testing (no fleet SSO). Do NOT re-bump fleet recipe past
+# v2026.5.27 without verifying SSO /auth/handoff flow on staging first.
+ARG OPENCLAW_VERSION=v2026.7.1-2
 
-FROM node:22-bookworm AS openclaw-builder
+FROM node:26-bookworm AS openclaw-builder
 
 ARG OPENCLAW_VERSION
 
@@ -108,7 +109,7 @@ RUN cp -r ./src/agents/templates /tmp/openclaw-templates 2>/dev/null || true && 
 
 # Auth proxy for Privy JWT authentication
 # Built at image time — bundles Privy SDK + React (no runtime CDN dependency)
-FROM node:22-bookworm-slim AS auth-proxy-builder
+FROM node:26-bookworm-slim AS auth-proxy-builder
 
 WORKDIR /auth-proxy
 
@@ -135,7 +136,7 @@ RUN rm -rf node_modules && \
 
 # ─── Stage 2: Production Image ───────────────────────────────────────────────
 
-FROM node:22-bookworm-slim AS production
+FROM node:26-bookworm-slim AS production
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -243,7 +244,7 @@ RUN FDIR="/home/node/.openclaw/workspace/skills/everclaw/flavors/${FLAVOR}"; \
 
 # Note: Prior release left this at 2026.5.20.1645 (desynchronized from package.json 2026.5.24.0400).
 # Re-aligned with release version as of v2026.5.28.1854.
-ARG EVERCLAW_VERSION=2026.5.28.1854
+ARG EVERCLAW_VERSION=2026.8.14.1446
 ENV EVERCLAW_VERSION=${EVERCLAW_VERSION}
 ENV NODE_ENV=production
 ENV EVERCLAW_PROXY_PORT=8083
