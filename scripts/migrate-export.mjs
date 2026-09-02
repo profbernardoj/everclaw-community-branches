@@ -464,7 +464,18 @@ export function generateRunbook(manifest, deps) {
  * @param {string} [options.stagingDir] — override for testing
  * @param {boolean} [options.dryRun=false]
  */
+// Phase instrumentation (staging debug 2026-09-02): every phase emits one
+// stderr line with elapsed seconds. stderr is NOT part of the --agentic JSON
+// stdout contract, so this is safe for production. Enable verbose listing via
+// MIGRATE_EXPORT_TRACE=1 (default on — lines are tiny and aid incident triage).
+const _t0 = Date.now();
+function tracePhase(name) {
+  if (process.env.MIGRATE_EXPORT_TRACE === '0') return;
+  console.error(`[export-phase] t=${((Date.now() - _t0) / 1000).toFixed(1)}s ${name}`);
+}
+
 export async function exportMigrateBundle(options = {}) {
+  tracePhase('start');
   const {
     output = null,
     role = 'primary',
@@ -493,18 +504,22 @@ export async function exportMigrateBundle(options = {}) {
   if (!['primary', 'worker'].includes(role)) {
     throw new Error(`role must be primary|worker, got: ${role}`);
   }
+  tracePhase('env-validated');
   if (!existsSync(join(openclawDir, 'openclaw.json'))) {
     throw new Error(`openclaw.json not found in ${openclawDir}`);
   }
 
   const cfg = JSON.parse(readFileSync(join(openclawDir, 'openclaw.json'), 'utf8'));
+  tracePhase('config-loaded');
   const { template: configTmpl, hits: pathHits } = templateConfig(cfg, homedir());
   const host = probeHost();
+  tracePhase('host-probed');
   const deps = buildDependencyManifest(cfg, targetPlatform);
   const skillsState = extractSkillsState(cfg);
 
   // Crons (L4: JSON only, never SQL)
   const cronRaw = loadCronsFileCompat(cronsFile);
+  tracePhase('crons-loaded');
   const crons = applyCronRole(cronRaw.jobs, role);
   const excluded = {
     crons: !crons,
@@ -514,7 +529,9 @@ export async function exportMigrateBundle(options = {}) {
   };
 
   // Keychain secrets (encrypted, never cleartext on disk)
+  tracePhase('keychain-start');
   const kc = collectKeychainSecrets(keychainServices);
+  tracePhase('keychain-done');
 
   const checksumOf = (s) => createHash('sha256').update(s).digest('hex');
 
@@ -530,6 +547,7 @@ export async function exportMigrateBundle(options = {}) {
     excluded,
   };
 
+  tracePhase('dry-run-check');
   if (dryRun) {
     return { manifest, deps, skillsState, cronCount: Array.isArray(crons) ? crons.length : 0, dryRun: true };
   }
@@ -552,11 +570,13 @@ export async function exportMigrateBundle(options = {}) {
   // NO -z flag: macOS bsdtar gzip has a 2 GiB internal limit.
   // The outer bundle tar uses -z for compression.
   const workspaces = findWorkspaces(openclawDir);
+  tracePhase(`workspaces-found count=${workspaces.length}`);
   if (workspaces.length > 0) {
     const tarArgs = ['-cf', join(stage, 'workspaces.tar'),
       '-C', openclawDir, ...workspaces.map(w => w.name)];
     const wsResult = spawnSync('tar', tarArgs,
       { timeout: 600000 });
+    tracePhase('workspaces-tarred');
     if (wsResult.status !== 0) {
       throw new Error(`workspace tar failed (exit ${wsResult.status}): ${wsResult.stderr?.toString()?.slice(0, 500)}`);
     }
@@ -593,6 +613,7 @@ export async function exportMigrateBundle(options = {}) {
   try {
     // Finalize manifest: per-file SHA-256 checksums of the staged payload files
     // exactly as they will ship.
+    tracePhase('final-checksums-start');
     const finalChecksums = {};
     for (const f of payloadFiles) {
       // Streaming hash for large files (>2 GiB workspaces.tar)
@@ -600,6 +621,7 @@ export async function exportMigrateBundle(options = {}) {
       await pipeline(createReadStream(join(stage, f), { highWaterMark: 1024 * 1024 * 8 }), h);
       finalChecksums[f] = h.digest('hex');
     }
+    tracePhase('final-checksums-done');
     manifest.checksums = finalChecksums;
 
     // Self-checksum (Grok R9/R10): the in-bundle checksum guarantee must cover
@@ -617,11 +639,13 @@ export async function exportMigrateBundle(options = {}) {
     // Use spawnSync for tar (no buffer issue — writes to file).
     const tarResult = spawnSync('tar', ['-cf', tarPath, '-C', stage, '.'],
       { timeout: 600000, maxBuffer: 1024 * 1024 * 1024 * 4 });
+    tracePhase('bundle-tarred');
     if (tarResult.status !== 0) {
       throw new Error(`bundle tar failed (exit ${tarResult.status}): ${tarResult.stderr?.toString()?.slice(0, 500)}`);
     }
     // Stream-encrypt the tar (handles >2 GiB files).
     await encryptFileStreaming(tarPath, outPath, passphrase);
+    tracePhase('bundle-encrypted');
     // B1 fix (Claude audit): the out-of-band checksum is the SHA-256 of the
     // ENCRYPTED FILE — the exact artifact the operator holds and imports.
     const ckHash = createHash('sha256');
@@ -630,6 +654,7 @@ export async function exportMigrateBundle(options = {}) {
       ckHash
     );
     bundleChecksum = ckHash.digest('hex');
+    tracePhase('bundle-checksummed');
   } finally {
     rmSync(tmpTarDir, { recursive: true, force: true });
     rmSync(stage, { recursive: true, force: true });
@@ -724,13 +749,16 @@ async function uploadBundle(outputPath, uploadUrl) {
   const formData = new FD();
   formData.append('file', new BL([fileBuffer], { type: 'application/octet-stream' }), basename(outputPath));
 
+  tracePhase(`upload-start size=${(fileSize / 1024 / 1024).toFixed(1)}MB`);
   const resp = await fetch(uploadUrl, {
     method: 'POST',
     headers: {
       'x-binding-secret': bindingSecret,
     },
     body: formData,
+    signal: AbortSignal.timeout(90_000), // bounded — a hung upload must not eat the 120s route budget
   });
+  tracePhase(`upload-response status=${resp.status}`);
 
   if (!resp.ok) {
     const errText = await resp.text();

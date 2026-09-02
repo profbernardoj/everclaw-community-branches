@@ -829,6 +829,7 @@ async function handleInternalExport(req, res) {
 
   console.log('[internal-export] Starting agent export...');
 
+  let stderrTail = '';
   const child = execFile('node', [
     EXPORT_SCRIPT,
     '--agentic',
@@ -840,6 +841,9 @@ async function handleInternalExport(req, res) {
     maxBuffer: 10 * 1024 * 1024, // 10 MB stdout buffer
     env: { ...process.env, OPENCLAW_BINDING_SECRET: CIG_CONFIG.bindingSecret },
   }, (err, stdout, _stderr) => {
+    // Phase-trace tail for diagnostics (bounded) — surfaced to the caller on
+    // failure so the last completed export phase is visible without shell access.
+    stderrTail = String(_stderr || '').split('\n').filter(Boolean).slice(-5).join(' | ').slice(-500);
     // Cleanup encrypted bundle from /tmp in all paths (success or failure).
     unlink(outputPath, () => {});
 
@@ -849,12 +853,13 @@ async function handleInternalExport(req, res) {
     if (err) {
       // err.code is the exit code (or null for signal/timeout)
       const isTimeout = err.killed === true;
-      console.error(`[internal-export] Export failed: ${isTimeout ? 'timeout' : err.message}`);
+      console.error(`[internal-export] Export failed: ${isTimeout ? 'timeout' : err.message} | phases: ${stderrTail}`);
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           error: isTimeout ? 'export_timeout' : 'export_failed',
           detail: isTimeout ? 'Export exceeded 120s limit' : undefined,
+          phases: stderrTail || undefined,
         }));
       }
       // Ensure child is fully cleaned up on timeout
