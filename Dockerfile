@@ -199,8 +199,12 @@ ENV BRAVE_PATH="/usr/bin/brave-browser" \
     BRAVE_FLAGS="--headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu"
 
 # ─── Install Whisper (speech-to-text, CPU-only torch, model downloads on demand)
+# Pin torch to a known-good CPU wheel. The PyTorch CPU index moved to
+# torch 2.14.0+cpu whose metadata has no prebuilt cp311 wheel (source build
+# fails: flit_core<4 unavailable on the isolated index) — broke CI 2026-09-02.
+# torch 2.3.1 has stable manylinux cp311 wheels on the CPU index.
 RUN pip3 install --no-cache-dir --break-system-packages \
-    torch --index-url https://download.pytorch.org/whl/cpu \
+    torch==2.3.1 --index-url https://download.pytorch.org/whl/cpu \
     && pip3 install --no-cache-dir --break-system-packages \
     --extra-index-url https://download.pytorch.org/whl/cpu \
     openai-whisper
