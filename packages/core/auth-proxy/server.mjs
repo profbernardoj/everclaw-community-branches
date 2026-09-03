@@ -42,13 +42,16 @@
  */
 
 import { createServer } from 'node:http';
+import { createReadStream } from 'node:fs';
 import { randomBytes, timingSafeEqual, createHmac, createHash } from 'node:crypto';
-import { readFile, unlink } from 'node:fs/promises';
+import { readFile, unlink, stat, readdir } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import httpProxy from 'http-proxy';
 import cookie from 'cookie';
 import { importSPKI, importJWK, jwtVerify } from 'jose';
+import { runEgressProbes } from './egress-probes.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -782,7 +785,13 @@ async function handleCigProxy(req, res, url) {
 // The passphrase is returned to the Edge Function and then to the Dashboard.
 // It is NEVER stored in any database.
 
-const EXPORT_TIMEOUT_MS = 120_000; // 120s — export + upload should complete in 5-30s typically
+const EXPORT_TIMEOUT_MS_RAW = parseInt(process.env.AGENT_EXPORT_TIMEOUT_MS || '120000', 10);
+// NaN/malformed env guard + ceiling clamp (Claude v2-C10): NaN would make
+// setTimeout fire immediately; an over-large value would break the EF's
+// 130s < 150s invariant from the container side. Ceiling 120s = EF 130s - 10s.
+const EXPORT_TIMEOUT_MS = Number.isFinite(EXPORT_TIMEOUT_MS_RAW) && EXPORT_TIMEOUT_MS_RAW > 0
+  ? Math.min(EXPORT_TIMEOUT_MS_RAW, 120_000)
+  : 120_000;
 // Safety net below adds +5s (125s worst case). The calling Edge Function uses
 // CONTAINER_TIMEOUT_MS = 130s, deliberately larger, so it sees our 5xx/504
 // response before ITS timeout fires. Keep in sync — see
@@ -791,28 +800,216 @@ const EXPORT_TIMEOUT_MS = 120_000; // 120s — export + upload should complete i
 //   auth-proxy is at /opt/everclaw/auth-proxy/server.mjs
 //   migrate-export.mjs is at /opt/everclaw/skill/scripts/migrate-export.mjs
 // Relative path: ../skill/scripts/migrate-export.mjs
-const EXPORT_SCRIPT = join(__dirname, '..', 'skill', 'scripts', 'migrate-export.mjs');
+// Test hook: point EXPORT_SCRIPT at a hermetic fake exporter (no real export
+// in tests). Override must never be set via untrusted input (fixed env only).
+const EXPORT_SCRIPT = process.env.AGENT_EXPORT_SCRIPT || join(__dirname, '..', 'skill', 'scripts', 'migrate-export.mjs');
 const EXPORT_UPLOAD_URL = process.env.AGENT_EXPORT_UPLOAD_URL || ''; // Edge Function URL for bundle upload
 
-async function handleInternalExport(req, res) {
-  // ── 1. Auth: verify binding secret (timing-safe) ──
-  const bindingSecret = req.headers['x-binding-secret'];
-  if (!bindingSecret || !CIG_CONFIG.bindingSecret) {
+// ─── Pull-path bundle tokens (single-use, memory-only) ─────────────────────
+// /internal/export/start issues a token; /internal/export/bundle consumes it
+// exactly once and streams the file. Tokens expire after 10 min. The bundle
+// file is deleted after transfer (success, failure, timeout, or expiry).
+const BUNDLE_TOKEN_TTL_MS = 10 * 60_000;
+const BUNDLE_TOKEN_MAX = 32; // bounded map — exports are rare
+const bundleTokens = new Map(); // token -> { path, sizeBytes, expiresAt }
+
+function sweepBundleTokens(now = Date.now()) {
+  // Collect first, then delete — avoids mutating the Map while iterating.
+  const expired = [];
+  for (const [token, entry] of bundleTokens) {
+    if (entry.expiresAt < now) expired.push([token, entry]);
+  }
+  for (const [token, entry] of expired) {
+    bundleTokens.delete(token);
+    unlink(entry.path).catch(() => {});
+  }
+}
+
+function issueBundleToken(bundlePath, sizeBytes) {
+  sweepBundleTokens();
+  // Evict oldest entry if the map is at capacity (bounded memory).
+  if (bundleTokens.size >= BUNDLE_TOKEN_MAX) {
+    const oldest = bundleTokens.keys().next().value;
+    const evicted = bundleTokens.get(oldest);
+    bundleTokens.delete(oldest);
+    unlink(evicted.path).catch(() => {});
+  }
+  const token = randomBytes(24).toString('hex');
+  bundleTokens.set(token, { path: bundlePath, sizeBytes, expiresAt: Date.now() + BUNDLE_TOKEN_TTL_MS });
+  return token;
+}
+
+// Lazy expiry sweeper — keeps the map bounded without a persistent timer.
+const bundleSweepTimer = setInterval(() => sweepBundleTokens(), 60_000);
+bundleSweepTimer.unref();
+
+// Process-group kill (Claude v2-C7): execFile(detached:true) gives the export
+// child its own process group. Negative-pid SIGKILL takes down the node child
+// AND any tar grandchildren it spawned — a bare child.kill() leaves the
+// grandchild reparented and running for up to its own 600s bound.
+function killExportTree(child) {
+  if (!child?.pid) return;
+  try { process.kill(-child.pid, 'SIGKILL'); } catch { /* group already gone */ }
+  try { child.kill('SIGKILL'); } catch {}
+}
+
+// Startup sweeper (Grok v2-R1): a crashed/incomplete export can leave an
+// agent-export-*.tar.gz.enc file in /tmp. Fresh exports finish in minutes and
+// bundle tokens live 10 min, so anything older than 1 h is orphaned garbage.
+async function sweepStaleExportBundles() {
+  try {
+    const files = await readdir('/tmp');
+    const now = Date.now();
+    for (const f of files) {
+      // Two name families (Claude v2-C7): auth-proxy route outputs use
+      // agent-export-*, while migrate-export's own default (used by
+      // --diag-size-probe when no --output is passed) uses migrate-bundle-*.
+      const isExport = f.startsWith('agent-export-') && f.endsWith('.tar.gz.enc');
+      const isMigrate = f.startsWith('migrate-bundle-') && f.endsWith('.tar.gz.enc');
+      if (!isExport && !isMigrate) continue;
+      try {
+        const s = await stat(join('/tmp', f));
+        if (now - s.mtimeMs > 60 * 60 * 1000) unlink(join('/tmp', f)).catch(() => {});
+      } catch { /* race — file gone */ }
+    }
+  } catch { /* /tmp unreadable — not fatal */ }
+}
+void sweepStaleExportBundles();
+
+// ─── Single in-flight export guard (push + pull share it) ───────────────────
+// Parallel exports would double CPU/tar work on a shared container. A second
+// export request while one is running gets an immediate 409.
+let exportInFlight = false;
+
+// ─── /internal/diag — bounded egress diagnostics (see egress-probes.mjs) ────
+const DIAG_CACHE_TTL_MS = 5 * 60_000;
+let diagCache = { at: 0, payload: null, inflight: null };
+
+async function runExportSizeProbe() {
+  // Gate on the SAME in-flight guard as real exports (Claude v2-C1 blocking):
+  // a size probe IS a full export — running it concurrently with a real export
+  // would double tar work + memory on a constrained container.
+  if (exportInFlight) {
+    return { ok: false, sizeBytes: null, elapsedMs: 0, error: 'export_in_progress' };
+  }
+  exportInFlight = true;
+  const t0 = Date.now();
+  try {
+    // Raw execFile (not the promisified wrapper) so we hold the ChildProcess
+    // handle: on timeout we must killExportTree — detached:true alone does NOT
+    // kill the tar grandchild, only the node child (Claude v2-C8/C9).
+    const probeResult = await new Promise((resolve, reject) => {
+      const child = execFile('node', [EXPORT_SCRIPT, '--diag-size-probe'], {
+        // Under the diag caller budget (Test 18 curl --max-time 120s): probes
+        // take <= ~30s wall (parallelized), leaving room for the size probe.
+        // Heavy workspaces that exceed this return an error — acceptable for a
+        // diagnostic; the probe result is cached and re-runs are cheap.
+        timeout: 90_000,
+        killSignal: 'SIGKILL',
+        maxBuffer: 1024 * 1024, // 1 MB stdout cap (size JSON is tiny)
+        env: { ...process.env },
+        detached: true, // own process group so killExportTree can reach tar
+      }, (err, stdout, stderr) => {
+        // In-callback tree-kill (Claude v2-C10): execFile's built-in timeout
+        // SIGKILLs only the node child; the 'close' that follows must ALSO
+        // take down the process group (tar grandchild). An external timer
+        // cleared by 'close' would never fire — dead code (C10 catch).
+        if (err?.killed) killExportTree(child);
+        if (err) {
+          err.stdout = stdout; err.stderr = stderr;
+          reject(err);
+        } else {
+          resolve(String(stdout));
+        }
+      });
+    });
+    const parsed = JSON.parse(probeResult.trim());
+    return {
+      ok: parsed.ok !== false,
+      sizeBytes: parsed.sizeBytes ?? null,
+      elapsedMs: Date.now() - t0,
+      error: parsed.error || null,
+    };
+  } catch (err) {
+    return { ok: false, sizeBytes: null, elapsedMs: Date.now() - t0, error: String(err.message || err).slice(0, 200) };
+  } finally {
+    exportInFlight = false;
+  }
+}
+
+async function getDiagnostics() {
+  const now = Date.now();
+  if (diagCache.payload && now - diagCache.at < DIAG_CACHE_TTL_MS) {
+    return diagCache.payload;
+  }
+  // Deduplicate concurrent diag calls (one probe run, shared result).
+  if (diagCache.inflight) return diagCache.inflight;
+  const run = (async () => {
+    const probes = await runEgressProbes();
+    const exportSizeProbe = await runExportSizeProbe();
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      containerFqdn: CIG_CONFIG.containerFqdn || null,
+      exportScript: EXPORT_SCRIPT,
+      probes,
+      exportSizeProbe,
+    };
+    // Don't cache a poisoned size probe (Claude v2-C4): if the size probe was
+    // skipped because a real export is in flight, keep the cache entry stale
+    // so the next diag call retries it instead of serving 'export_in_progress'
+    // for 5 minutes.
+    const sizeUsable = exportSizeProbe.ok || exportSizeProbe.error !== 'export_in_progress';
+    diagCache = { at: sizeUsable ? Date.now() : 0, payload, inflight: null };
+    return payload;
+  })();
+  diagCache.inflight = run;
+  try {
+    return await run;
+  } catch (err) {
+    diagCache.inflight = null;
+    return { generatedAt: new Date().toISOString(), probes: [], exportSizeProbe: { ok: false, error: String(err.message || err) } };
+  }
+}
+
+async function handleInternalDiag(req, res) {
+  // Auth: binding secret (same as /internal/export). Read-only diagnostic.
+  if (!verifyBindingSecret(req)) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'unauthorized' }));
     return;
   }
+  const payload = await getDiagnostics();
+  res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+  res.end(JSON.stringify(payload));
+}
 
-  const providedBuf = Buffer.from(bindingSecret);
-  const expectedBuf = Buffer.from(CIG_CONFIG.bindingSecret);
-  if (providedBuf.length !== expectedBuf.length ||
-      !timingSafeEqual(providedBuf, expectedBuf)) {
+// Shared binding-secret check for all /internal/* routes (timing-safe).
+function verifyBindingSecret(req) {
+  // Coerce duplicated headers to a single string (Claude v2-C6): Node gives
+  // string[] for repeated headers; Buffer.from(string[]) coerces to garbage
+  // octets (fails closed, but unintended type path).
+  const rawProvided = req.headers['x-binding-secret'];
+  const provided = Array.isArray(rawProvided) ? rawProvided[0] : rawProvided;
+  const expected = CIG_CONFIG.bindingSecret;
+  if (!provided || !expected) return false;
+  const providedBuf = Buffer.from(provided);
+  const expectedBuf = Buffer.from(expected);
+  return providedBuf.length === expectedBuf.length &&
+    timingSafeEqual(providedBuf, expectedBuf);
+}
+
+async function handleInternalExport(req, res) {
+  // ── 1. Auth: verify binding secret (timing-safe) ──
+  if (!verifyBindingSecret(req)) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'unauthorized' }));
     return;
   }
 
   // ── 2. Validate upload URL is configured ──
+  // BEFORE the guard: an early return here must not leak the flag
+  // (Claude v2-C2 — push path with unset URL would wedge the shared guard
+  // forever in pull-mode deployments).
   if (!EXPORT_UPLOAD_URL) {
     console.error('[internal-export] AGENT_EXPORT_UPLOAD_URL not set');
     res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -820,17 +1017,27 @@ async function handleInternalExport(req, res) {
     return;
   }
 
+  // ── 1b. In-flight guard: one export at a time per container ──
+  // Acquired ONLY after all synchronous validation passes (C2 fix).
+  if (exportInFlight) {
+    res.writeHead(409, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'export_in_progress' }));
+    return;
+  }
+  exportInFlight = true;
+
   // ── 3. Run export script ──
-  const { execFile } = await import('node:child_process');
-  const { randomUUID } = await import('node:crypto');
-  // Random component prevents path collision if two exports overlap in time.
-  const outputPath = `/tmp/agent-export-${Date.now()}-${randomUUID().slice(0, 8)}.tar.gz.enc`;
-  let responded = false;
+  // try/catch around acquire→spawn (Claude v2-C4): a synchronous throw between
+  // guard acquisition and spawn would wedge the flag forever (the R2 failure
+  // class via a rarer path). execFile/randomBytes come from top-level imports.
+  try {
+    const outputPath = `/tmp/agent-export-${Date.now()}-${randomBytes(4).toString('hex')}.tar.gz.enc`;
+    let responded = false;
 
-  console.log('[internal-export] Starting agent export...');
+    console.log('[internal-export] Starting agent export...');
 
-  let stderrTail = '';
-  const child = execFile('node', [
+    let stderrTail = '';
+    const child = execFile('node', [
     EXPORT_SCRIPT,
     '--agentic',
     '--upload',
@@ -838,17 +1045,24 @@ async function handleInternalExport(req, res) {
     '--output', outputPath,
   ], {
     timeout: EXPORT_TIMEOUT_MS,
+    killSignal: 'SIGKILL', // instant — matches the safety net; no half-alive window
     maxBuffer: 10 * 1024 * 1024, // 10 MB stdout buffer
     env: { ...process.env, OPENCLAW_BINDING_SECRET: CIG_CONFIG.bindingSecret },
+    // Process-group kill (Claude v2-C7): the script spawns tar grandchildren
+    // synchronously; killing only the node child would leave tar reparented
+    // and running for up to its own 600s bound. detached:true puts the child
+    // in its own process group so killExportTree below can SIGKILL everything.
+    detached: true,
   }, (err, stdout, _stderr) => {
     // Phase-trace tail for diagnostics (bounded) — surfaced to the caller on
     // failure so the last completed export phase is visible without shell access.
     stderrTail = String(_stderr || '').split('\n').filter(Boolean).slice(-5).join(' | ').slice(-500);
     // Cleanup encrypted bundle from /tmp in all paths (success or failure).
-    unlink(outputPath, () => {});
+    unlink(outputPath).catch(() => {});
 
     if (responded) return; // already sent a response (e.g. timeout handler)
     responded = true;
+    exportInFlight = false;
 
     if (err) {
       // err.code is the exit code (or null for signal/timeout)
@@ -862,10 +1076,9 @@ async function handleInternalExport(req, res) {
           phases: stderrTail || undefined,
         }));
       }
-      // Ensure child is fully cleaned up on timeout
-      if (isTimeout && child.pid) {
-        try { child.kill('SIGKILL'); } catch {}
-      }
+            // Tree-kill on timeout (C10 carryover): mirror the start path — the
+      // group must die with the child, not just the node process.
+      if (isTimeout && child.pid) { killExportTree(child); }
       return;
     }
 
@@ -918,12 +1131,15 @@ async function handleInternalExport(req, res) {
         }));
       }
     } else if (result.upload_error) {
-      console.error('[internal-export] Upload failed:', result.upload_error);
+      // Phase tail included here too — without it the upload branch is blind
+      // (diagnostics lesson from staging timeout debug, 2026-09-02).
+      console.error(`[internal-export] Upload failed: ${result.upload_error} | phases: ${stderrTail}`);
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           error: 'upload_failed',
           detail: result.upload_error,
+          phases: stderrTail || undefined,
         }));
       }
     } else {
@@ -949,14 +1165,235 @@ async function handleInternalExport(req, res) {
   const timeoutSafety = setTimeout(() => {
     if (!responded && !res.headersSent) {
       responded = true;
-      console.error('[internal-export] Safety-net timeout fired — killing child');
-      if (child.pid) { try { child.kill('SIGKILL'); } catch {} }
-      unlink(outputPath, () => {});
+      exportInFlight = false;
+      console.error('[internal-export] Safety-net timeout fired — killing child tree');
+      killExportTree(child);
+      unlink(outputPath).catch(() => {});
       res.writeHead(504, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'export_timeout' }));
     }
   }, EXPORT_TIMEOUT_MS + 5000);
   timeoutSafety.unref();
+  } catch (spawnErr) {
+    // Synchronous throw between guard acquire and spawn — release the guard
+    // and answer, never wedge the subsystem (Claude v2-C4).
+    exportInFlight = false;
+    console.error('[internal-export] Spawn failed:', spawnErr?.message || spawnErr);
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'export_spawn_failed' }));
+    }
+  }
+}
+
+// ─── Pull path: POST /internal/export/start ──────────────────────────────
+// Runs migrate-export.mjs --agentic WITHOUT upload. Returns bundleToken +
+// passphrase + size. The caller then GETs /internal/export/bundle?token=...
+// to stream the file. Passphrase is returned in this JSON response only.
+async function handleInternalExportStart(req, res) {
+  if (!verifyBindingSecret(req)) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'unauthorized' }));
+    return;
+  }
+  if (exportInFlight) {
+    res.writeHead(409, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'export_in_progress' }));
+    return;
+  }
+  exportInFlight = true;
+
+  // try/catch around acquire→spawn (Claude v2-C5): same hardening as the push
+  // path — a synchronous execFile throw must not wedge the shared guard.
+  try {
+  const outputPath = `/tmp/agent-export-${Date.now()}-${randomBytes(4).toString('hex')}.tar.gz.enc`;
+  let responded = false;
+  let stderrTail = '';
+
+  console.log('[internal/export/start] Starting agent export (pull path)...');
+  const child = execFile('node', [
+    EXPORT_SCRIPT,
+    '--agentic',
+    '--output', outputPath,
+  ], {
+    timeout: EXPORT_TIMEOUT_MS,
+    maxBuffer: 10 * 1024 * 1024,
+    env: { ...process.env },
+    detached: true, // process group for tree-kill (Claude v2-C7) — see push path
+  }, (err, stdout, _stderr) => {
+    // Stale-callback guard (Claude v2-C2): after the safety-net timeout fires
+    // (responded=true, flag released, child SIGKILLed), this completion callback
+    // still runs. Without this guard it would UNCONDITIONALLY reset the flag —
+    // releasing a NEW export's mutex if one started in the window.
+    if (responded) return;
+    responded = true;
+    exportInFlight = false;
+    stderrTail = String(_stderr || '').split('\n').filter(Boolean).slice(-5).join(' | ').slice(-500);
+
+    if (err) {
+      const isTimeout = err.killed === true;
+      console.error(`[internal/export/start] Export failed: ${isTimeout ? 'timeout' : err.message} | phases: ${stderrTail}`);
+      unlink(outputPath).catch(() => {});
+      if (!res.headersSent) {
+        res.writeHead(isTimeout ? 504 : 500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          error: isTimeout ? 'export_timeout' : 'export_failed',
+          detail: isTimeout ? `Export exceeded ${Math.round(EXPORT_TIMEOUT_MS / 1000)}s limit` : undefined,
+          phases: stderrTail || undefined,
+        }));
+      }
+      if (isTimeout && child.pid) { killExportTree(child); }
+      return;
+    }
+
+    let result;
+    try {
+      result = JSON.parse(stdout.trim());
+    } catch (parseErr) {
+      console.error('[internal/export/start] Failed to parse export stdout:', parseErr.message);
+      unlink(outputPath).catch(() => {});
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'export_parse_failed', phases: stderrTail || undefined }));
+      }
+      return;
+    }
+
+    // Contract: { outputPath, passphrase, bundleChecksum, size }
+    if (!result.outputPath || !result.passphrase || typeof result.size !== 'number') {
+      console.error('[internal/export/start] Incomplete export result (contract violation)');
+      unlink(outputPath).catch(() => {});
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'export_incomplete_result' }));
+      }
+      return;
+    }
+
+    // Proxy-owned path only (Claude v2-C4): never trust the child's reported
+    // path for token issuance/streaming — a divergent (buggy or compromised)
+    // child must not turn the bundle route into an arbitrary-file-read.
+    if (result.outputPath !== outputPath) {
+      console.error('[internal/export/start] Child reported a foreign outputPath — refusing');
+      unlink(outputPath).catch(() => {});
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'export_path_mismatch' }));
+      }
+      return;
+    }
+
+    const token = issueBundleToken(outputPath, result.size);
+    console.log(`[internal/export/start] Export ready: size=${result.size} tokenIssued=true`);
+    if (!res.headersSent) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        bundleToken: token,
+        sizeBytes: result.size,
+        passphrase: result.passphrase,
+        expiresAt: new Date(Date.now() + BUNDLE_TOKEN_TTL_MS).toISOString(),
+      }));
+    }
+  });
+
+  if (process.env.AGENT_EXPORT_DEBUG === '1') {
+    child.stderr?.on('data', (chunk) => {
+      process.stderr.write(`[export-child] ${chunk}`);
+    });
+  }
+
+  const timeoutSafety = setTimeout(() => {
+    if (!responded && !res.headersSent) {
+      responded = true;
+      exportInFlight = false;
+      console.error('[internal/export/start] Safety-net timeout fired — killing child tree');
+      killExportTree(child);
+      unlink(outputPath).catch(() => {});
+      res.writeHead(504, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'export_timeout' }));
+    }
+  }, EXPORT_TIMEOUT_MS + 5000);
+  timeoutSafety.unref();
+  } catch (spawnErr) {
+    // Sync throw between guard acquire and spawn — release and answer (C5).
+    exportInFlight = false;
+    console.error('[internal/export/start] Spawn failed:', spawnErr?.message || spawnErr);
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'export_spawn_failed' }));
+    }
+  }
+}
+
+// ─── Pull path: GET /internal/export/bundle?token=... ────────────────────────
+// Streams the encrypted bundle file. Single-use token (consumed on arrival),
+// 10-min TTL, file deleted after transfer on every path.
+async function handleInternalExportBundle(req, res) {
+  if (!verifyBindingSecret(req)) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'unauthorized' }));
+    return;
+  }
+
+  const url = new URL(req.url, 'http://localhost');
+  const token = url.searchParams.get('token');
+  if (!token) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'missing_token' }));
+    return;
+  }
+
+  // Single-use: consume the token BEFORE streaming. A second GET with the
+  // same token gets 404 even while the first transfer is still running.
+  const entry = bundleTokens.get(token);
+  bundleTokens.delete(token);
+  if (!entry) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'token_not_found' }));
+    return;
+  }
+  if (entry.expiresAt < Date.now()) {
+    unlink(entry.path).catch(() => {});
+    res.writeHead(410, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'token_expired' }));
+    return;
+  }
+
+  let fileStat;
+  try {
+    fileStat = await stat(entry.path);
+  } catch {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'bundle_missing' }));
+    return;
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'application/octet-stream',
+    'Content-Length': fileStat.size,
+    'Content-Disposition': `attachment; filename="agent-bundle-${Date.now()}.tar.gz.enc"`,
+    'Cache-Control': 'no-store',
+  });
+
+  const stream = createReadStream(entry.path);
+  let cleanedUp = false;
+  const cleanup = () => {
+    if (cleanedUp) return;
+    cleanedUp = true;
+    unlink(entry.path).catch(() => {});
+  };
+  stream.on('error', (err) => {
+    console.error('[internal/export/bundle] Stream error:', err.message);
+    cleanup();
+    res.destroy();
+  });
+  stream.on('end', cleanup);
+  res.on('close', () => {
+    // Client disconnected mid-transfer — stop reading and delete the file.
+    cleanup();
+    stream.destroy();
+  });
+  stream.pipe(res);
 }
 
 async function handleRequest(req, res) {
@@ -1272,6 +1709,24 @@ async function handleRequest(req, res) {
   // Runs migrate-export.mjs --agentic --upload, returns download_url + passphrase.
   if (pathname === '/internal/export' && req.method === 'POST') {
     await handleInternalExport(req, res);
+    return;
+  }
+
+  // ── Internal Diagnostics (egress probes) — read-only, binding-secret auth ──
+  if (pathname === '/internal/diag' && req.method === 'GET') {
+    await handleInternalDiag(req, res);
+    return;
+  }
+
+  // ── Pull path: start an export and get a one-time bundle token ──
+  if (pathname === '/internal/export/start' && req.method === 'POST') {
+    await handleInternalExportStart(req, res);
+    return;
+  }
+
+  // ── Pull path: stream the bundle (single-use token) ──
+  if (pathname === '/internal/export/bundle' && req.method === 'GET') {
+    await handleInternalExportBundle(req, res);
     return;
   }
 
