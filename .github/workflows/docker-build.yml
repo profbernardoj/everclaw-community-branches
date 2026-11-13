@@ -45,7 +45,7 @@ jobs:
         run: |
           # Check if we should build only the generic image
           FILTER="${{ github.event.inputs.flavor_filter }}"
-  # Staging branch always builds generic-only (SSO pin verification; never touch latest).
+          # Staging branch always builds generic-only (SSO pin verification; never touch latest).
           if [ "${{ github.ref }}" = "refs/heads/staging" ]; then
             FILTER="generic-only"
           fi
