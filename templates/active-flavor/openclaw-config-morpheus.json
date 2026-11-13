@@ -16,7 +16,6 @@
       "_comment": "Required when OpenClaw binds to non-loopback (0.0.0.0 / lan).",
       "enabled": true,
       "dangerouslyDisableDeviceAuth": true,
-      "allowInsecureAuth": true,
       "allowedOrigins": [
         "http://localhost:18789",
         "http://127.0.0.1:18789",

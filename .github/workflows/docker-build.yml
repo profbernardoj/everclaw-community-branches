@@ -45,11 +45,10 @@ jobs:
         run: |
           # Check if we should build only the generic image
           FILTER="${{ github.event.inputs.flavor_filter }}"
-          # Staging branch always builds generic-only (SSO pin verification; never touch latest).
+  # Staging branch always builds generic-only (SSO pin verification; never touch latest).
           if [ "${{ github.ref }}" = "refs/heads/staging" ]; then
             FILTER="generic-only"
           fi
-          
           if [ "$FILTER" = "generic-only" ]; then
             # Only build the generic image
             MATRIX='[{"flavor": "", "image_name": "everclaw/everclaw"}]'
@@ -74,6 +73,10 @@ jobs:
     needs: discover-flavors
     if: github.repository == 'EverClaw/EverClaw'
     runs-on: ubuntu-latest
+    # Hard cap: cold builds take ~30-40 min; a silent hang (tsdown stall observed
+    # 2026-11-03, 2h+ no-output loop) must fail fast so it can be diagnosed from
+    # logs instead of sitting until the 6h default timeout.
+    timeout-minutes: 90
     permissions:
       contents: read
       packages: write
@@ -85,6 +88,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Cold builds exhaust the default 14GB runner disk (Errno 28 on pip torch,
+      # 2026-11-03) AND the 7GB runner RAM (ResourceExhausted in pnpm build /
+      # rolldown write-unified-entry-dts). Free the runner's heavy toolchains
+      # and add an 8GB swapfile before building. Explicit paths only, no
+      # third-party action.
+      - name: Free disk space and add swap
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/boost /usr/local/.ghcup /opt/hostedtoolcache/CodeQL \
+            /usr/share/swift /opt/hostedtoolcache/go /opt/hostedtoolcache/Java_*
+          sudo fallocate -l 8G /swapfile && sudo chmod 600 /swapfile \
+            && sudo mkswap /swapfile && sudo swapon /swapfile
+          free -h
+          df -h /
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -139,7 +157,7 @@ jobs:
             # Staging builds: tag as "staging" and version-staging (never overwrites latest)
             type=raw,value=staging,enable=${{ github.ref == 'refs/heads/staging' }}
             type=raw,value=${{ steps.version.outputs.VERSION }}-staging,enable=${{ github.ref == 'refs/heads/staging' }}
-            type=raw,value=staging-openclaw-2026.7.1-2,enable=${{ github.ref == 'refs/heads/staging' }}
+            type=raw,value=staging-openclaw-2026.10.9,enable=${{ github.ref == 'refs/heads/staging' }}
             # PR builds: tag with PR number (not pushed)
             type=ref,event=pr
 

@@ -2,6 +2,35 @@
 
 All notable changes to EverClaw are documented here.
 
+## [2026.11.13.2110] - 2026-11-13 — OpenClaw pin v2026.7.1-2 → v2026.10.9 (security-dep upgrade + fleet blockers)
+
+### Changed — OpenClaw Pin v2026.7.1-2 → v2026.10.9
+
+- **Dockerfile:** OpenClaw build target updated to `v2026.10.9`
+- **docker-compose.yml:** Image tag, OPENCLAW_VERSION arg, and EVERCLAW_VERSION updated
+- **Node base upgraded:** Builder, auth-proxy, and production stages from `node:22.23.4` to `node:24.22.2` (v2026.10.9 engine floor ≥24.22.1)
+- **Bun pinned to v1.4.2:** Latest release assets (v1.4.3/v1.4.4) return 504 from GitHub CDN
+
+### Upstream Highlights (OpenClaw v2026.7.1-2 → v2026.10.9)
+
+#### New Features & Changes
+- **Security:** patched fast-uri (MCP schema validation), Zod collection overflow, nodemailer 10.1.4 IMAP sender-spoofing gate, MSAL Node 7.1.1
+- **Credential hygiene:** live credentials kept out of MCP CLI inspection; Google OAuth secrets masked in logs
+- **SQLite tokenizer recovery:** memory DB integrity after failed updates
+- **Large-transcript migration:** handles oversized session files
+- **Disk-full recovery:** graceful handling on full volumes
+
+#### Fixes
+- **Retired config field:** `gateway.controlUi.allowInsecureAuth` removed upstream — removed from all templates, entrypoint, and setup.mjs
+- **SSO /auth/handoff:** verified end-to-end on staging canary (no v2026.6.8 regression class)
+- **Control-UI 503:** fixed by exporting `OPENCLAUD_BUILD_TIMESTAMP` across build:docker + ui:build (shared identity stamps)
+- **Device pairing wall:** `gateway.auth.trustedProxy.deviceAutoApprove` enabled for IOC users (no shell access)
+- **Exec-approvals migration:** `doctor --fix` runs pre-gateway to import legacy exec-approvals.json to SQLite
+- **Build hardening:** timeout-minutes 90, runner disk free + 8GB swapfile for cold CI builds
+
+### Upstream Reference
+https://github.com/openclaw/openclaw/releases/tag/v2026.10.9
+
 ## [2026.10.27.1656] - 2026-10-27 — Fix: auth-proxy login modal follows Privy dashboard methods (login parity)
 
 ### Fixed — hardcoded loginMethods drifted from the Privy dashboards (2026-10-27)

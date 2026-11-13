@@ -350,7 +350,6 @@ else
       .gateway.auth.token = $token |
       .gateway.controlUi.enabled = (.gateway.controlUi.enabled // true) |
       .gateway.controlUi.dangerouslyDisableDeviceAuth = $dda |
-      .gateway.controlUi.allowInsecureAuth = true |
       .gateway.controlUi.allowedOrigins = (
         if (.gateway.controlUi.allowedOrigins // [] | length) == 0
         then ["http://localhost:18789", "http://127.0.0.1:18789", "http://[::1]:18789"]
@@ -373,7 +372,6 @@ else
     if jq --arg token "$AUTH_TOKEN" --argjson dda "$DDA_VALUE" '
       .gateway.auth.token = $token |
       .gateway.controlUi.dangerouslyDisableDeviceAuth = $dda |
-      .gateway.controlUi.allowInsecureAuth = true |
       .gateway.controlUi.allowedOrigins = (
         if (.gateway.controlUi.allowedOrigins // []) | length > 0
         then .gateway.controlUi.allowedOrigins
@@ -427,22 +425,20 @@ echo ""
 
 # ─── Config Verification: Ensure device auth bypass is set ───────────────────
 # Defensive check: regardless of how the config was built, make sure DDA is true
-# and allowInsecureAuth is true for container environments.
+# for container environments.
 
 if jq . "$CONFIG_FILE" > /dev/null 2>&1; then
   DDA_CHECK=$(jq -r '.gateway.controlUi.dangerouslyDisableDeviceAuth // "false"' "$CONFIG_FILE" 2>/dev/null)
-  AIA_CHECK=$(jq -r '.gateway.controlUi.allowInsecureAuth // "false"' "$CONFIG_FILE" 2>/dev/null)
   NEEDS_FIX=false
 
-  if [ "$DDA_CHECK" != "true" ] || [ "$AIA_CHECK" != "true" ]; then
+  if [ "$DDA_CHECK" != "true" ]; then
     NEEDS_FIX=true
   fi
 
   if [ "$NEEDS_FIX" = "true" ] && [ "${OPENCLAW_ENABLE_DEVICE_AUTH:-}" != "true" ]; then
     TMP_CONFIG=$(mktemp)
     if jq '
-      .gateway.controlUi.dangerouslyDisableDeviceAuth = true |
-      .gateway.controlUi.allowInsecureAuth = true
+      .gateway.controlUi.dangerouslyDisableDeviceAuth = true
     ' "$CONFIG_FILE" > "$TMP_CONFIG"; then
       mv "$TMP_CONFIG" "$CONFIG_FILE"
       echo "🔧 Verified: device auth bypass enabled for container environment"
@@ -662,6 +658,31 @@ else
   echo "ℹ️  Security tier script not found — using config defaults"
 fi
 
+# ─── Exec-approvals legacy migration (OpenClaw v2026.10.9) ──────────────────
+# security-tier.mjs writes the legacy exec-approvals.json (v2026.7.x format).
+# v2026.10.9 stores exec approvals in SQLite and HARD-FAILS every
+# exec-approval-loading path (tool construction, /tools/invoke, exec-using
+# cron lanes) with ExecApprovalsMigrationRequiredError while the legacy file
+# exists. Doctor owns the one-time legacy import — run it BEFORE the gateway
+# starts, scoped to the container state dir. Non-fatal: a failed migration
+# logs loudly but must not crash-loop the container.
+if [ -f "${OPENCLAW_HOME}/exec-approvals.json" ] || [ -f "${OPENCLAW_HOME}/exec-approvals.json.doctor-importing" ]; then
+  echo "🔧 Migrating legacy exec approvals into SQLite (doctor --fix)..."
+  DOCTOR_LOG=$(mktemp)
+  DOCTOR_EXIT=0
+  OPENCLAW_STATE_DIR="${OPENCLAW_HOME}" node /app/openclaw.mjs doctor --fix > "$DOCTOR_LOG" 2>&1 || DOCTOR_EXIT=$?
+  if [ "$DOCTOR_EXIT" -eq 0 ]; then
+    echo "   ✅ Exec-approvals migration done"
+    grep -iE 'exec-approvals|migrat' "$DOCTOR_LOG" | head -3 || true
+  else
+    echo "   ⚠️  doctor --fix exited $DOCTOR_EXIT — exec approvals may stay gated"
+    tail -5 "$DOCTOR_LOG"
+  fi
+  rm -f "$DOCTOR_LOG"
+else
+  echo "ℹ️  No legacy exec-approvals.json — skipping doctor migration"
+fi
+
 # ─── Bonjour/mDNS Mitigation (OpenClaw v2026.4.24) ──────────────────────────
 # OpenClaw v2026.4.24 ships a broken bonjour (mDNS/CIAO) plugin that throws
 # unhandled promise rejections on macOS and headless Linux (Docker/VPS).
@@ -798,10 +819,16 @@ if [ -n "${PRIVY_APP_ID:-}" ] && [ -n "${PRIVY_VERIFICATION_KEY:-}" ] && [ -n "$
       .gateway.auth.mode = "trusted-proxy" |
       .gateway.auth.trustedProxy.userHeader = "x-forwarded-user" |
       .gateway.auth.trustedProxy.allowLoopback = true |
+      # v2026.8.1+ requires one-time device pairing for Control UI browsers even
+      # behind trusted-proxy auth. IOC users have no gateway-host shell, so they
+      # can never run `openclaw devices approve`. deviceAutoApprove enrolls each
+      # proxy-authenticated user browser automatically (auth-proxy is the sole
+      # local listener and verifies the Privy JWT + verify-owner chain).
+      .gateway.auth.trustedProxy.deviceAutoApprove.enabled = true |
+      .gateway.auth.trustedProxy.deviceAutoApprove.scopes = ["operator.read", "operator.write", "operator.approvals", "operator.questions"] |
       .gateway.trustedProxies = ["127.0.0.1"] |
       .gateway.controlUi.enabled = true |
       .gateway.controlUi.dangerouslyDisableDeviceAuth = true |
-      .gateway.controlUi.allowInsecureAuth = true |
       .gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback = true |
       # Remove token auth fields that conflict with trusted-proxy mode
       del(.gateway.auth.token)

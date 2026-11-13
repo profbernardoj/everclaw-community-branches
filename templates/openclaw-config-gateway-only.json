@@ -10,10 +10,9 @@
   ],
   "[REDACTED]": {
     "controlUi": {
-      "_comment": "Required when [REDACTED] binds to non-loopback (0.0.0.0 / lan). Without this, [REDACTED] crashes on startup. dangerouslyDisableDeviceAuth and allowInsecureAuth are needed for HTTP access from non-localhost IPs (e.g. Docker container IP).",
+      "_comment": "Required when [REDACTED] binds to non-loopback (0.0.0.0 / lan). Without this, [REDACTED] crashes on startup. dangerouslyDisableDeviceAuth is needed for HTTP access from non-localhost IPs (e.g. Docker container IP). (allowInsecureAuth was retired upstream v2026.10.9 — removed 2026-11-05.)",
       "enabled": true,
       "dangerouslyDisableDeviceAuth": true,
-      "allowInsecureAuth": true,
       "allowedOrigins": [
         "http://localhost:18789",
         "http://127.0.0.1:18789",

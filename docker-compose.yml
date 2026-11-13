@@ -13,13 +13,13 @@
 
 services:
   everclaw:
-    image: ghcr.io/everclaw/everclaw:2026.10.23.0148
+    image: ghcr.io/everclaw/everclaw:2026.11.13.2110
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        EVERCLAW_VERSION: "2026.10.23.0148"   # EverClaw version — never uses 'v' prefix (see Dockerfile policy)
-        OPENCLAW_VERSION: "v2026.7.1-2"       # OpenClaw version — always uses 'v' prefix (see Dockerfile policy)
+        EVERCLAW_VERSION: "2026.11.13.2110"   # EverClaw version — never uses 'v' prefix (see Dockerfile policy)
+        OPENCLAW_VERSION: "v2026.10.9"       # OpenClaw version — always uses 'v' prefix (see Dockerfile policy)
     container_name: everclaw
     restart: unless-stopped
     # Manifest retention partitioning — per-customer restore quota isolation.

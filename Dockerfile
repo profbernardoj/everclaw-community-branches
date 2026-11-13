@@ -20,7 +20,7 @@
 #   docker build -t ghcr.io/everclaw/everclaw:latest .
 #
 # Build with specific OpenClaw version:
-#   docker build --build-arg OPENCLAW_VERSION=v2026.7.1-2 -t ghcr.io/everclaw/everclaw:latest .
+#   docker build --build-arg OPENCLAW_VERSION=v2026.10.9 -t ghcr.io/everclaw/everclaw:latest .
 #
 # Run:
 #   docker run -d \
@@ -53,18 +53,32 @@
 
 # ─── Stage 1: Build OpenClaw ─────────────────────────────────────────────────
 
-# Production pin — v2026.7.1-2.
-# Prior pin: v2026.5.27 (v2026.6.8 broke SSO Session Bridge / auth-proxy trusted-proxy mode).
-# SSO /auth/handoff verified end-to-end on the staging image (2026-08-12, staging tag) before
-# this promotion; update.checkOnStart=false suppresses the update banner in openclaw-default.json.
-ARG OPENCLAW_VERSION=v2026.7.1-2
+# Production pin — v2026.10.9 (STAGING VALIDATION IN PROGRESS — staging repo: profbernardoj/everclaw-staging).
+# Prior pin: v2026.7.1-2. Historical: v2026.5.27 (v2026.6.8 broke SSO Session Bridge /
+# auth-proxy trusted-proxy mode). HARD RULE: SSO /auth/handoff must be verified end-to-end
+# on a staging image with the new version BEFORE promoting a pin to main (SOP-005, 2026-08-12).
+# v2026.10.9 = upstream security-dep release (fast-uri / Zod collection guard / nodemailer
+# 10.1.4 / MSAL 7.1.1, credential masking, safer rollbacks). Phase 0 audit passed 2026-11-02.
+# NOTE (2026-11-03): v2026.10.9 raises the Node engine floor to >=24.22.1 <25 || >=26.12.1
+# (was >=22.22.3 for v2026.7.1-2). Builder, auth-proxy, and production stages moved from
+# node:22.23.4 to node:24.22.2 (latest 24.x patch; staging CI discovered the preinstall
+# ERR_PNPM_EXECUTOR_LIFECYCLE_SCRIPT_FAILED on the old base).
+# update.checkOnStart=false suppresses the update banner in openclaw-default.json.
+ARG OPENCLAW_VERSION=v2026.10.9
 
-FROM node:22.23.4-bookworm AS openclaw-builder
+FROM node:24.22.2-bookworm AS openclaw-builder
 
 ARG OPENCLAW_VERSION
 
 # Install Bun (required for OpenClaw build scripts)
-RUN curl -fsSL https://bun.sh/install | bash
+# Pinned: the two newest release assets (bun-v1.4.4 / v1.4.3) return 504 from
+# GitHub's release CDN as of 2026-11-09 (verified from two networks + GH Actions
+# runners — broke every staging build). bun-v1.4.2 verified healthy. Pinning also
+# makes builds reproducible instead of tracking a moving "latest". One retry
+# covers transient CDN blips on the pinned asset.
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.4.2" \
+    || (echo "bun install retry after failure" && sleep 10 \
+        && curl -fsSL https://bun.sh/install | bash -s "bun-v1.4.2")
 ENV PATH="/root/.bun/bin:${PATH}"
 
 RUN corepack enable
@@ -92,9 +106,39 @@ COPY --chown=node:node config /everclaw-skill/config
 RUN pnpm install --frozen-lockfile
 
 # Build gateway + UI
-RUN pnpm build
+# ROOT-CAUSE FIX (runs 41730674946 + 41748461568 hung in tsdown-build): upstream OpenClaw's
+# own Dockerfile runs `pnpm build:docker` — the lean Docker target — NOT `pnpm build`.
+# At v2026.10.9, plain `pnpm build` = full build-all: multi-workspace pipeline + DTS
+# declaration emission + tsdown with a 12 GB DEFAULT heap
+# (scripts/tsdown-build.mts DEFAULT_TSDOWN_MAX_OLD_SPACE_MB=12288). That swap-thrashes
+# GitHub-hosted runners into silent 2h/90min hangs. Upstream's Dockerfile at BOTH
+# v2026.7.1-2 and v2026.10.9 uses build:docker with SKIP_DTS=1 (ARG default).
+# Mirrors upstream: pnpm_config_verify_deps_before_run=false on both steps.
+# build:docker + ui:build stay in ONE RUN (single layer avoids the EXDEV dir-rename
+# failure if control-ui output ever appears in an earlier layer again).
+# Memory caps retained from prior commits: 4096 MB envelopes proven on 2026-11-03
+# (run 41720296258, pnpm build completed in 8m49s); tsdown child heap capped via
+# OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB, overriding the 12 GB script default.
+# BUILD-ID FIX (canary 01a1ad9a, 2026-11-05): export ONE OPENCLAW_BUILD_TIMESTAMP for
+# BOTH build:docker and ui:build, mirroring upstream's own Dockerfile. Without it the
+# runtime build-info and the Control UI assets carry different builtAt stamps → the
+# gateway treats shipped UI assets as not-ready at boot and re-prepares them
+# IN-CONTAINER (10-min build window, node-CPU dependent). Canary lease e34e885 on a
+# busy node hit that window, timed out, and served 503 "Control UI assets could not
+# be prepared" on every gateway HTTP route — while the same image on an idle node
+# completed the re-prepare and served 200. A shared timestamp ships matching
+# identities: assets are ready at boot, no in-container rebuild, no failure window.
 ENV OPENCLAW_PREFER_PNPM=1
-RUN pnpm ui:build
+RUN set -eu; \
+    if [ -z "${OPENCLAW_BUILD_TIMESTAMP:-}" ]; then \
+      OPENCLAW_BUILD_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
+      export OPENCLAW_BUILD_TIMESTAMP; \
+    fi; \
+    NODE_OPTIONS=--max-old-space-size=4096 \
+    OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB=4096 \
+    OPENCLAW_RUN_NODE_SKIP_DTS_BUILD=1 \
+    pnpm_config_verify_deps_before_run=false pnpm build:docker && \
+    pnpm_config_verify_deps_before_run=false pnpm ui:build
 
 # Install runtime deps for all bundled OpenClaw channel plugins.
 # postinstall-bundled-plugins.mjs skips source checkouts (detects src/ + extensions/),
@@ -113,7 +157,7 @@ RUN cp -r ./src/agents/templates /tmp/openclaw-templates 2>/dev/null || true && 
 
 # Auth proxy for Privy JWT authentication
 # Built at image time — bundles Privy SDK + React (no runtime CDN dependency)
-FROM node:22.23.4-bookworm-slim AS auth-proxy-builder
+FROM node:24.22.2-bookworm-slim AS auth-proxy-builder
 
 WORKDIR /auth-proxy
 
@@ -141,7 +185,7 @@ RUN rm -rf node_modules && \
 
 # ─── Stage 2: Production Image ───────────────────────────────────────────────
 
-FROM node:22.23.4-bookworm-slim AS production
+FROM node:24.22.2-bookworm-slim AS production
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
